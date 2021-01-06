@@ -56,7 +56,7 @@ sealed class QuantBase(
         }
     }
 
-    fun toEvent(rate: Int, note: String): EventBase {
+    fun toEvent(rate: Int, date: Long, note: String): EventBase {
         when (this) {
             is QuantRated -> {
                 val bonusesList = ArrayList<EventBonusBase>()
@@ -65,7 +65,7 @@ sealed class QuantBase(
                 }
                 return EventBase.EventRated(
                     this.name,
-                    System.currentTimeMillis(),
+                    date,
                     note,
                     rate,
                     bonusesList
@@ -74,13 +74,13 @@ sealed class QuantBase(
             is QuantMeasure -> {
                 return EventBase.EventMeasure(
                     this.name,
-                    System.currentTimeMillis(),
+                    date,
                     note,
                     rate
                 )
             }
             is QuantNote -> {
-                return EventBase.EventNote(this.name, System.currentTimeMillis(), note)
+                return EventBase.EventNote(this.name, date, note)
             }
         }
     }

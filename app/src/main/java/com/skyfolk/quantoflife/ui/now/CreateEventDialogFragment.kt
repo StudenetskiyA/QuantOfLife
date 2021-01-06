@@ -1,21 +1,29 @@
 package com.skyfolk.quantoflife.ui.now
 
 import android.app.Activity
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.DatePicker
 import android.widget.Toast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.skyfolk.quantoflife.databinding.CreateEventDialogBinding
 import com.skyfolk.quantoflife.entity.*
+import com.skyfolk.quantoflife.utils.toDate
+import java.time.Year
+import java.util.*
 
 class CreateEventDialogFragment(val quant: QuantBase) : BottomSheetDialogFragment() {
     private var dialogListener: DialogListener? = null
 
     private lateinit var binding: CreateEventDialogBinding
+
+    private val calendar = Calendar.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -24,8 +32,19 @@ class CreateEventDialogFragment(val quant: QuantBase) : BottomSheetDialogFragmen
         binding = CreateEventDialogBinding.inflate(inflater, container, false)
 
 
+        val imageResource = requireContext().resources.getIdentifier(quant.icon, "drawable", requireContext().packageName)
+        if (imageResource !=0 ) {
+            binding.quantImage.setImageResource(imageResource)
+        } else {
+            binding.quantImage.setImageResource(requireContext().resources.getIdentifier("quant_default", "drawable", requireContext().packageName))
+        }
         binding.eventName.text = quant.name
         binding.eventDescription.text = quant.description
+
+        binding.eventDateChoiceButton.setOnClickListener {
+            DatePickerDialog(requireContext(),onDateSelected, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
+                .show()
+        }
 
         when (quant) {
             is QuantBase.QuantNote -> {
@@ -71,13 +90,27 @@ class CreateEventDialogFragment(val quant: QuantBase) : BottomSheetDialogFragmen
                         is QuantBase.QuantRated -> binding.eventRating.rating.toInt()
                         is QuantBase.QuantMeasure -> binding.eventRatingNumeric.text.toString().toInt()
                         is QuantBase.QuantNote -> -1
-                    },
+                    }, calendar.timeInMillis,
                     binding.eventNote.text.toString()
                 )
             )
             dismiss()
         }
         return binding.root
+    }
+
+    private val onDateSelected = DatePickerDialog.OnDateSetListener { _: DatePicker, year: Int, month: Int, day: Int ->
+        calendar.set(Calendar.YEAR, year)
+        calendar.set(Calendar.MONTH, month)
+        calendar.set(Calendar.DAY_OF_MONTH, day)
+        TimePickerDialog(requireContext(),onTimeSelected, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true)
+            .show()
+    }
+    private val onTimeSelected = TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
+        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+        calendar.set(Calendar.MINUTE, minute)
+
+        binding.eventDate.text = calendar.timeInMillis.toDate()
     }
 
     fun setDialogListener(listener: DialogListener) {

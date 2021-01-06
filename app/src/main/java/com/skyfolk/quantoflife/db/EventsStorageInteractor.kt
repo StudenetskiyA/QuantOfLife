@@ -40,7 +40,7 @@ class EventsStorageInteractor(private val dbInteractor: DBInteractor) {
 
     fun getAllEvents(): ArrayList<EventBase> {
         val result = ArrayList<EventBase>()
-        for (r in dbInteractor.getDB().where(EventDbEntity::class.java).findAll()) {
+        for (r in dbInteractor.getDB().where(EventDbEntity::class.java).findAll().sortedBy { it.date }) {
             when {
                 (r.bonusDbEntities.isNotEmpty() && r.rate != null) -> {
                     val bonuses = ArrayList<EventBonusBase>()
