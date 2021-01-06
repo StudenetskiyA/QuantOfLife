@@ -24,27 +24,27 @@ class StatisticViewModel(
     val listOfEvents: LiveData<ArrayList<EventBase>> = _listOfEvents
 
     private val _listOfQuants = MutableLiveData<ArrayList<QuantBase>>().apply {
-        value = quantsStorageInteractor.getAllQuantsList()
+        value = quantsStorageInteractor.getAllQuantsList(false)
     }
     val listOfQuants: LiveData<ArrayList<QuantBase>> = _listOfQuants
 
     private val _totalPhysicalFound = MutableLiveData<Double>().apply {
-        value = getTotal(eventsStorageInteractor.getAllEvents(), QuantCategory.Physical)
+        value = getTotal(quantsStorageInteractor, eventsStorageInteractor.getAllEvents(), QuantCategory.Physical)
     }
     val totalPhysicalFound: LiveData<Double> = _totalPhysicalFound
 
     private val _totalEmotionalFound = MutableLiveData<Double>().apply {
-        value = getTotal(eventsStorageInteractor.getAllEvents(), QuantCategory.Emotion)
+        value = getTotal(quantsStorageInteractor, eventsStorageInteractor.getAllEvents(), QuantCategory.Emotion)
     }
     val totalEmotionalFound: LiveData<Double> = _totalEmotionalFound
 
     private val _totalEvolutionFound = MutableLiveData<Double>().apply {
-        value = getTotal(eventsStorageInteractor.getAllEvents(), QuantCategory.Emotion)
+        value = getTotal(quantsStorageInteractor, eventsStorageInteractor.getAllEvents(), QuantCategory.Emotion)
     }
     val totalEvolutionFound: LiveData<Double> = _totalEvolutionFound
 
     private val _totalFound = MutableLiveData<Double>().apply {
-        value = getTotal(eventsStorageInteractor.getAllEvents())
+        value = getTotal(quantsStorageInteractor, eventsStorageInteractor.getAllEvents())
     }
     val totalFound: LiveData<Double> = _totalFound
 
@@ -65,7 +65,7 @@ class StatisticViewModel(
 
         var resultList = ArrayList(
             eventsStorageInteractor.getAllEvents().filter { it.date in startDate until endDate })
-        if (selectedEventFilter != null) resultList = ArrayList(resultList.filter { it.name == selectedEventFilter })
+        if (selectedEventFilter != null) resultList = ArrayList(resultList.filter { it.quantId == selectedEventFilter })
 
         setListOfEventsValue(resultList)
     }
@@ -75,10 +75,10 @@ class StatisticViewModel(
 
     private fun setListOfEventsValue(value: ArrayList<EventBase>) {
         _listOfEvents.value = value
-        _totalPhysicalFound.value = getTotal(value, QuantCategory.Physical)
-        _totalEmotionalFound.value = getTotal(value, QuantCategory.Emotion)
-        _totalEvolutionFound.value = getTotal(value, QuantCategory.Evolution)
-        _totalFound.value = getTotal(value)
+        _totalPhysicalFound.value = getTotal(quantsStorageInteractor, value, QuantCategory.Physical)
+        _totalEmotionalFound.value = getTotal(quantsStorageInteractor, value, QuantCategory.Emotion)
+        _totalEvolutionFound.value = getTotal(quantsStorageInteractor, value, QuantCategory.Evolution)
+        _totalFound.value = getTotal(quantsStorageInteractor, value)
     }
 
     private fun setSelectedTimeInterval(timeInterval: TimeInterval) {

@@ -5,16 +5,16 @@ import java.util.*
 sealed class QuantBase(
     open var id: String = UUID.randomUUID().toString(), //TODO Replace to GUID
     open var name: String,
-    open var icon: String = "",
+    open var icon: String,
     open var primalCategory: QuantCategory,
-    open var description: String = "Подсказка для оценки"
+    open var description: String
 ) {
     data class QuantNote(
         override var id: String = UUID.randomUUID().toString(),
         override var name: String,
-        override var icon: String = "",
+        override var icon: String,
         override var primalCategory: QuantCategory,
-        override var description: String = "Подсказка для оценки"
+        override var description: String
     ) : QuantBase(id, name, icon, primalCategory, description) {
         override fun copy(): QuantNote {
             return QuantNote(id, name, icon, primalCategory, description)
@@ -24,10 +24,10 @@ sealed class QuantBase(
     data class QuantRated(
         override var id: String = UUID.randomUUID().toString(),
         override var name: String,
-        override var icon: String = "",
+        override var icon: String,
         override var primalCategory: QuantCategory,
         var bonuses: ArrayList<QuantBonusBase.QuantBonusRated>,
-        override var description: String = "Подсказка для оценки"
+        override var description: String
     ) : QuantBase(id, name, icon, primalCategory, description) {
         fun getBonusFor(category: QuantCategory): QuantBonusBase.QuantBonusRated? {
             for (bonus in bonuses) {
@@ -47,9 +47,9 @@ sealed class QuantBase(
     data class QuantMeasure(
         override var id: String = UUID.randomUUID().toString(),
         override var name: String,
-        override var icon: String = "",
+        override var icon: String,
         override var primalCategory: QuantCategory,
-        override var description: String = "Подсказка для оценки"
+        override var description: String
     ) : QuantBase(id, name, icon, primalCategory, description) {
         override fun copy(): QuantMeasure {
             return QuantMeasure(id, name, icon, primalCategory, description)
@@ -59,28 +59,23 @@ sealed class QuantBase(
     fun toEvent(rate: Int, date: Long, note: String): EventBase {
         when (this) {
             is QuantRated -> {
-                val bonusesList = ArrayList<EventBonusBase>()
-                for (bonus in this.bonuses) {
-                    bonusesList.add(bonus.toEventBonusBase(rate))
-                }
                 return EventBase.EventRated(
-                    this.name,
+                    this.id,
                     date,
                     note,
-                    rate,
-                    bonusesList
+                    rate
                 )
             }
             is QuantMeasure -> {
                 return EventBase.EventMeasure(
-                    this.name,
+                    this.id,
                     date,
                     note,
                     rate
                 )
             }
             is QuantNote -> {
-                return EventBase.EventNote(this.name, date, note)
+                return EventBase.EventNote(this.id, date, note)
             }
         }
     }
@@ -100,14 +95,7 @@ sealed class QuantBonusBase(
         override var category: QuantCategory,
         var baseBonus: Double,
         var bonusForEachRating: Double
-    ) : QuantBonusBase(category) {
-        fun toEventBonusBase(rating: Int): EventBonusBase {
-            return EventBonusBase(
-                this.category,
-                this.baseBonus + this.bonusForEachRating * rating
-            )
-        }
-    }
+    ) : QuantBonusBase(category)
 }
 
 enum class QuantCategory {

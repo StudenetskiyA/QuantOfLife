@@ -87,7 +87,7 @@ class NowFragment : Fragment() {
                 override fun onConfirm(event: EventBase) {
                     val snackBar = Snackbar.make(
                         requireActivity().findViewById(android.R.id.content),
-                        "Event '${event.name}' create",
+                        "Event '${event.quantId}' create",
                         Snackbar.LENGTH_LONG
                     )
                     snackBar.setAction("Отмена") {

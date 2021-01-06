@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -47,7 +48,9 @@ class StatisticFragment : Fragment() {
 
         lifecycleScope.launch {
             viewModel.listOfEvents.observe(viewLifecycleOwner, {
-                val adapter = EventListDataAdapter(it, quantStorageInteractor, settingsInteractor) {}
+                val adapter = EventListDataAdapter(it, quantStorageInteractor, settingsInteractor) {
+                    Toast.makeText(requireContext(), "${it.quantId}\n${it.date}\n${it.note}\n", Toast.LENGTH_LONG).show()
+                }
                 if (adapter.itemCount == 0) {
                     binding.itemsNotFound.visibility = View.VISIBLE
                     binding.listOfEvents.visibility = View.GONE

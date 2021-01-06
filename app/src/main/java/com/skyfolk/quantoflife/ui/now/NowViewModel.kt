@@ -27,7 +27,7 @@ class NowViewModel(
     val dialogState: LiveData<DialogFragment> get() = _dialogState
 
     private val _listOfQuants = MutableLiveData<ArrayList<QuantBase>>().apply {
-        value = quantsStorageInteractor.getAllQuantsList()
+        value = quantsStorageInteractor.getAllQuantsList(false)
     }
     val listOfQuants: LiveData<ArrayList<QuantBase>> = _listOfQuants
 
@@ -37,11 +37,11 @@ class NowViewModel(
     val todayTotal: LiveData<Double> = _todayTotal
 
     init {
-        if (quantsStorageInteractor.getAllQuantsList().isEmpty()) {
+        if (quantsStorageInteractor.getAllQuantsList(false).isEmpty()) {
             for (quant in quantsStorageInteractor.getPresetQuantsList()) {
                 quantsStorageInteractor.addQuantToDB(quant)
             }
-            _listOfQuants.value = quantsStorageInteractor.getAllQuantsList()
+            _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
         }
     }
 
@@ -50,12 +50,13 @@ class NowViewModel(
         dialog.setDialogListener(object : CreateQuantDialogFragment.DialogListener {
             override fun onConfirm(quant: QuantBase) {
                 quantsStorageInteractor.addQuantToDB(quant)
-                _listOfQuants.value = quantsStorageInteractor.getAllQuantsList()
+                _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
+                _todayTotal.value = calculateTodayTotal()
             }
 
             override fun onDelete(quant: QuantBase) {
                 quantsStorageInteractor.deleteQuant(quant)
-                _listOfQuants.value = quantsStorageInteractor.getAllQuantsList()
+                _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
             }
 
             override fun onDecline() {}
@@ -79,7 +80,7 @@ class NowViewModel(
         val resultList = ArrayList(
             eventsStorageInteractor.getAllEvents().filter { it.date in startDate until endDate })
 
-        return getTotal(resultList)
+        return getTotal(quantsStorageInteractor, resultList)
     }
 
 }

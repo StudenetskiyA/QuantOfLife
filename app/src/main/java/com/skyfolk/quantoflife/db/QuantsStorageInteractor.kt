@@ -1,13 +1,7 @@
 package com.skyfolk.quantoflife.db
 
 import com.skyfolk.quantoflife.entity.*
-import io.realm.RealmList
-import io.realm.RealmObject
-import io.realm.RealmResults
-import io.realm.annotations.PrimaryKey
-import java.util.*
 import kotlin.collections.ArrayList
-
 
 class QuantsStorageInteractor(private val dbInteractor: DBInteractor) : IQuantsStorageInteractor {
     override fun addQuantToDB(quant: QuantBase) {
@@ -18,27 +12,31 @@ class QuantsStorageInteractor(private val dbInteractor: DBInteractor) : IQuantsS
 
     override fun deleteQuant(quant: QuantBase) {
         dbInteractor.getDB().executeTransaction {
-            val result: RealmResults<QuantDbEntity> =
+            val result: QuantDbEntity =
                 dbInteractor.getDB().where(QuantDbEntity::class.java).equalTo("id", quant.id)
-                    .findAll()
-            result.deleteAllFromRealm()
+                    .findFirst()
+            result.isDeleted = true
         }
     }
 
-    override fun getAllQuantsList(): ArrayList<QuantBase> {
+    override fun getAllQuantsList(includeDeleted: Boolean): ArrayList<QuantBase> {
         val result = ArrayList<QuantBase>()
         for (r in dbInteractor.getDB().where(QuantDbEntity::class.java).findAll()) {
-            result.add(r.toQuantBase())
+            if (!r.isDeleted || includeDeleted) result.add(r.toQuantBase())
         }
         return result
     }
 
     //TODO This is bad implementation
     override fun alreadyHaveQuant(quant: QuantBase): Boolean {
-        for (storedQuant in getAllQuantsList()) {
+        for (storedQuant in getAllQuantsList(true)) {
             if (quant.isEqual(storedQuant)) return true
         }
         return false
+    }
+
+    override fun getQuantById(id: String): QuantBase? {
+        return getAllQuantsList(true).find { it.id == id }
     }
 
     override fun getPresetQuantsList(): ArrayList<QuantBase> {

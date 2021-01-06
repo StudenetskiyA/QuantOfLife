@@ -46,7 +46,7 @@ class SettingsViewModel(
             oldEvents.add(oldEvent.copy())
         }
         val oldQuants = ArrayList<QuantBase>()
-        for (oldQuant in quantsStorageInteractor.getAllQuantsList()) {
+        for (oldQuant in quantsStorageInteractor.getAllQuantsList(true)) {
             quantsImported++
             oldQuants.add(oldQuant.copy())
         }

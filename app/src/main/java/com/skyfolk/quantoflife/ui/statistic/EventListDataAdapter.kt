@@ -10,14 +10,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
 import com.skyfolk.quantoflife.entity.EventBase
+import com.skyfolk.quantoflife.entity.QuantBase
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.utils.toDate
 import kotlin.collections.ArrayList
 
-class EventListDataAdapter(private val eventsList: ArrayList<EventBase>,
-                           private val quantsStorageInteractor: IQuantsStorageInteractor,
-                           private val settingsInteractor: SettingsInteractor,
-                           private val clickListener: (EventBase) -> Unit) : RecyclerView.Adapter<EventListDataAdapter.ViewHolder>() {
+class EventListDataAdapter(
+    private val eventsList: ArrayList<EventBase>,
+    private val quantsStorageInteractor: IQuantsStorageInteractor,
+    private val settingsInteractor: SettingsInteractor,
+    private val clickListener: (EventBase) -> Unit
+) : RecyclerView.Adapter<EventListDataAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.item_event, parent, false)
         return ViewHolder(v, quantsStorageInteractor, settingsInteractor)
@@ -31,15 +34,26 @@ class EventListDataAdapter(private val eventsList: ArrayList<EventBase>,
         return eventsList.size
     }
 
-    class ViewHolder(itemView: View, private val quantsStorageInteractor: IQuantsStorageInteractor, private val settingsInteractor: SettingsInteractor) : RecyclerView.ViewHolder(itemView) {
+    class ViewHolder(
+        itemView: View,
+        private val quantsStorageInteractor: IQuantsStorageInteractor,
+        private val settingsInteractor: SettingsInteractor
+    ) : RecyclerView.ViewHolder(itemView) {
 
         fun bindItems(event: EventBase, clickListener: (EventBase) -> Unit) {
             val eventNameView = itemView.findViewById(R.id.event_name) as TextView
-            eventNameView.text = event.name
-
             val eventImage = itemView.findViewById(R.id.quant_image) as ImageView
-            val quant = quantsStorageInteractor.getAllQuantsList().firstOrNull { it.name == event.name}
-            if (quant != null && itemView.context.resources.getIdentifier(quant.icon, "drawable", itemView.context.packageName) != 0) {
+
+            val quant = quantsStorageInteractor.getAllQuantsList(true)
+                .firstOrNull { it.id == event.quantId }
+            eventNameView.text = quant?.name ?: "Unknown"
+
+            if (quant != null && itemView.context.resources.getIdentifier(
+                    quant.icon,
+                    "drawable",
+                    itemView.context.packageName
+                ) != 0
+            ) {
                 val imageResource = itemView.context.resources.getIdentifier(
                     quant.icon,
                     "drawable",
@@ -65,12 +79,16 @@ class EventListDataAdapter(private val eventsList: ArrayList<EventBase>,
             val eventBonusesView = itemView.findViewById(R.id.event_bonuses) as TextView
             when (event) {
                 is EventBase.EventRated -> {
-                        var result = ":"
-                        for (bonus in event.bonuses.filter { it.value >=0 }) {
+                    var result = ":"
+                    val foundQuant = quantsStorageInteractor.getQuantById(event.quantId)
+                    if (foundQuant is QuantBase.QuantRated) {
+                        for (bonus in foundQuant.bonuses) {
                             result += " " + settingsInteractor.getCategoryName(bonus.category)
-                            result += "=" + bonus.value +";"
+                            val value = bonus.baseBonus + bonus.bonusForEachRating * event.rate
+                            result += "=$value;"
                         }
-                        eventBonusesView.text = result
+                    }
+                    eventBonusesView.text = result
                     eventRatingView.rating = event.rate.toFloat()
                 }
                 is EventBase.EventMeasure -> {
