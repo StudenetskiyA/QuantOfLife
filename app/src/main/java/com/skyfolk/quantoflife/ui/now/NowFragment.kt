@@ -100,6 +100,10 @@ class NowFragment : Fragment() {
 
                 override fun onDecline() {
                 }
+
+                override fun onDelete(event: EventBase, name: String) {
+                    //Событие не может быть удалено при его создании
+                }
             })
             val fm: FragmentManager = requireActivity().supportFragmentManager
             dialog.show(fm, dialog.tag)

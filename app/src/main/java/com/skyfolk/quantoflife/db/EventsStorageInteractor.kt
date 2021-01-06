@@ -1,5 +1,6 @@
 package com.skyfolk.quantoflife.db
 
+import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.entity.*
 
 class EventsStorageInteractor(private val dbInteractor: DBInteractor) {
@@ -21,25 +22,42 @@ class EventsStorageInteractor(private val dbInteractor: DBInteractor) {
             is EventBase.EventNote -> {
             }
         }
-        val eventDbElement = EventDbEntity(event.quantId, event.date, rate, numericValue, event.note)
+        val eventDbElement =
+            EventDbEntity(event.quantId, event.date, rate, numericValue, event.note)
 
         dbInteractor.getDB().executeTransaction {
-            dbInteractor.getDB().insertOrUpdate(eventDbElement)
+            val existEvent = existEventOrNull(event)
+            if (existEvent != null) {
+                QLog.d("edit event")
+                existEvent.date = event.date
+                existEvent.rate = rate
+                existEvent.numericValue = numericValue
+                existEvent.note = event.note
+            } else {
+                dbInteractor.getDB().insertOrUpdate(eventDbElement)
+            }
+        }
+    }
+
+    fun deleteEvent(event: EventBase) {
+        dbInteractor.getDB().executeTransaction {
+            existEventOrNull(event)?.deleteFromRealm()
         }
     }
 
     fun getAllEvents(): ArrayList<EventBase> {
         val result = ArrayList<EventBase>()
-        for (r in dbInteractor.getDB().where(EventDbEntity::class.java).findAll().sortedBy { it.date }) {
+        for (r in dbInteractor.getDB().where(EventDbEntity::class.java).findAll()
+            .sortedBy { it.date }) {
             when {
                 (r.rate != null) -> {
-                    result.add(EventBase.EventRated(r.quantId, r.date, r.note, r.rate!!))
+                    result.add(EventBase.EventRated(r.id, r.quantId, r.date, r.note, r.rate!!))
                 }
                 (r.numericValue != null) -> {
-                    result.add(EventBase.EventMeasure(r.quantId, r.date, r.note, r.numericValue!!))
+                    result.add(EventBase.EventMeasure(r.id, r.quantId, r.date, r.note, r.numericValue!!))
                 }
                 else -> {
-                    result.add(EventBase.EventNote(r.quantId, r.date, r.note))
+                    result.add(EventBase.EventNote(r.id, r.quantId, r.date, r.note))
                 }
             }
         }
@@ -52,5 +70,11 @@ class EventsStorageInteractor(private val dbInteractor: DBInteractor) {
             if (event.isEqual(storedEvent)) return true
         }
         return false
+    }
+
+    private fun existEventOrNull(event: EventBase): EventDbEntity? {
+        return dbInteractor.getDB().where(EventDbEntity::class.java)
+            .equalTo("id", event.id)
+            .findFirst()
     }
 }

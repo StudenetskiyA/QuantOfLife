@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
 import com.skyfolk.quantoflife.entity.EventBase
@@ -47,6 +48,10 @@ class EventListDataAdapter(
             val quant = quantsStorageInteractor.getAllQuantsList(true)
                 .firstOrNull { it.id == event.quantId }
             eventNameView.text = quant?.name ?: "Unknown"
+
+            if (event.note.contains("Призраки")) {
+                QLog.d("призраки")
+            }
 
             if (quant != null && itemView.context.resources.getIdentifier(
                     quant.icon,
@@ -89,10 +94,13 @@ class EventListDataAdapter(
                         }
                     }
                     eventBonusesView.text = result
+                    eventBonusesView.visibility = View.VISIBLE
+                    eventRatingView.visibility = View.VISIBLE
                     eventRatingView.rating = event.rate.toFloat()
                 }
                 is EventBase.EventMeasure -> {
                     eventBonusesView.text = event.value.toString()
+                    eventBonusesView.visibility = View.VISIBLE
                     eventRatingView.visibility = View.GONE
                 }
                 is EventBase.EventNote -> {
@@ -104,7 +112,10 @@ class EventListDataAdapter(
             val eventNotesView = itemView.findViewById(R.id.event_notes) as TextView
             eventNotesView.text = event.note
 
-            itemView.setOnClickListener { clickListener(event) }
+            itemView.setOnLongClickListener {
+                clickListener(event)
+                true
+            }
         }
     }
 }

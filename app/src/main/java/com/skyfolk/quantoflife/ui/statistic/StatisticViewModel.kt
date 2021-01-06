@@ -112,6 +112,19 @@ class StatisticViewModel(
     fun setSelectedEventFilter(item: String?) {
         selectedEventFilter = item
     }
+
+    fun eventEdited(event: EventBase) {
+        eventsStorageInteractor.addEventToDB(event)
+        _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
+        runSearch()
+    }
+
+    fun deleteEvent(event: EventBase) {
+        QLog.d("eventId = ${event.id}")
+        eventsStorageInteractor.deleteEvent(event)
+        _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
+        runSearch()
+    }
 }
 
 enum class TimeInterval {

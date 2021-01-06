@@ -17,7 +17,7 @@ import com.skyfolk.quantoflife.entity.*
 import com.skyfolk.quantoflife.utils.toDate
 import java.util.*
 
-class CreateEventDialogFragment(val quant: QuantBase) : BottomSheetDialogFragment() {
+class CreateEventDialogFragment(val quant: QuantBase, private val existEvent: EventBase? = null) : BottomSheetDialogFragment() {
     private var dialogListener: DialogListener? = null
 
     private lateinit var binding: CreateEventDialogBinding
@@ -29,7 +29,6 @@ class CreateEventDialogFragment(val quant: QuantBase) : BottomSheetDialogFragmen
         savedInstanceState: Bundle?
     ): View {
         binding = CreateEventDialogBinding.inflate(inflater, container, false)
-
 
         val imageResource = requireContext().resources.getIdentifier(quant.icon, "drawable", requireContext().packageName)
         if (imageResource !=0 ) {
@@ -43,6 +42,22 @@ class CreateEventDialogFragment(val quant: QuantBase) : BottomSheetDialogFragmen
         binding.eventDateChoiceButton.setOnClickListener {
             DatePickerDialog(requireContext(),onDateSelected, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
                 .show()
+        }
+
+        existEvent?.let {
+            binding.buttonDelete.visibility = View.VISIBLE
+            binding.eventNote.setText(it.note)
+            binding.eventDate.text = it.date.toDate()
+            calendar.timeInMillis = it.date
+            when (it) {
+                is EventBase.EventRated -> {
+                    binding.eventRating.rating = it.rate.toFloat()
+                }
+                is EventBase.EventMeasure -> {
+                    binding.eventRatingNumeric.setText(it.value.toString())
+                }
+                else -> {}
+            }
         }
 
         when (quant) {
@@ -85,6 +100,7 @@ class CreateEventDialogFragment(val quant: QuantBase) : BottomSheetDialogFragmen
             }
             dialogListener?.onConfirm(
                 quant.toEvent(
+                    existEvent?.id,
                     when (quant) {
                         is QuantBase.QuantRated -> binding.eventRating.rating.toInt()
                         is QuantBase.QuantMeasure -> binding.eventRatingNumeric.text.toString().toInt()
@@ -95,6 +111,14 @@ class CreateEventDialogFragment(val quant: QuantBase) : BottomSheetDialogFragmen
             )
             dismiss()
         }
+
+        binding.buttonDelete.setOnClickListener {
+            if (existEvent != null) {
+                dialogListener?.onDelete(existEvent, quant.name)
+            }
+            dismiss()
+        }
+
         return binding.root
     }
 
@@ -119,5 +143,6 @@ class CreateEventDialogFragment(val quant: QuantBase) : BottomSheetDialogFragmen
     interface DialogListener {
         fun onConfirm(event: EventBase, name: String)
         fun onDecline()
+        fun onDelete(event: EventBase, name: String)
     }
 }

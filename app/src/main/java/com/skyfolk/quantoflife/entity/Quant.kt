@@ -56,10 +56,11 @@ sealed class QuantBase(
         }
     }
 
-    fun toEvent(rate: Int, date: Long, note: String): EventBase {
+    fun toEvent(eventId: String? = null, rate: Int, date: Long, note: String): EventBase {
         when (this) {
             is QuantRated -> {
                 return EventBase.EventRated(
+                    eventId ?: UUID.randomUUID().toString(),
                     this.id,
                     date,
                     note,
@@ -68,6 +69,7 @@ sealed class QuantBase(
             }
             is QuantMeasure -> {
                 return EventBase.EventMeasure(
+                    eventId ?: UUID.randomUUID().toString(),
                     this.id,
                     date,
                     note,
@@ -75,7 +77,11 @@ sealed class QuantBase(
                 )
             }
             is QuantNote -> {
-                return EventBase.EventNote(this.id, date, note)
+                return EventBase.EventNote(
+                    eventId ?: UUID.randomUUID().toString(),
+                    this.id,
+                    date,
+                    note)
             }
         }
     }

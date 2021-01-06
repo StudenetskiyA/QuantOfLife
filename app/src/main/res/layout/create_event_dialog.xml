@@ -118,10 +118,21 @@
         android:focusable="true"
         app:layout_constraintTop_toBottomOf="@+id/event_note"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/button_delete"
         app:layout_constraintRight_toRightOf="parent" />
 
-
+    <Button
+        android:id="@+id/button_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:text="Удалить"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/button_ok"
+        app:layout_constraintTop_toBottomOf="@+id/event_note"
+        android:visibility="gone"
+        tools:visibility="visible"/>
 
 
 

@@ -10,13 +10,19 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
+import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.databinding.StatisticFragmentBinding
 import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
+import com.skyfolk.quantoflife.entity.EventBase
 import com.skyfolk.quantoflife.entity.QuantCategory
+import com.skyfolk.quantoflife.setOnHideByTimeout
 import com.skyfolk.quantoflife.settings.SettingsInteractor
+import com.skyfolk.quantoflife.ui.now.CreateEventDialogFragment
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -48,9 +54,46 @@ class StatisticFragment : Fragment() {
 
         lifecycleScope.launch {
             viewModel.listOfEvents.observe(viewLifecycleOwner, {
-                val adapter = EventListDataAdapter(it, quantStorageInteractor, settingsInteractor) {
-                    Toast.makeText(requireContext(), "${it.quantId}\n${it.date}\n${it.note}\n", Toast.LENGTH_LONG).show()
+                val adapter = EventListDataAdapter(it, quantStorageInteractor, settingsInteractor) { event ->
+                    quantStorageInteractor.getQuantById(event.quantId)?.let { quant ->
+                        val dialog = CreateEventDialogFragment(quant, event)
+                        dialog.setDialogListener(object : CreateEventDialogFragment.DialogListener {
+                            override fun onConfirm(event: EventBase, name: String) {
+                                val snackBar = Snackbar.make(
+                                    requireActivity().findViewById(R.id.content),
+                                    "Событие '${name}' изменено",
+                                    Snackbar.LENGTH_LONG
+                                )
+                                snackBar.setAction("Отмена") {
+                                }
+                                snackBar.setOnHideByTimeout {
+                                    viewModel.eventEdited(event)
+                                }
+                                snackBar.show()
+                            }
+
+                            override fun onDecline() {
+                            }
+
+                            override fun onDelete(event: EventBase, name: String) {
+                                val snackBar = Snackbar.make(
+                                    requireActivity().findViewById(R.id.content),
+                                    "Событие '${name}' удалено",
+                                    Snackbar.LENGTH_LONG
+                                )
+                                snackBar.setAction("Отмена") {
+                                }
+                                snackBar.setOnHideByTimeout {
+                                    viewModel.deleteEvent(event)
+                                }
+                                snackBar.show()
+                            }
+                        })
+                        val fm: FragmentManager = requireActivity().supportFragmentManager
+                        dialog.show(fm, dialog.tag)
+                    }
                 }
+
                 if (adapter.itemCount == 0) {
                     binding.itemsNotFound.visibility = View.VISIBLE
                     binding.listOfEvents.visibility = View.GONE
