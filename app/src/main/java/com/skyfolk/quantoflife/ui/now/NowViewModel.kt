@@ -66,6 +66,8 @@ class NowViewModel(
 
     override fun onEventCreated(event: EventBase) {
         eventsStorageInteractor.addEventToDB(event)
+        quantsStorageInteractor.incrementQuantUsage(event.quantId)
+        _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
         _todayTotal.value = calculateTodayTotal()
     }
 

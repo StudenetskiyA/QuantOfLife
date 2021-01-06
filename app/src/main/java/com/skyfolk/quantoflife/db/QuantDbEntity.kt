@@ -18,7 +18,8 @@ open class QuantDbEntity(
     var bonuses: RealmList<QuantBonusDbEntity> = RealmList(),
     var typeDescription: String = QuantBase.QuantNote::class.java.name,
     var description: String = "Подсказка для оценки",
-    var isDeleted: Boolean = false
+    var isDeleted: Boolean = false,
+    var usageCount: Int = 0
 ) : RealmObject() {
     companion object {
         fun toQuantDbEntity(quant: QuantBase): QuantDbEntity {

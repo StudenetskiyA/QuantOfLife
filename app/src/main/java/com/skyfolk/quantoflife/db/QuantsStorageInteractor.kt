@@ -21,7 +21,7 @@ class QuantsStorageInteractor(private val dbInteractor: DBInteractor) : IQuantsS
 
     override fun getAllQuantsList(includeDeleted: Boolean): ArrayList<QuantBase> {
         val result = ArrayList<QuantBase>()
-        for (r in dbInteractor.getDB().where(QuantDbEntity::class.java).findAll()) {
+        for (r in dbInteractor.getDB().where(QuantDbEntity::class.java).findAll().sortedByDescending { it.usageCount }) {
             if (!r.isDeleted || includeDeleted) result.add(r.toQuantBase())
         }
         return result
@@ -37,6 +37,12 @@ class QuantsStorageInteractor(private val dbInteractor: DBInteractor) : IQuantsS
 
     override fun getQuantById(id: String): QuantBase? {
         return getAllQuantsList(true).find { it.id == id }
+    }
+
+    override fun incrementQuantUsage(id: String) {
+        dbInteractor.getDB().executeTransaction {
+            dbInteractor.getDB().where(QuantDbEntity::class.java).equalTo("id", id).findFirst().usageCount++
+        }
     }
 
     override fun getPresetQuantsList(): ArrayList<QuantBase> {
