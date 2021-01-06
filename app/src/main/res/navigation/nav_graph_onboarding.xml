@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_cards"
+    app:startDestination="@id/first_screen">
+
+    <fragment
+        android:id="@+id/first_screen"
+        android:name="com.skyfolk.quantoflife.ui.onboarding.OnBoardingFirstFragment"
+        android:label="RecordAudioFragment"
+        tools:layout="@layout/onboarding_first_fragment">
+        <action
+            android:id="@+id/action_go_to_second_screen"
+            app:destination="@id/second_screen" />
+    </fragment>
+    <fragment
+        android:id="@+id/second_screen"
+        android:name="com.skyfolk.quantoflife.ui.onboarding.OnBoardingSecondFragment"
+        android:label="SelectTrackFragment"
+        tools:layout="@layout/onboarding_second_fragment">
+    </fragment>
+</navigation>
