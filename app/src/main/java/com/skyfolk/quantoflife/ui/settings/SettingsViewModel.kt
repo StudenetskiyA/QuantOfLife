@@ -36,44 +36,50 @@ class SettingsViewModel(
     }
 
     fun importAllEventsAndQuantsFromFile() {
-        val mainPath = dbInteractor.getDBPath()
-        //Copy
-        var eventsImported = 0
-        var quantsImported = 0
-        val oldEvents = ArrayList<EventBase>()
-        for (oldEvent in eventsStorageInteractor.getAllEvents()) {
-            eventsImported++
-            oldEvents.add(oldEvent.copy())
-        }
-        val oldQuants = ArrayList<QuantBase>()
-        for (oldQuant in quantsStorageInteractor.getAllQuantsList(true)) {
-            quantsImported++
-            oldQuants.add(oldQuant.copy())
-        }
+        _permissionRequestState.value =
+            PermissionRequest("android.permission.WRITE_EXTERNAL_STORAGE") {
+                val mainPath = dbInteractor.getDBPath()
+                //Copy
+                var eventsImported = 0
+                var quantsImported = 0
+                val oldEvents = ArrayList<EventBase>()
+                for (oldEvent in eventsStorageInteractor.getAllEvents()) {
+                    eventsImported++
+                    oldEvents.add(oldEvent.copy())
+                }
+                val oldQuants = ArrayList<QuantBase>()
+                for (oldQuant in quantsStorageInteractor.getAllQuantsList(true)) {
+                    quantsImported++
+                    oldQuants.add(oldQuant.copy())
+                }
 
-        dbInteractor.close()
-        val restoreFilePath = file.path
-        copyBundledRealmFile(restoreFilePath, mainPath)
+                dbInteractor.close()
+                val restoreFilePath = file.path
+                copyBundledRealmFile(restoreFilePath, mainPath)
 
-        //Merge
-        for (event in oldEvents) {
-            if (!eventsStorageInteractor.alreadyHaveEvent(event)) {
-            eventsStorageInteractor.addEventToDB(event)
+                quantsImported = quantsStorageInteractor.getAllQuantsList(true).size - quantsImported
+                eventsImported = eventsStorageInteractor.getAllEvents().size - eventsImported
+
+                //Merge
+                for (event in oldEvents) {
+                    if (!eventsStorageInteractor.alreadyHaveEvent(event)) {
+                        eventsStorageInteractor.addEventToDB(event)
+                    }
+                }
+                for (quant in oldQuants) {
+                    if (!quantsStorageInteractor.alreadyHaveQuant(quant)) {
+                        quantsStorageInteractor.addQuantToDB(quant)
+                    }
+                }
+
+                //Count
+                _toastState.value = "Импорт успешен\nИмпортировано новых типов событий - $quantsImported\nИмпортировано новых событий - $eventsImported"
             }
-        }
-        for (quant in oldQuants) {
-            if (!quantsStorageInteractor.alreadyHaveQuant(quant)) {
-                quantsStorageInteractor.addQuantToDB(quant)
-            }
-        }
-
-        //Count
-        _toastState.value = "Импорт успешен\nИмпортировано новых типов событий - $quantsImported\nИмпортировано новых событий - $eventsImported"
     }
 
     fun saveDBToFile() {
         _permissionRequestState.value =
-            PermissionRequest("android.permission.READ_EXTERNAL_STORAGE") {
+            PermissionRequest("android.permission.WRITE_EXTERNAL_STORAGE") {
                 file.delete()
 
                 dbInteractor.getDB().writeCopyTo(file)
@@ -82,11 +88,10 @@ class SettingsViewModel(
             }
     }
 
-    private fun copyBundledRealmFile(oldFilePath: String, outFileName: String): String? {
+    private fun copyBundledRealmFile(inputFileName: String, outFileName: String): String? {
         try {
-            val file = File(outFileName)
-            val outputStream = FileOutputStream(file)
-            val inputStream = FileInputStream(File(oldFilePath))
+            val outputStream = FileOutputStream(File(outFileName))
+            val inputStream = FileInputStream(File(inputFileName))
             val buf = ByteArray(1024)
             var bytesRead: Int
             while (inputStream.read(buf).also { bytesRead = it } > 0) {

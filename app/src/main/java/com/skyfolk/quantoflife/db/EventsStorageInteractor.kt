@@ -36,7 +36,7 @@ class EventsStorageInteractor(private val dbInteractor: DBInteractor) {
                     result.add(EventBase.EventRated(r.quantId, r.date, r.note, r.rate!!))
                 }
                 (r.numericValue != null) -> {
-                    result.add(EventBase.EventMeasure(r.quantId, r.date, r.note, r.rate!!))
+                    result.add(EventBase.EventMeasure(r.quantId, r.date, r.note, r.numericValue!!))
                 }
                 else -> {
                     result.add(EventBase.EventNote(r.quantId, r.date, r.note))

@@ -84,10 +84,10 @@ class NowFragment : Fragment() {
         val quantListClickListener: (quant: QuantBase) -> Unit = {
             val dialog = CreateEventDialogFragment(it)
             dialog.setDialogListener(object : DialogListener {
-                override fun onConfirm(event: EventBase) {
+                override fun onConfirm(event: EventBase, name: String) {
                     val snackBar = Snackbar.make(
                         requireActivity().findViewById(android.R.id.content),
-                        "Event '${event.quantId}' create",
+                        "Event '${name}' create",
                         Snackbar.LENGTH_LONG
                     )
                     snackBar.setAction("Отмена") {

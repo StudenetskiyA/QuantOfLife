@@ -91,7 +91,7 @@ class CreateEventDialogFragment(val quant: QuantBase) : BottomSheetDialogFragmen
                         is QuantBase.QuantNote -> -1
                     }, calendar.timeInMillis,
                     binding.eventNote.text.toString()
-                )
+                ), quant.name
             )
             dismiss()
         }
@@ -117,7 +117,7 @@ class CreateEventDialogFragment(val quant: QuantBase) : BottomSheetDialogFragmen
     }
 
     interface DialogListener {
-        fun onConfirm(event: EventBase)
+        fun onConfirm(event: EventBase, name: String)
         fun onDecline()
     }
 }
