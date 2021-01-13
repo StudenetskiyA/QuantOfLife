@@ -3,17 +3,17 @@
 
     <item
         android:id="@+id/navigation_home"
-        android:icon="@android:drawable/ic_input_add"
+        android:icon="@drawable/ic_now"
         android:title="@string/title_now" />
 
     <item
         android:id="@+id/navigation_dashboard"
-        android:icon="@android:drawable/ic_menu_mapmode"
+        android:icon="@drawable/ic_statistic"
         android:title="@string/title_statistic" />
 
     <item
         android:id="@+id/navigation_notifications"
-        android:icon="@android:drawable/ic_menu_sort_alphabetically"
+        android:icon="@drawable/ic_settings"
         android:title="@string/title_settings" />
 
 </menu>
