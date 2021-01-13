@@ -6,7 +6,14 @@ import kotlin.collections.ArrayList
 class QuantsStorageInteractor(private val dbInteractor: DBInteractor) : IQuantsStorageInteractor {
     override fun addQuantToDB(quant: QuantBase) {
         dbInteractor.getDB().executeTransaction {
-            dbInteractor.getDB().insertOrUpdate(QuantDbEntity.toQuantDbEntity(quant))
+            val existQuant = existEventOrNull(quant)
+            var usageCount = 0
+            if (existQuant != null) {
+                usageCount = existQuant.usageCount
+            }
+            val quantDbEntity = QuantDbEntity.toQuantDbEntity(quant)
+            quantDbEntity.usageCount = usageCount
+            dbInteractor.getDB().insertOrUpdate(quantDbEntity)
         }
     }
 
@@ -43,6 +50,12 @@ class QuantsStorageInteractor(private val dbInteractor: DBInteractor) : IQuantsS
         dbInteractor.getDB().executeTransaction {
             dbInteractor.getDB().where(QuantDbEntity::class.java).equalTo("id", id).findFirst().usageCount++
         }
+    }
+
+    private fun existEventOrNull(quant: QuantBase): QuantDbEntity? {
+        return dbInteractor.getDB().where(QuantDbEntity::class.java)
+            .equalTo("id", quant.id)
+            .findFirst()
     }
 
     override fun getPresetQuantsList(): ArrayList<QuantBase> {

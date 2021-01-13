@@ -114,7 +114,6 @@ class StatisticFragment : Fragment() {
 
                 binding.spinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
                     override fun onItemSelected(parent:AdapterView<*>, view: View, position: Int, id: Long){
-                        Log.d("log-level-skyfolk", "select = ${parent.getItemAtPosition(position)}")
                         if (position == 0) {
                             viewModel.setSelectedEventFilter(null)
                         } else {
@@ -168,14 +167,6 @@ class StatisticFragment : Fragment() {
             }
             viewModel.saveTimeIntervalState(selected)
             viewModel.runSearch()
-        }
-
-        binding.search.setOnClickListener {
-
-        }
-
-        binding.clearSearch.setOnClickListener {
-            viewModel.clearSearch()
         }
 
         return binding.root

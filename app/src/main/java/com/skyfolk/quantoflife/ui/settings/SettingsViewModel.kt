@@ -9,7 +9,10 @@ import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
 import com.skyfolk.quantoflife.entity.*
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.utils.SingleLiveEvent
+import com.skyfolk.quantoflife.utils.toCalendar
 import java.io.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 class SettingsViewModel(
     private val eventsStorageInteractor: EventsStorageInteractor,
@@ -19,6 +22,11 @@ class SettingsViewModel(
 ) : ViewModel() {
     private val _toastState = SingleLiveEvent<String>()
     val toastState: LiveData<String> get() = _toastState
+
+    private val _dayStartTime = SingleLiveEvent<Calendar>().apply {
+        value = settingsInteractor.getStartDayTime().toCalendar()
+    }
+    val dayStartTime: LiveData<Calendar> get() = _dayStartTime
 
     private val _downloadFile = SingleLiveEvent<File>()
     val downloadFile: LiveData<File> get() = _downloadFile
@@ -86,6 +94,11 @@ class SettingsViewModel(
                 _downloadFile.value = file
                 _toastState.value = "Архив сохранен в папку \"Загрузки\" "
             }
+    }
+
+    fun setStartDayTime(timeInMillis: Long) {
+        settingsInteractor.setStartDayTime(timeInMillis)
+        _dayStartTime.value = timeInMillis.toCalendar()
     }
 
     private fun copyBundledRealmFile(inputFileName: String, outFileName: String): String? {

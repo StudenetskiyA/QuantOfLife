@@ -12,6 +12,7 @@ import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.statistic.getTotal
 import com.skyfolk.quantoflife.ui.create_quant.CreateQuantDialogFragment
 import com.skyfolk.quantoflife.utils.SingleLiveEvent
+import com.skyfolk.quantoflife.utils.toCalendar
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -73,8 +74,8 @@ class NowViewModel(
 
     private fun calculateTodayTotal() : Double{
         val selectedCalendar = Calendar.getInstance()
-        selectedCalendar[Calendar.HOUR_OF_DAY] = 0
-        selectedCalendar[Calendar.MINUTE] = 0
+        selectedCalendar[Calendar.HOUR_OF_DAY] = settingsInteractor.getStartDayTime().toCalendar()[Calendar.HOUR_OF_DAY]
+        selectedCalendar[Calendar.MINUTE] = settingsInteractor.getStartDayTime().toCalendar()[Calendar.MINUTE]
         selectedCalendar[Calendar.SECOND] = 0
         val startDate = selectedCalendar.timeInMillis
         val endDate = System.currentTimeMillis()

@@ -1,6 +1,7 @@
 package com.skyfolk.quantoflife.ui.settings
 
 import android.app.DownloadManager
+import android.app.TimePickerDialog
 import android.content.Context.DOWNLOAD_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,14 +18,14 @@ import com.skyfolk.quantoflife.databinding.SettingsFragmentBinding
 import com.skyfolk.quantoflife.db.DBInteractor
 import com.skyfolk.quantoflife.entity.QuantCategory
 import com.skyfolk.quantoflife.ui.onboarding.OnBoardingActivity
+import com.skyfolk.quantoflife.utils.toDate
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
+import java.util.*
 
 
 class SettingsFragment : Fragment() {
     private val viewModel: SettingsViewModel by viewModel()
-
-    private val dbInteractor: DBInteractor by inject()
 
     private lateinit var binding: SettingsFragmentBinding
 
@@ -41,6 +42,12 @@ class SettingsFragment : Fragment() {
             if (message != "") {
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             }
+        })
+
+        viewModel.dayStartTime.observe(viewLifecycleOwner, {
+            val hour = if (it[Calendar.HOUR_OF_DAY]<10) "0"+it[Calendar.HOUR_OF_DAY] else it[Calendar.HOUR_OF_DAY]
+            val minute = if (it[Calendar.MINUTE]<10) "0"+it[Calendar.MINUTE] else it[Calendar.MINUTE]
+            binding.startHour.text = "Время начала дня - $hour:${minute}"
         })
 
         viewModel.downloadFile.observe(viewLifecycleOwner, { file ->
@@ -102,7 +109,17 @@ class SettingsFragment : Fragment() {
             startActivity(Intent(requireContext(), OnBoardingActivity::class.java))
         }
 
+        binding.submitStartHour.setOnClickListener {
+            TimePickerDialog(requireContext(),onTimeSelected, 0, 0, true)
+                .show()
+        }
+
         return binding.root
+    }
+
+    private val onTimeSelected = TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
+        val result = ((hourOfDay * 60 * 60 * 1000) + (minute * 60 * 1000)).toLong()
+        viewModel.setStartDayTime(result)
     }
 
     override fun onRequestPermissionsResult(

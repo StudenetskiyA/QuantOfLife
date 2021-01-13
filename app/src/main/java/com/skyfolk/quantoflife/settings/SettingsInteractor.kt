@@ -8,6 +8,7 @@ class SettingsInteractor(private val preferences: SharedPreferences) {
         const val SELECTED_RADIO_IN_STATISTIC = "selected_radio_in_statistic_2"
         const val CATEGORY_NAME_ = "category_name_"
         const val ONBOARDING_COMPLETE = "onboarding_complete"
+        const val START_DAY_TIME = "start_day_time"
     }
 
     fun writeStatisticTimeIntervalSelectedElement(element: String) {
@@ -39,4 +40,14 @@ class SettingsInteractor(private val preferences: SharedPreferences) {
             .putBoolean(ONBOARDING_COMPLETE, complete)
             .apply()
     }
-}
+
+    fun getStartDayTime() : Long {
+        return preferences.getLong(START_DAY_TIME , 0)
+    }
+
+    fun setStartDayTime(timeInMillis: Long) {
+        preferences.edit()
+            .putLong(START_DAY_TIME, timeInMillis)
+            .apply()
+    }
+ }

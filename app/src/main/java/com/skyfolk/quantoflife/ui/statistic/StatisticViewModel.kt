@@ -9,6 +9,7 @@ import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
 import com.skyfolk.quantoflife.entity.*
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.statistic.getTotal
+import com.skyfolk.quantoflife.utils.toCalendar
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -65,12 +66,11 @@ class StatisticViewModel(
 
         var resultList = ArrayList(
             eventsStorageInteractor.getAllEvents().filter { it.date in startDate until endDate })
-        if (selectedEventFilter != null) resultList = ArrayList(resultList.filter { it.quantId == selectedEventFilter })
+        if (selectedEventFilter != null) {
+            resultList = ArrayList(resultList.filter { it.quantId == selectedEventFilter })
+        }
 
         setListOfEventsValue(resultList)
-    }
-
-    fun clearSearch() {
     }
 
     private fun setListOfEventsValue(value: ArrayList<EventBase>) {
@@ -89,17 +89,19 @@ class StatisticViewModel(
             }
             TimeInterval.Month -> {
                 selectedCalendar[Calendar.DAY_OF_MONTH] = 1
-                selectedCalendar[Calendar.MINUTE] = 0
+                selectedCalendar[Calendar.HOUR_OF_DAY] = settingsInteractor.getStartDayTime().toCalendar()[Calendar.HOUR_OF_DAY]
+                selectedCalendar[Calendar.MINUTE] = settingsInteractor.getStartDayTime().toCalendar()[Calendar.MINUTE]
                 selectedCalendar[Calendar.SECOND] = 0
             }
             TimeInterval.Week -> {
                 selectedCalendar[Calendar.DAY_OF_WEEK] = 2
-                selectedCalendar[Calendar.MINUTE] = 0
+                selectedCalendar[Calendar.HOUR_OF_DAY] = settingsInteractor.getStartDayTime().toCalendar()[Calendar.HOUR_OF_DAY]
+                selectedCalendar[Calendar.MINUTE] = settingsInteractor.getStartDayTime().toCalendar()[Calendar.MINUTE]
                 selectedCalendar[Calendar.SECOND] = 0
             }
             TimeInterval.Today -> {
-                selectedCalendar[Calendar.HOUR_OF_DAY] = 0
-                selectedCalendar[Calendar.MINUTE] = 0
+                selectedCalendar[Calendar.HOUR_OF_DAY] = settingsInteractor.getStartDayTime().toCalendar()[Calendar.HOUR_OF_DAY]
+                selectedCalendar[Calendar.MINUTE] = settingsInteractor.getStartDayTime().toCalendar()[Calendar.MINUTE]
                 selectedCalendar[Calendar.SECOND] = 0
             }
         }
@@ -110,7 +112,12 @@ class StatisticViewModel(
     }
 
     fun setSelectedEventFilter(item: String?) {
-        selectedEventFilter = item
+        selectedEventFilter = if (item!=null) {
+            quantsStorageInteractor.getAllQuantsList(true).first { it.name == item }.id
+        } else {
+            null
+        }
+        runSearch()
     }
 
     fun eventEdited(event: EventBase) {
@@ -120,7 +127,6 @@ class StatisticViewModel(
     }
 
     fun deleteEvent(event: EventBase) {
-        QLog.d("eventId = ${event.id}")
         eventsStorageInteractor.deleteEvent(event)
         _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
         runSearch()
