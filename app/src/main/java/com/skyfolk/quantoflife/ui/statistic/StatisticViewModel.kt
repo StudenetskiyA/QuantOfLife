@@ -7,9 +7,9 @@ import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.db.EventsStorageInteractor
 import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
 import com.skyfolk.quantoflife.entity.*
+import com.skyfolk.quantoflife.getStartDateCalendar
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.statistic.getTotal
-import com.skyfolk.quantoflife.utils.toCalendar
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -51,17 +51,14 @@ class StatisticViewModel(
 
     val selectedTimeInterval: TimeInterval = TimeInterval.toTimeInterval(settingsInteractor.getStatisticTimeIntervalSelectedElement())
 
-    private var selectedCalendar = Calendar.getInstance()
     private var selectedEventFilter: String? = null
 
     init {
-        setSelectedTimeInterval(TimeInterval.toTimeInterval(settingsInteractor.getStatisticTimeIntervalSelectedElement()))
         runSearch()
     }
 
     fun runSearch() {
-        setSelectedTimeInterval(TimeInterval.toTimeInterval(settingsInteractor.getStatisticTimeIntervalSelectedElement()))
-        val startDate = selectedCalendar.timeInMillis
+        val startDate = Calendar.getInstance().getStartDateCalendar(TimeInterval.toTimeInterval(settingsInteractor.getStatisticTimeIntervalSelectedElement()), settingsInteractor.getStartDayTime()).timeInMillis
         val endDate = System.currentTimeMillis()
 
         var resultList = ArrayList(
@@ -79,32 +76,6 @@ class StatisticViewModel(
         _totalEmotionalFound.value = getTotal(quantsStorageInteractor, value, QuantCategory.Emotion)
         _totalEvolutionFound.value = getTotal(quantsStorageInteractor, value, QuantCategory.Evolution)
         _totalFound.value = getTotal(quantsStorageInteractor, value)
-    }
-
-    private fun setSelectedTimeInterval(timeInterval: TimeInterval) {
-        selectedCalendar = Calendar.getInstance()
-        when (timeInterval) {
-            TimeInterval.All -> {
-                selectedCalendar[Calendar.YEAR] = 1900
-            }
-            TimeInterval.Month -> {
-                selectedCalendar[Calendar.DAY_OF_MONTH] = 1
-                selectedCalendar[Calendar.HOUR_OF_DAY] = settingsInteractor.getStartDayTime().toCalendar()[Calendar.HOUR_OF_DAY]
-                selectedCalendar[Calendar.MINUTE] = settingsInteractor.getStartDayTime().toCalendar()[Calendar.MINUTE]
-                selectedCalendar[Calendar.SECOND] = 0
-            }
-            TimeInterval.Week -> {
-                selectedCalendar[Calendar.DAY_OF_WEEK] = 2
-                selectedCalendar[Calendar.HOUR_OF_DAY] = settingsInteractor.getStartDayTime().toCalendar()[Calendar.HOUR_OF_DAY]
-                selectedCalendar[Calendar.MINUTE] = settingsInteractor.getStartDayTime().toCalendar()[Calendar.MINUTE]
-                selectedCalendar[Calendar.SECOND] = 0
-            }
-            TimeInterval.Today -> {
-                selectedCalendar[Calendar.HOUR_OF_DAY] = settingsInteractor.getStartDayTime().toCalendar()[Calendar.HOUR_OF_DAY]
-                selectedCalendar[Calendar.MINUTE] = settingsInteractor.getStartDayTime().toCalendar()[Calendar.MINUTE]
-                selectedCalendar[Calendar.SECOND] = 0
-            }
-        }
     }
 
     fun saveTimeIntervalState(timeInterval: TimeInterval) {

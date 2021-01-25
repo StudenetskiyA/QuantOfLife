@@ -10,7 +10,9 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.ui.onboarding.OnBoardingActivity
+import com.skyfolk.quantoflife.utils.toDate
 import org.koin.android.ext.android.inject
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private val settingsInteractor: SettingsInteractor by inject()
