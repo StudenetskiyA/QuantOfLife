@@ -56,7 +56,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 android:text="Задать" />
         </LinearLayout>
-        
+
         <Button
             android:id="@+id/clear_db_button"
             android:layout_width="match_parent"

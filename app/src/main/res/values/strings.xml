@@ -2,6 +2,7 @@
     <string name="app_name">Квант жизни</string>
     <string name="title_now">Сейчас</string>
     <string name="title_statistic">Статистика</string>
+    <string name="title_feeds">События</string>
     <string name="title_settings">Настройки</string>
     <string name="onboarding_first_description">Здесь большое и подробное описание, как пользоваться приложением.\nС картинками и графиками.\n</string>
     <string name="onboarding_second_description">Здесь описание про то, что нужно выбрать три категории оценки и назвать их.\nЕсли не заполните - проставятся дефолтные.</string>

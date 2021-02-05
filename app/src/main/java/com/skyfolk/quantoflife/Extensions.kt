@@ -2,9 +2,8 @@ package com.skyfolk.quantoflife
 
 import com.google.android.material.snackbar.Snackbar
 import com.skyfolk.quantoflife.entity.QuantBase
-import com.skyfolk.quantoflife.ui.statistic.TimeInterval
+import com.skyfolk.quantoflife.ui.feeds.TimeInterval
 import com.skyfolk.quantoflife.utils.toCalendar
-import com.skyfolk.quantoflife.utils.toDate
 import java.util.*
 import kotlin.collections.ArrayList
 

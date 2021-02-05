@@ -1,4 +1,4 @@
-package com.skyfolk.quantoflife.ui.statistic
+package com.skyfolk.quantoflife.ui.feeds
 
 import android.view.LayoutInflater
 import android.view.View
@@ -48,10 +48,6 @@ class EventListDataAdapter(
             val quant = quantsStorageInteractor.getAllQuantsList(true)
                 .firstOrNull { it.id == event.quantId }
             eventNameView.text = quant?.name ?: "Unknown"
-
-            if (event.note.contains("Призраки")) {
-                QLog.d("призраки")
-            }
 
             if (quant != null && itemView.context.resources.getIdentifier(
                     quant.icon,

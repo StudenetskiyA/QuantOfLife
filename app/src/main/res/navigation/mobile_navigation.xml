@@ -12,10 +12,16 @@
         tools:layout="@layout/now_fragment" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/navigation_feeds"
+        android:name="com.skyfolk.quantoflife.ui.feeds.FeedsFragment"
+        android:label="@string/title_feeds"
+        tools:layout="@layout/feeds_fragment" />
+
+    <fragment
+        android:id="@+id/navigation_statistic"
         android:name="com.skyfolk.quantoflife.ui.statistic.StatisticFragment"
         android:label="@string/title_statistic"
-        tools:layout="@layout/statistic_fragment" />
+        tools:layout="@layout/feeds_fragment" />
 
     <fragment
         android:id="@+id/navigation_notifications"

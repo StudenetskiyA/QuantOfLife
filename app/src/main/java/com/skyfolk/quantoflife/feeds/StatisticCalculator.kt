@@ -1,4 +1,4 @@
-package com.skyfolk.quantoflife.statistic
+package com.skyfolk.quantoflife.feeds
 
 import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
 import com.skyfolk.quantoflife.entity.EventBase

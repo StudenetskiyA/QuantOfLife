@@ -1,4 +1,4 @@
-package com.skyfolk.quantoflife.ui.statistic
+package com.skyfolk.quantoflife.ui.feeds
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,7 +9,7 @@ import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
 import com.skyfolk.quantoflife.entity.*
 import com.skyfolk.quantoflife.getStartDateCalendar
 import com.skyfolk.quantoflife.settings.SettingsInteractor
-import com.skyfolk.quantoflife.statistic.getTotal
+import com.skyfolk.quantoflife.feeds.getTotal
 import java.util.*
 import kotlin.collections.ArrayList
 

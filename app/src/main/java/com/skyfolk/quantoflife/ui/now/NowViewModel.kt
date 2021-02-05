@@ -10,11 +10,10 @@ import com.skyfolk.quantoflife.entity.EventBase
 import com.skyfolk.quantoflife.entity.QuantBase
 import com.skyfolk.quantoflife.getStartDateCalendar
 import com.skyfolk.quantoflife.settings.SettingsInteractor
-import com.skyfolk.quantoflife.statistic.getTotal
+import com.skyfolk.quantoflife.feeds.getTotal
 import com.skyfolk.quantoflife.ui.create_quant.CreateQuantDialogFragment
-import com.skyfolk.quantoflife.ui.statistic.TimeInterval
+import com.skyfolk.quantoflife.ui.feeds.TimeInterval
 import com.skyfolk.quantoflife.utils.SingleLiveEvent
-import com.skyfolk.quantoflife.utils.toCalendar
 import java.util.*
 import kotlin.collections.ArrayList
 

@@ -10,8 +10,7 @@ import com.skyfolk.quantoflife.ui.now.NowViewModel
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.ui.onboarding.OnBoardingViewModel
 import com.skyfolk.quantoflife.ui.settings.SettingsViewModel
-import com.skyfolk.quantoflife.ui.statistic.StatisticViewModel
-import org.koin.android.ext.android.inject
+import com.skyfolk.quantoflife.ui.feeds.StatisticViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.android.viewmodel.dsl.viewModel

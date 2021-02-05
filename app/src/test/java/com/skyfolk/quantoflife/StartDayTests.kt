@@ -1,6 +1,6 @@
 package com.skyfolk.quantoflife
 
-import com.skyfolk.quantoflife.ui.statistic.TimeInterval
+import com.skyfolk.quantoflife.ui.feeds.TimeInterval
 import org.junit.Assert
 import org.junit.Test
 import java.util.*
