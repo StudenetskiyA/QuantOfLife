@@ -13,7 +13,7 @@ fun getTotal(quantsStorageInteractor: IQuantsStorageInteractor, events: List<Eve
             val foundQuant = quantsStorageInteractor.getQuantById(event.quantId)
             if (foundQuant is QuantBase.QuantRated) {
                 for (bonus in foundQuant.bonuses) {
-                    if (bonus.category == category || category == QuantCategory.None) {
+                    if (bonus.category == category || category == QuantCategory.None || category == QuantCategory.All) {
                         total += bonus.baseBonus + bonus.bonusForEachRating * event.rate
                     }
                 }

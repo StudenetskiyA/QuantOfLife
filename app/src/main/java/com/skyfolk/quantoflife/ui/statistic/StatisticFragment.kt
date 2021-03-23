@@ -1,40 +1,27 @@
-package com.skyfolk.quantoflife.ui.statistic
+     package com.skyfolk.quantoflife.ui.statistic
 
-import com.skyfolk.quantoflife.ui.feeds.EventListDataAdapter
-import com.skyfolk.quantoflife.ui.feeds.StatisticViewModel
-import com.skyfolk.quantoflife.ui.feeds.TimeInterval
-
-
-import android.R
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
-import com.skyfolk.quantoflife.databinding.FeedsFragmentBinding
+import com.github.mikephil.charting.components.XAxis.XAxisPosition
+import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.databinding.StatisticFragmentBinding
-import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
-import com.skyfolk.quantoflife.entity.EventBase
-import com.skyfolk.quantoflife.entity.QuantCategory
-import com.skyfolk.quantoflife.setOnHideByTimeout
-import com.skyfolk.quantoflife.settings.SettingsInteractor
-import com.skyfolk.quantoflife.ui.now.CreateEventDialogFragment
-import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
+import com.skyfolk.quantoflife.statistic.DayAxisValueFormatter
+import com.skyfolk.quantoflife.statistic.WeekAxisValueFormatter
+import java.util.*
+
 import org.koin.android.viewmodel.ext.android.viewModel
 
+
 class StatisticFragment : Fragment() {
-//    private val viewModel: StatisticViewModel by viewModel()
+    private val viewModel: StatisticViewModel by viewModel()
     private lateinit var binding: StatisticFragmentBinding
-//    private val quantStorageInteractor: IQuantsStorageInteractor by inject()
-//    private val settingsInteractor: SettingsInteractor by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,6 +29,42 @@ class StatisticFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = StatisticFragmentBinding.inflate(inflater, container, false)
+
+        binding.chart.description.isEnabled = false
+        binding.chart.setPinchZoom(false)
+        binding.chart.setDrawGridBackground(false)
+
+
+
+        binding.chart.legend.isEnabled = false
+
+        viewModel.barEntryData.observe(viewLifecycleOwner, { data ->
+            val set = LineDataSet(data.entry, "")
+            set.setDrawIcons(false)
+            set.setDrawFilled(true)
+            context?.let { set.fillDrawable = ContextCompat.getDrawable(it, R.drawable.fade_red) }
+
+            val dataSets = ArrayList<ILineDataSet>()
+            dataSets.add(set)
+            val barData = LineData(dataSets)
+            barData.setDrawValues(true)
+
+            val xAxis = binding.chart.xAxis
+            xAxis.position = XAxisPosition.BOTTOM
+            xAxis.setDrawGridLines(true)
+            xAxis.labelRotationAngle = -45F
+
+            xAxis.granularity = (data.entry[1].x - data.entry[0].x)
+            xAxis.labelCount = data.entry.size
+
+            val xAxisFormatter = WeekAxisValueFormatter(data.firstDate)
+            xAxis.valueFormatter = xAxisFormatter
+
+            binding.chart
+
+            binding.chart.data = barData
+        })
+
         return binding.root
     }
 }

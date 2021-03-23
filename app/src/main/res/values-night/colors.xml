@@ -3,5 +3,7 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
-    <color name="progressAccent">#89FF00</color>
+    <color name="progressAccent">#5F635A</color>
+    <color name="progressPrimary">#FBE200</color>
+    <color name="progressRed">#00FBC9</color>
 </resources>

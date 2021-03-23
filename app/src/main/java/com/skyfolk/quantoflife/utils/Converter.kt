@@ -1,5 +1,4 @@
 package com.skyfolk.quantoflife.utils
-import com.skyfolk.quantoflife.QLog
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -15,8 +14,15 @@ fun Long.toDate() : String {
                 Instant.ofEpochMilli(this),
                 ZoneId.systemDefault()))
 }
+fun Long.toShortDate() : String {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = this
+    val day = if (calendar[Calendar.DAY_OF_MONTH] < 10) "0${calendar[Calendar.DAY_OF_MONTH]}" else calendar[Calendar.DAY_OF_MONTH]
+    val month = if (calendar[Calendar.MONTH+1] < 10) "0${calendar[Calendar.MONTH]+1}" else calendar[Calendar.MONTH]+1
+    return "$day:$month"
+}
 
-fun Long.toCalendar() : Calendar {
+fun Long.toCalendarOnlyHourAndMinute() : Calendar {
     val calendar = Calendar.getInstance()
     calendar.timeInMillis = this
     val hour: Int = (this/(60*60*1000)).toInt()
@@ -25,5 +31,11 @@ fun Long.toCalendar() : Calendar {
     calendar[Calendar.HOUR_OF_DAY] = hour
     calendar[Calendar.MINUTE] = minute
 
+    return calendar
+}
+
+fun Long.toCalendar() : Calendar {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = this
     return calendar
 }

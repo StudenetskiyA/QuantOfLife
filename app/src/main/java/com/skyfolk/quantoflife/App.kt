@@ -2,15 +2,16 @@ package com.skyfolk.quantoflife
 
 import android.app.Application
 import android.content.Context
-import com.skyfolk.quantoflife.db.DBInteractor
-import com.skyfolk.quantoflife.db.EventsStorageInteractor
-import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
-import com.skyfolk.quantoflife.db.QuantsStorageInteractor
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+import com.skyfolk.quantoflife.db.*
 import com.skyfolk.quantoflife.ui.now.NowViewModel
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.ui.onboarding.OnBoardingViewModel
 import com.skyfolk.quantoflife.ui.settings.SettingsViewModel
-import com.skyfolk.quantoflife.ui.feeds.StatisticViewModel
+import com.skyfolk.quantoflife.ui.feeds.FeedsViewModel
+import com.skyfolk.quantoflife.ui.statistic.StatisticViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.android.viewmodel.dsl.viewModel
@@ -25,12 +26,14 @@ class App: Application() {
             single { DBInteractor(get()) }
             single<IQuantsStorageInteractor> { QuantsStorageInteractor(get()) }
             single{ EventsStorageInteractor(get()) }
+            single<IGoalStorageInteractor> { GoalStorageInteractor() }
             single { SettingsInteractor(androidContext().getSharedPreferences("qol_preferences", Context.MODE_PRIVATE))}
         }
 
         val viewModelModule = module {
-            viewModel { NowViewModel(get(), get(), get()) }
+            viewModel { NowViewModel(get(), get(), get(), get()) }
             viewModel { SettingsViewModel(get(), get(), get(), get())}
+            viewModel { FeedsViewModel(get(), get(), get()) }
             viewModel { StatisticViewModel(get(), get(), get()) }
             viewModel { OnBoardingViewModel(get()) }
         }
@@ -40,6 +43,8 @@ class App: Application() {
             androidLogger()
             modules(listOf(storageModule, viewModelModule))
         }
+
+        AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES)
     }
 }
 

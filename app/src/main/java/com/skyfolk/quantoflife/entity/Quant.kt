@@ -105,5 +105,5 @@ sealed class QuantBonusBase(
 }
 
 enum class QuantCategory {
-    Physical, Emotion, Evolution, Other, None
+    Physical, Emotion, Evolution, Other, None, All
 }

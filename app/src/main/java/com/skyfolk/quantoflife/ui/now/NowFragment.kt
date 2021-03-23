@@ -17,6 +17,7 @@ import com.skyfolk.quantoflife.entity.*
 import com.skyfolk.quantoflife.filterToArrayList
 import com.skyfolk.quantoflife.setOnHideByTimeout
 import com.skyfolk.quantoflife.settings.SettingsInteractor
+import com.skyfolk.quantoflife.ui.feeds.TimeInterval
 import com.skyfolk.quantoflife.ui.now.CreateEventDialogFragment.DialogListener
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -63,6 +64,13 @@ class NowFragment : Fragment() {
             }
         })
 
+        viewModel.listOfGoal.observe(viewLifecycleOwner, {
+            if (it == null) binding.currentGoal.visibility = View.GONE
+            it?.let {
+                binding.currentGoal.updateViewState(it)
+            }
+        })
+
         binding.categoryPhysical.text = settingsInteractor.getCategoryName(QuantCategory.Physical)
         binding.categoryEmotion.text = settingsInteractor.getCategoryName(QuantCategory.Emotion)
         binding.categoryEvolution.text = settingsInteractor.getCategoryName(QuantCategory.Evolution)
@@ -83,6 +91,7 @@ class NowFragment : Fragment() {
 
         val quantListClickListener: (quant: QuantBase) -> Unit = {
             val dialog = CreateEventDialogFragment(it)
+            val theme = dialog.theme
             dialog.setDialogListener(object : DialogListener {
                 override fun onConfirm(event: EventBase, name: String) {
                     val snackBar = Snackbar.make(
@@ -144,7 +153,7 @@ class NowFragment : Fragment() {
         }
 
         binding.fab.setOnClickListener {
-           viewModel.openCreateNewQuantDialog(null)
+            viewModel.openCreateNewQuantDialog(null)
         }
     }
 }

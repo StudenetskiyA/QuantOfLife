@@ -25,7 +25,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class FeedsFragment : Fragment() {
-    private val viewModel: StatisticViewModel by viewModel()
+    private val viewModel: FeedsViewModel by viewModel()
     private lateinit var binding: FeedsFragmentBinding
     private val quantStorageInteractor: IQuantsStorageInteractor by inject()
     private val settingsInteractor: SettingsInteractor by inject()
@@ -54,6 +54,7 @@ class FeedsFragment : Fragment() {
                 val adapter = EventListDataAdapter(it, quantStorageInteractor, settingsInteractor) { event ->
                     quantStorageInteractor.getQuantById(event.quantId)?.let { quant ->
                         val dialog = CreateEventDialogFragment(quant, event)
+
                         dialog.setDialogListener(object : CreateEventDialogFragment.DialogListener {
                             override fun onConfirm(event: EventBase, name: String) {
                                 val snackBar = Snackbar.make(

@@ -1,6 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/goal_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:paddingBottom="5dp"
+        tools:text="Вы поставили такую-то цель" />
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/goal_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:indicatorColor="@color/progressPrimary"
+        app:trackColor="@color/progressAccent"
+        tools:progress="70"
+        app:trackThickness = "20dp"
+        app:trackCornerRadius = "4dp"
+        android:paddingLeft="15dp"
+
+        android:paddingRight="15dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/goal_title"
+        app:layout_constraintBottom_toBottomOf="@+id/goal_progress_text"/>
+
+    <TextView
+        android:id="@+id/goal_progress_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/goal_title"
+        tools:text="50 из 100" />
+
+    <TextView
+        android:id="@+id/goal_more"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Для выполнения цели получите сегодня еще + 10"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/goal_progress"  />
 </androidx.constraintlayout.widget.ConstraintLayout>

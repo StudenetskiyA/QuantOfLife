@@ -9,7 +9,7 @@ import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
 import com.skyfolk.quantoflife.entity.*
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.utils.SingleLiveEvent
-import com.skyfolk.quantoflife.utils.toCalendar
+import com.skyfolk.quantoflife.utils.toCalendarOnlyHourAndMinute
 import java.io.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -24,7 +24,7 @@ class SettingsViewModel(
     val toastState: LiveData<String> get() = _toastState
 
     private val _dayStartTime = SingleLiveEvent<Calendar>().apply {
-        value = settingsInteractor.getStartDayTime().toCalendar()
+        value = settingsInteractor.getStartDayTime().toCalendarOnlyHourAndMinute()
     }
     val dayStartTime: LiveData<Calendar> get() = _dayStartTime
 
@@ -98,7 +98,7 @@ class SettingsViewModel(
 
     fun setStartDayTime(timeInMillis: Long) {
         settingsInteractor.setStartDayTime(timeInMillis)
-        _dayStartTime.value = timeInMillis.toCalendar()
+        _dayStartTime.value = timeInMillis.toCalendarOnlyHourAndMinute()
     }
 
     private fun copyBundledRealmFile(inputFileName: String, outFileName: String): String? {

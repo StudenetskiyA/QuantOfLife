@@ -5,9 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.skyfolk.quantoflife.db.EventsStorageInteractor
+import com.skyfolk.quantoflife.db.IGoalStorageInteractor
 import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
-import com.skyfolk.quantoflife.entity.EventBase
-import com.skyfolk.quantoflife.entity.QuantBase
+import com.skyfolk.quantoflife.entity.*
 import com.skyfolk.quantoflife.getStartDateCalendar
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.feeds.getTotal
@@ -20,6 +20,7 @@ import kotlin.collections.ArrayList
 class NowViewModel(
     private val quantsStorageInteractor: IQuantsStorageInteractor,
     private val eventsStorageInteractor: EventsStorageInteractor,
+    private val goalStorageInteractor: IGoalStorageInteractor,
     private val settingsInteractor: SettingsInteractor
 ) : ViewModel(), INowViewModel {
     private val _toastState = SingleLiveEvent<String>()
@@ -34,9 +35,14 @@ class NowViewModel(
     val listOfQuants: LiveData<ArrayList<QuantBase>> = _listOfQuants
 
     private val _todayTotal = MutableLiveData<Double>().apply {
-        value = calculateTodayTotal()
+        value = 0.0
     }
     val todayTotal: LiveData<Double> = _todayTotal
+
+    private val _listOfGoals = MutableLiveData<GoalPresent?>().apply {
+        value = null // getGoalPresent(goalStorageInteractor.getListOfGoals().first())
+    }
+    val listOfGoal: LiveData<GoalPresent?> = _listOfGoals
 
     init {
         if (quantsStorageInteractor.getAllQuantsList(false).isEmpty()) {
@@ -45,6 +51,8 @@ class NowViewModel(
             }
             _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
         }
+
+        updateTodayTotal()
     }
 
     override fun openCreateNewQuantDialog(existQuant: QuantBase?) {
@@ -53,7 +61,8 @@ class NowViewModel(
             override fun onConfirm(quant: QuantBase) {
                 quantsStorageInteractor.addQuantToDB(quant)
                 _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
-                _todayTotal.value = calculateTodayTotal()
+                updateTodayTotal()
+                //_todayTotal.value = updateTodayTotal()
             }
 
             override fun onDelete(quant: QuantBase) {
@@ -70,17 +79,43 @@ class NowViewModel(
         eventsStorageInteractor.addEventToDB(event)
         quantsStorageInteractor.incrementQuantUsage(event.quantId)
         _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
-        _todayTotal.value = calculateTodayTotal()
+
+        updateTodayTotal()
+//        _todayTotal.value = updateTodayTotal()
+//        _listOfGoals.value = getGoalPresent(goalStorageInteractor.getListOfGoals().first())
     }
 
-    private fun calculateTodayTotal() : Double{
+    private fun updateTodayTotal() {
         val startDate = Calendar.getInstance().getStartDateCalendar(TimeInterval.Today, settingsInteractor.getStartDayTime()).timeInMillis
         val endDate = System.currentTimeMillis()
 
         val resultList = ArrayList(
             eventsStorageInteractor.getAllEvents().filter { it.date in startDate until endDate })
 
-        return getTotal(quantsStorageInteractor, resultList)
+        _todayTotal.value = getTotal(quantsStorageInteractor, resultList)
+
+        val millisecondsInDay = 24 * 60 * 60 * 1000
+        val goalStartDate = Calendar.getInstance().getStartDateCalendar(TimeInterval.Week, settingsInteractor.getStartDayTime()).timeInMillis
+
+        val goalResultList = ArrayList(
+            eventsStorageInteractor.getAllEvents().filter { it.date in startDate until endDate })
+
+        val daysGone = ((endDate - goalStartDate) / millisecondsInDay).toInt() + 1
+        val completed = getTotal(quantsStorageInteractor, goalResultList, QuantCategory.All)
+        val goal = goalStorageInteractor.getListOfGoals().first()
+        _listOfGoals.value = GoalPresent(goal.duration, goal.target, completed, daysGone, goal.type)
     }
 
+//    private fun getGoalPresent(goal: Goal) : GoalPresent {
+//        val millisecondsInDay = 24 * 60 * 60 * 1000
+//        val startDate = Calendar.getInstance().getStartDateCalendar(TimeInterval.Week, settingsInteractor.getStartDayTime()).timeInMillis
+//        val endDate = System.currentTimeMillis()
+//
+//        val resultList = ArrayList(
+//            eventsStorageInteractor.getAllEvents().filter { it.date in startDate until endDate })
+//
+//        val daysGone = ((endDate - startDate) / millisecondsInDay).toInt() + 1
+//        val completed = getTotal(quantsStorageInteractor, resultList, QuantCategory.All)
+//        return GoalPresent(goal.duration, goal.target, completed, daysGone, goal.type)
+//    }
 }

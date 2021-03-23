@@ -10,16 +10,16 @@ import com.skyfolk.quantoflife.entity.*
 import com.skyfolk.quantoflife.getStartDateCalendar
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.feeds.getTotal
+import java.time.temporal.WeekFields
 import java.util.*
 import kotlin.collections.ArrayList
 
-class StatisticViewModel(
+class FeedsViewModel(
     private val eventsStorageInteractor: EventsStorageInteractor,
     private val settingsInteractor: SettingsInteractor,
     private val quantsStorageInteractor: IQuantsStorageInteractor
 ) : ViewModel() {
     private val _listOfEvents = MutableLiveData<ArrayList<EventBase>>().apply {
-        QLog.d("events list loading")
         value = eventsStorageInteractor.getAllEvents()
     }
     val listOfEvents: LiveData<ArrayList<EventBase>> = _listOfEvents
