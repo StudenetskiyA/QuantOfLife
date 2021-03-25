@@ -43,7 +43,7 @@ constructor(context: Context,
         progressText.text = "${goalPresent.comleted.format(0)} из ${goalPresent.target.format(0)}"
 
         val daysTotal = 7
-        val dayGone = 2
+        val dayGone = goalPresent.daysGone
 
         val futureProgress = goalPresent.comleted / dayGone * daysTotal
         if (futureProgress >= goalPresent.target) {

@@ -1,8 +1,7 @@
 package com.skyfolk.quantoflife
 
 import com.skyfolk.quantoflife.ui.feeds.TimeInterval
-import com.skyfolk.quantoflife.utils.toCalendar
-import com.skyfolk.quantoflife.utils.toDate
+import com.skyfolk.quantoflife.utils.getEndDateCalendar
 import org.junit.Assert
 import org.junit.Test
 import java.util.*

@@ -1,11 +1,8 @@
-package com.skyfolk.quantoflife
+package com.skyfolk.quantoflife.utils
 
-import android.util.Log
 import com.google.android.material.snackbar.Snackbar
 import com.skyfolk.quantoflife.entity.QuantBase
 import com.skyfolk.quantoflife.ui.feeds.TimeInterval
-import com.skyfolk.quantoflife.utils.toCalendarOnlyHourAndMinute
-import com.skyfolk.quantoflife.utils.toDate
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -45,25 +42,28 @@ fun Calendar.moreHourAndMinute(calendar: Calendar) : Boolean {
 fun Calendar.getStartDateCalendar(timeInterval: TimeInterval, startDayTime: Long) : Calendar {
     val calendar: Calendar = this.clone() as Calendar
     when (timeInterval) {
-        TimeInterval.All -> {
+        is TimeInterval.All -> {
             calendar[Calendar.YEAR] = 1900
         }
-        TimeInterval.Month -> {
+        is TimeInterval.Month -> {
             if (calendar[Calendar.DAY_OF_MONTH]==1 && calendar.lessHourAndMinute(startDayTime.toCalendarOnlyHourAndMinute())) {
                 calendar[Calendar.MONTH] --
             }
             calendar[Calendar.DAY_OF_MONTH] = 1
         }
-        TimeInterval.Week -> {
+        is TimeInterval.Week -> {
             if (calendar[Calendar.DAY_OF_WEEK]==2 && calendar.lessHourAndMinute(startDayTime.toCalendarOnlyHourAndMinute())) {
                 calendar[Calendar.WEEK_OF_YEAR] --
             }
             calendar[Calendar.DAY_OF_WEEK] = 2
         }
-        TimeInterval.Today -> {
+        is TimeInterval.Today -> {
             if (calendar.lessHourAndMinute(startDayTime.toCalendarOnlyHourAndMinute())) {
                 calendar[Calendar.DAY_OF_MONTH] --
             }
+        }
+        is TimeInterval.Selected -> {
+            calendar.timeInMillis = timeInterval.start
         }
     }
     calendar[Calendar.HOUR_OF_DAY] = startDayTime.toCalendarOnlyHourAndMinute()[Calendar.HOUR_OF_DAY]
@@ -79,27 +79,31 @@ fun Calendar.getEndDateCalendar(timeInterval: TimeInterval, startDayTime: Long) 
     calendar.minimalDaysInFirstWeek = 1
 
     when (timeInterval) {
-        TimeInterval.All -> {
+        is TimeInterval.All -> {
             calendar[Calendar.YEAR] = 30900
         }
-        TimeInterval.Month -> {
+        is TimeInterval.Month -> {
             if (calendar[Calendar.DAY_OF_MONTH]>1 ||
                 (calendar[Calendar.DAY_OF_MONTH]==1 && calendar.moreHourAndMinute(startDayTime.toCalendarOnlyHourAndMinute()))) {
                 calendar[Calendar.MONTH] ++
             }
             calendar[Calendar.DAY_OF_MONTH] = 1
         }
-        TimeInterval.Week -> {
+        is TimeInterval.Week -> {
             if (calendar[Calendar.DAY_OF_WEEK]>2 ||
                 (calendar[Calendar.DAY_OF_WEEK]==2 && calendar.moreHourAndMinute(startDayTime.toCalendarOnlyHourAndMinute()))) {
                 calendar[Calendar.WEEK_OF_YEAR] ++
             }
             calendar[Calendar.DAY_OF_WEEK] = 2
         }
-        TimeInterval.Today -> {
+        is TimeInterval.Today -> {
             if (calendar.moreHourAndMinute(startDayTime.toCalendarOnlyHourAndMinute())) {
                 calendar[Calendar.DAY_OF_MONTH] ++
             }
+        }
+        is TimeInterval.Selected -> {
+            calendar.timeInMillis = timeInterval.end
+            calendar[Calendar.DAY_OF_MONTH] ++
         }
     }
     calendar[Calendar.HOUR_OF_DAY] = startDayTime.toCalendarOnlyHourAndMinute()[Calendar.HOUR_OF_DAY]

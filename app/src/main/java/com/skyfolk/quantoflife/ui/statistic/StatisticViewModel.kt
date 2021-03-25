@@ -1,6 +1,5 @@
 package com.skyfolk.quantoflife.ui.statistic
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,7 +9,7 @@ import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.db.EventsStorageInteractor
 import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
 import com.skyfolk.quantoflife.feeds.getTotal
-import com.skyfolk.quantoflife.getEndDateCalendar
+import com.skyfolk.quantoflife.utils.getEndDateCalendar
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.ui.feeds.TimeInterval
 import com.skyfolk.quantoflife.utils.*
@@ -21,15 +20,17 @@ class StatisticViewModel(
     private val quantsStorageInteractor: IQuantsStorageInteractor,
     private val settingsInteractor: SettingsInteractor
 ) : ViewModel() {
-    private val _barEntryData = MutableLiveData<EntryAndFirstDate>().apply {
+    private val _barEntryData = MutableLiveData<EntryAndFirstDate?>().apply {
         value = getBarEntryData()
     }
-    val barEntryData: LiveData<EntryAndFirstDate> = _barEntryData
+    val barEntryData: LiveData<EntryAndFirstDate?> = _barEntryData
 
-    private fun getBarEntryData() : EntryAndFirstDate {
+    private fun getBarEntryData() : EntryAndFirstDate? {
         val result = ArrayList<Entry>()
         var resultCount = 0
         val allEvents = eventsStorageInteractor.getAllEvents()
+
+        if (allEvents.firstOrNull() == null) return null
 
         val firstDate = allEvents.first().date
         val lastDate = System.currentTimeMillis()

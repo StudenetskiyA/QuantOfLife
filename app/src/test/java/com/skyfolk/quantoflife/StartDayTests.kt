@@ -1,6 +1,7 @@
 package com.skyfolk.quantoflife
 
 import com.skyfolk.quantoflife.ui.feeds.TimeInterval
+import com.skyfolk.quantoflife.utils.getStartDateCalendar
 import org.junit.Assert
 import org.junit.Test
 import java.util.*
@@ -55,6 +56,14 @@ class StartDayTests {
         Assert.assertEquals(28, calendar.getStartDateCalendar(TimeInterval.Week, startDayTimeInMillis)[Calendar.DAY_OF_MONTH])
         Assert.assertEquals(20, calendar.getStartDateCalendar(TimeInterval.Week, startDayTimeInMillis)[Calendar.MINUTE])
         Assert.assertEquals(2020, calendar.getStartDateCalendar(TimeInterval.Week, startDayTimeInMillis)[Calendar.YEAR])
+
+        //03-01 05:25
+        calendar[Calendar.DAY_OF_MONTH] = 24
+        calendar[Calendar.MONTH] = 2
+        calendar[Calendar.YEAR] = 2021
+        Assert.assertEquals(22, calendar.getStartDateCalendar(TimeInterval.Week, startDayTimeInMillis)[Calendar.DAY_OF_MONTH])
+        Assert.assertEquals(20, calendar.getStartDateCalendar(TimeInterval.Week, startDayTimeInMillis)[Calendar.MINUTE])
+        Assert.assertEquals(2021, calendar.getStartDateCalendar(TimeInterval.Week, startDayTimeInMillis)[Calendar.YEAR])
     }
 
     @Test

@@ -8,7 +8,7 @@ import com.skyfolk.quantoflife.db.EventsStorageInteractor
 import com.skyfolk.quantoflife.db.IGoalStorageInteractor
 import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
 import com.skyfolk.quantoflife.entity.*
-import com.skyfolk.quantoflife.getStartDateCalendar
+import com.skyfolk.quantoflife.utils.getStartDateCalendar
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.feeds.getTotal
 import com.skyfolk.quantoflife.ui.create_quant.CreateQuantDialogFragment
@@ -40,7 +40,7 @@ class NowViewModel(
     val todayTotal: LiveData<Double> = _todayTotal
 
     private val _listOfGoals = MutableLiveData<GoalPresent?>().apply {
-        value = null // getGoalPresent(goalStorageInteractor.getListOfGoals().first())
+        value = null
     }
     val listOfGoal: LiveData<GoalPresent?> = _listOfGoals
 
@@ -62,7 +62,6 @@ class NowViewModel(
                 quantsStorageInteractor.addQuantToDB(quant)
                 _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
                 updateTodayTotal()
-                //_todayTotal.value = updateTodayTotal()
             }
 
             override fun onDelete(quant: QuantBase) {
@@ -81,8 +80,6 @@ class NowViewModel(
         _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
 
         updateTodayTotal()
-//        _todayTotal.value = updateTodayTotal()
-//        _listOfGoals.value = getGoalPresent(goalStorageInteractor.getListOfGoals().first())
     }
 
     private fun updateTodayTotal() {
@@ -98,24 +95,11 @@ class NowViewModel(
         val goalStartDate = Calendar.getInstance().getStartDateCalendar(TimeInterval.Week, settingsInteractor.getStartDayTime()).timeInMillis
 
         val goalResultList = ArrayList(
-            eventsStorageInteractor.getAllEvents().filter { it.date in startDate until endDate })
+            eventsStorageInteractor.getAllEvents().filter { it.date in goalStartDate until endDate })
 
         val daysGone = ((endDate - goalStartDate) / millisecondsInDay).toInt() + 1
         val completed = getTotal(quantsStorageInteractor, goalResultList, QuantCategory.All)
         val goal = goalStorageInteractor.getListOfGoals().first()
         _listOfGoals.value = GoalPresent(goal.duration, goal.target, completed, daysGone, goal.type)
     }
-
-//    private fun getGoalPresent(goal: Goal) : GoalPresent {
-//        val millisecondsInDay = 24 * 60 * 60 * 1000
-//        val startDate = Calendar.getInstance().getStartDateCalendar(TimeInterval.Week, settingsInteractor.getStartDayTime()).timeInMillis
-//        val endDate = System.currentTimeMillis()
-//
-//        val resultList = ArrayList(
-//            eventsStorageInteractor.getAllEvents().filter { it.date in startDate until endDate })
-//
-//        val daysGone = ((endDate - startDate) / millisecondsInDay).toInt() + 1
-//        val completed = getTotal(quantsStorageInteractor, resultList, QuantCategory.All)
-//        return GoalPresent(goal.duration, goal.target, completed, daysGone, goal.type)
-//    }
 }

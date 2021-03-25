@@ -14,10 +14,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.databinding.NowFragmentBinding
 import com.skyfolk.quantoflife.entity.*
-import com.skyfolk.quantoflife.filterToArrayList
-import com.skyfolk.quantoflife.setOnHideByTimeout
+import com.skyfolk.quantoflife.utils.filterToArrayList
+import com.skyfolk.quantoflife.utils.setOnHideByTimeout
 import com.skyfolk.quantoflife.settings.SettingsInteractor
-import com.skyfolk.quantoflife.ui.feeds.TimeInterval
 import com.skyfolk.quantoflife.ui.now.CreateEventDialogFragment.DialogListener
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject

@@ -1,13 +1,10 @@
 package com.skyfolk.quantoflife.statistic
 
-import com.github.mikephil.charting.charts.BarLineChartBase
 import com.github.mikephil.charting.formatter.ValueFormatter
-import com.skyfolk.quantoflife.getEndDateCalendar
-import com.skyfolk.quantoflife.getStartDateCalendar
-import com.skyfolk.quantoflife.settings.SettingsInteractor
+import com.skyfolk.quantoflife.utils.getEndDateCalendar
+import com.skyfolk.quantoflife.utils.getStartDateCalendar
 import com.skyfolk.quantoflife.ui.feeds.TimeInterval
 import com.skyfolk.quantoflife.utils.toCalendar
-import com.skyfolk.quantoflife.utils.toDate
 import com.skyfolk.quantoflife.utils.toShortDate
 
 class WeekAxisValueFormatter(private val startFirstWeekTimeInMillis: Long) : ValueFormatter() {

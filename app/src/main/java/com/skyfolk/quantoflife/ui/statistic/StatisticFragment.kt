@@ -39,30 +39,37 @@ class StatisticFragment : Fragment() {
         binding.chart.legend.isEnabled = false
 
         viewModel.barEntryData.observe(viewLifecycleOwner, { data ->
-            val set = LineDataSet(data.entry, "")
-            set.setDrawIcons(false)
-            set.setDrawFilled(true)
-            context?.let { set.fillDrawable = ContextCompat.getDrawable(it, R.drawable.fade_red) }
+            if (data != null && data.entry.size > 1) {
+                val set = LineDataSet(data.entry, "")
+                set.setDrawIcons(false)
+                set.setDrawFilled(true)
+                context?.let {
+                    set.fillDrawable = ContextCompat.getDrawable(it, R.drawable.fade_red)
+                }
 
-            val dataSets = ArrayList<ILineDataSet>()
-            dataSets.add(set)
-            val barData = LineData(dataSets)
-            barData.setDrawValues(true)
+                val dataSets = ArrayList<ILineDataSet>()
+                dataSets.add(set)
+                val barData = LineData(dataSets)
+                barData.setDrawValues(true)
 
-            val xAxis = binding.chart.xAxis
-            xAxis.position = XAxisPosition.BOTTOM
-            xAxis.setDrawGridLines(true)
-            xAxis.labelRotationAngle = -45F
+                val xAxis = binding.chart.xAxis
+                xAxis.position = XAxisPosition.BOTTOM
+                xAxis.setDrawGridLines(true)
+                xAxis.labelRotationAngle = -45F
 
-            xAxis.granularity = (data.entry[1].x - data.entry[0].x)
-            xAxis.labelCount = data.entry.size
+                xAxis.granularity = (data.entry[1].x - data.entry[0].x)
+                xAxis.labelCount = data.entry.size
 
-            val xAxisFormatter = WeekAxisValueFormatter(data.firstDate)
-            xAxis.valueFormatter = xAxisFormatter
+                val xAxisFormatter = WeekAxisValueFormatter(data.firstDate)
+                xAxis.valueFormatter = xAxisFormatter
 
-            binding.chart
+//                binding.chart
 
-            binding.chart.data = barData
+                binding.chart.data = barData
+            } else {
+                // Not enough data
+                binding.chart.visibility = View.GONE
+            }
         })
 
         return binding.root

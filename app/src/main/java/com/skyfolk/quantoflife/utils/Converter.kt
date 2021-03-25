@@ -14,11 +14,17 @@ fun Long.toDate() : String {
                 Instant.ofEpochMilli(this),
                 ZoneId.systemDefault()))
 }
+fun Long.toDateWithoutHourAndMinutes() : String {
+    return DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).format(
+            ZonedDateTime.ofInstant(
+                Instant.ofEpochMilli(this),
+                ZoneId.systemDefault()))
+}
 fun Long.toShortDate() : String {
     val calendar = Calendar.getInstance()
     calendar.timeInMillis = this
-    val day = if (calendar[Calendar.DAY_OF_MONTH] < 10) "0${calendar[Calendar.DAY_OF_MONTH]}" else calendar[Calendar.DAY_OF_MONTH]
-    val month = if (calendar[Calendar.MONTH+1] < 10) "0${calendar[Calendar.MONTH]+1}" else calendar[Calendar.MONTH]+1
+    val day = if (calendar[Calendar.DAY_OF_MONTH] + 1 < 10) "0${calendar[Calendar.DAY_OF_MONTH]}" else calendar[Calendar.DAY_OF_MONTH]
+    val month = if (calendar[Calendar.MONTH] +1 < 10) "0${calendar[Calendar.MONTH]+1}" else calendar[Calendar.MONTH]+1
     return "$day:$month"
 }
 
