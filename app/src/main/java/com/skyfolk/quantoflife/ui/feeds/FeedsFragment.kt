@@ -179,6 +179,10 @@ class FeedsFragment : Fragment() {
                 binding.totalValue.text = String.format("%.1f", it)
             })
 
+            viewModel.totalStarFound.observe(viewLifecycleOwner, {
+                binding.starValue.text = it.toString()
+            })
+
 
         }
 
@@ -241,3 +245,4 @@ class FeedsFragment : Fragment() {
         return binding.root
     }
 }
+

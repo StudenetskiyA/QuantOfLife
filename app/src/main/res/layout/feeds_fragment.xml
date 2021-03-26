@@ -4,314 +4,339 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/feeds_fragment_root">
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ui.feeds.FeedsFragment"
-    android:paddingStart="10dp"
-    android:paddingEnd="10dp"
-    android:paddingTop="10dp"
-    android:paddingBottom="60dp">
-
-    <TextView
-        android:id="@+id/list_description"
-        android:layout_height="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/list_of_events_layout"
-        android:text="Лента событий"
-        android:textAlignment="center"
-        android:textStyle="bold"
-        />
-
-    <LinearLayout
-        android:id="@+id/list_of_events_layout"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/list_description"
-        app:layout_constraintBottom_toTopOf="@id/total_layout"
-        android:orientation="vertical">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/list_of_events"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/list_description"
-            android:paddingBottom="30dp"
-            tools:visibility="visible"/>
-        <TextView
-            android:id="@+id/items_not_found"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/list_description"
-            android:text = "События с указанным фильтром не найдены"
-            android:paddingBottom="30dp"
-            android:paddingTop="20dp"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/total_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/list_of_events_layout"
-        app:layout_constraintBottom_toTopOf="@id/filter_layout">
-        <View
-            android:id="@+id/total_description_line"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/background_dark"
-            android:layout_marginBottom="8dp"/>
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="60dp"
+        tools:context=".ui.feeds.FeedsFragment">
 
         <TextView
-            android:id="@+id/total_description"
-            android:layout_height="wrap_content"
+            android:id="@+id/list_description"
             android:layout_width="match_parent"
-            tools:text = "Итого за период найдено 99 событий"
+            android:layout_height="wrap_content"
+            android:text="Лента событий"
             android:textAlignment="center"
-            android:layout_marginBottom="8dp"
             android:textStyle="bold"
-            />
+            app:layout_constraintBottom_toTopOf="@id/list_of_events_layout"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
+            android:id="@+id/list_of_events_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:id="@+id/physical_description"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:text="Всего физического:"
-                />
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/total_layout"
+            app:layout_constraintTop_toBottomOf="@id/list_description">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/list_of_events"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingBottom="30dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/list_description"
+                tools:visibility="visible" />
 
             <TextView
-                android:id="@+id/physical_value"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:gravity="end"
-                android:layout_weight="1"
-                tools:text="100.98"
-                />
+                android:id="@+id/items_not_found"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="20dp"
+                android:paddingBottom="30dp"
+                android:text="События с указанным фильтром не найдены"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/list_description" />
         </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:id="@+id/emotional_description"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            android:text="Всего эмоционального:"
-            />
-        <TextView
-            android:id="@+id/emotional_value"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:text="80.98"
-            android:gravity="end"
-            android:layout_weight="1"
-            />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:id="@+id/evolution_description"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            android:text="Всего эволюционного:"
-            />
-        <TextView
-            android:id="@+id/evolution_value"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:text="80.98"
-            android:gravity="end"
-            android:layout_weight="1"
-            />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:id="@+id/period_total_description"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:text="Всего:"
-            android:layout_marginBottom="12dp"
-            />
-        <TextView
-            android:id="@+id/total_value"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:text="80.98"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="12dp"
-            android:gravity="end"
-            android:layout_weight="1"
-            />
-    </LinearLayout>
-
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/filter_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/total_layout"
-        app:layout_constraintBottom_toBottomOf="parent">
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/background_dark"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/total_layout"
-            android:layout_marginBottom="4dp"
-            />
-
-        <TextView
-            android:id="@+id/filter_description"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/spinner"
-            android:text = "Фильтр : "
-            android:textAlignment="center"
-            android:layout_marginBottom="8dp"
-            android:textStyle="bold"
-            />
-
-        <Spinner
-            android:id="@+id/spinner"
+        <LinearLayout
+            android:id="@+id/total_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/time_interval_radio_group"
-            android:layout_marginBottom="8dp"/>
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/filter_layout"
+            app:layout_constraintTop_toBottomOf="@id/list_of_events_layout">
 
-        <Spinner
-            android:id="@+id/time_interval_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/search"
-            android:entries="@array/time_interval"/>
+            <View
+                android:id="@+id/total_description_line"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="8dp"
+                android:background="@android:color/background_dark" />
 
-        <RadioGroup
-            android:id="@+id/time_interval_radio_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/search"
-            android:visibility="gone">
-            <RadioButton
-                android:id="@+id/time_interval_all"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text = "Все время"/>
-            <RadioButton
-                android:id="@+id/time_interval_this_month"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text = "Этот месяц"/>
-            <RadioButton
-                android:id="@+id/time_interval_this_week"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text = "Эта неделя"/>
-            <RadioButton
-                android:id="@+id/time_interval_today"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text = "Сегодня"/>
-        </RadioGroup>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="4dp"
-            android:id="@+id/selected_time_interval_layout">
             <TextView
-                android:id="@+id/selected_time_interval_start_label"
-                android:layout_width="wrap_content"
+                android:id="@+id/total_description"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text = "От 8 мар. 2021г."
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_gravity="center"
-                />
-            <ImageButton
-                android:id="@+id/time_interval_start_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@android:color/transparent"
-                android:scaleType="fitCenter"
-                app:layout_constraintStart_toEndOf="@id/selected_time_interval_start_label"
-                app:layout_constraintTop_toTopOf="parent"
-                android:src="@drawable/quant_date" />
+                android:layout_marginBottom="8dp"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                tools:text="Итого за период найдено 99 событий" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/physical_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Всего физического:" />
+
+                <TextView
+                    android:id="@+id/physical_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    tools:text="100.98" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/emotional_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Всего эмоционального:"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/emotional_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="80.98" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/evolution_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Всего эволюционного:"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/evolution_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="80.98" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/star_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Всего звезд:"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/star_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="10" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/period_total_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:text="Всего:"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/total_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="80.98" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/filter_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/total_layout">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="4dp"
+                android:background="@android:color/background_dark"
+                app:layout_constraintBottom_toTopOf="@id/total_layout"
+                app:layout_constraintStart_toStartOf="parent" />
+
             <TextView
-                android:id="@+id/selected_time_interval_end_label"
+                android:id="@+id/filter_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Фильтр : "
+                android:textAlignment="center"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@id/spinner"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toTopOf="@id/time_interval_radio_group"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <Spinner
+                android:id="@+id/time_interval_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:entries="@array/time_interval"
+                app:layout_constraintBottom_toTopOf="@+id/search"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <RadioGroup
+                android:id="@+id/time_interval_radio_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@+id/search"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <RadioButton
+                    android:id="@+id/time_interval_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Все время" />
+
+                <RadioButton
+                    android:id="@+id/time_interval_this_month"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Этот месяц" />
+
+                <RadioButton
+                    android:id="@+id/time_interval_this_week"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Эта неделя" />
+
+                <RadioButton
+                    android:id="@+id/time_interval_today"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Сегодня" />
+            </RadioGroup>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/selected_time_interval_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="4dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/selected_time_interval_start_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="От 8 мар. 2021г."
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageButton
+                    android:id="@+id/time_interval_start_button"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@android:color/transparent"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/quant_date"
+                    app:layout_constraintStart_toEndOf="@id/selected_time_interval_start_label"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/selected_time_interval_end_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignStart="@+id/time_interval_end_button"
+                    android:layout_gravity="center"
+                    android:text="До 8 мар. 2021г."
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/time_interval_end_button"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageButton
+                    android:id="@+id/time_interval_end_button"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@android:color/transparent"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/quant_date"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <Button
+                android:id="@+id/search"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text = "До 8 мар. 2021г."
-                android:layout_gravity="center"
-                app:layout_constraintEnd_toStartOf="@id/time_interval_end_button"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_alignStart="@+id/time_interval_end_button"
-                />
-            <ImageButton
-                android:id="@+id/time_interval_end_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@android:color/transparent"
-                android:scaleType="fitCenter"
-                app:layout_constraintTop_toTopOf="parent"
-                android:src="@drawable/quant_date"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                android:text="Search"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <Button
-            android:id="@+id/search"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            android:text="Search"
-            android:visibility="gone"
-            />
-        <Button
-            android:id="@+id/clear_search"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toEndOf="@+id/search"
-            android:text="Clear"
-            android:visibility="gone"
-            />
-    </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <Button
+                android:id="@+id/clear_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clear"
+                android:visibility="gone"
+                app:layout_constraintStart_toEndOf="@+id/search" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

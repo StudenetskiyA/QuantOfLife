@@ -23,3 +23,16 @@ fun getTotal(quantsStorageInteractor: IQuantsStorageInteractor, events: List<Eve
     return total
 }
 
+fun getStarTotal(quantsStorageInteractor: IQuantsStorageInteractor, events: List<EventBase>) : Int {
+    var total = 0
+
+    for (event in events) {
+        if (event is EventBase.EventRated) {
+            val foundQuant = quantsStorageInteractor.getQuantById(event.quantId)
+            if (foundQuant is QuantBase.QuantRated) {
+                        total += event.rate
+                }
+            }
+        }
+    return total
+}

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.skyfolk.quantoflife.db.EventsStorageInteractor
 import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
 import com.skyfolk.quantoflife.entity.*
+import com.skyfolk.quantoflife.feeds.getStarTotal
 import com.skyfolk.quantoflife.utils.getStartDateCalendar
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.feeds.getTotal
@@ -55,6 +56,14 @@ class FeedsViewModel(
     }
     val totalEvolutionFound: LiveData<Double> = _totalEvolutionFound
 
+    private val _totalStarFound = MutableLiveData<Int>().apply {
+        value = getStarTotal(
+            quantsStorageInteractor,
+            eventsStorageInteractor.getAllEvents()
+        )
+    }
+    val totalStarFound: LiveData<Int> = _totalStarFound
+
     private val _totalFound = MutableLiveData<Double>().apply {
         value = getTotal(quantsStorageInteractor, eventsStorageInteractor.getAllEvents())
     }
@@ -77,15 +86,15 @@ class FeedsViewModel(
     }
 
     fun runSearch() {
-        selectedTimeInterval.value?.let {
+        selectedTimeInterval.value?.let { interval ->
             val startDate =
                 Calendar.getInstance().getStartDateCalendar(
-                    it,
+                    interval,
                     settingsInteractor.getStartDayTime()
                 ).timeInMillis
             val endDate =
                 Calendar.getInstance().getEndDateCalendar(
-                    it,
+                    interval,
                     settingsInteractor.getStartDayTime()
                 ).timeInMillis
 
@@ -101,13 +110,16 @@ class FeedsViewModel(
         }
     }
 
-    private fun setListOfEventsValue(value: ArrayList<EventBase>) {
-        _listOfEvents.value = value
-        _totalPhysicalFound.value = getTotal(quantsStorageInteractor, value, QuantCategory.Physical)
-        _totalEmotionalFound.value = getTotal(quantsStorageInteractor, value, QuantCategory.Emotion)
+    private fun setListOfEventsValue(listOfEvents: ArrayList<EventBase>) {
+        _listOfEvents.value = listOfEvents
+        _totalPhysicalFound.value =
+            getTotal(quantsStorageInteractor, listOfEvents, QuantCategory.Physical)
+        _totalEmotionalFound.value =
+            getTotal(quantsStorageInteractor, listOfEvents, QuantCategory.Emotion)
         _totalEvolutionFound.value =
-            getTotal(quantsStorageInteractor, value, QuantCategory.Evolution)
-        _totalFound.value = getTotal(quantsStorageInteractor, value)
+            getTotal(quantsStorageInteractor, listOfEvents, QuantCategory.Evolution)
+        _totalFound.value = getTotal(quantsStorageInteractor, listOfEvents)
+        _totalStarFound.value = getStarTotal(quantsStorageInteractor, listOfEvents)
     }
 
     fun saveTimeIntervalState(timeInterval: TimeInterval) {
@@ -159,4 +171,22 @@ sealed class TimeInterval {
             }
         }
     }
+}
+
+sealed class FeedsFragmentState(
+    open val listOfQuants: ArrayList<QuantBase>,
+    open val selectedTimeInterval: TimeInterval,
+    open val selectedEventFilter: String
+) {
+    data class Loading(
+        override val listOfQuants: ArrayList<QuantBase>,
+        override val selectedTimeInterval: TimeInterval,
+        override val selectedEventFilter: String
+    ) : FeedsFragmentState(listOfQuants, selectedTimeInterval, selectedEventFilter)
+
+    data class Completed(
+        override val listOfQuants: ArrayList<QuantBase>,
+        override val selectedTimeInterval: TimeInterval,
+        override val selectedEventFilter: String
+    ) : FeedsFragmentState(listOfQuants, selectedTimeInterval, selectedEventFilter)
 }

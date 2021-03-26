@@ -63,8 +63,6 @@ class StatisticFragment : Fragment() {
                 val xAxisFormatter = WeekAxisValueFormatter(data.firstDate)
                 xAxis.valueFormatter = xAxisFormatter
 
-//                binding.chart
-
                 binding.chart.data = barData
             } else {
                 // Not enough data

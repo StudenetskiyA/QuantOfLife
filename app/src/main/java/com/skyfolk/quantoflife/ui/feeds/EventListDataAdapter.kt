@@ -85,7 +85,8 @@ class EventListDataAdapter(
                     if (foundQuant is QuantBase.QuantRated) {
                         for (bonus in foundQuant.bonuses) {
                             result += " " + settingsInteractor.getCategoryName(bonus.category)
-                            val value = bonus.baseBonus + bonus.bonusForEachRating * event.rate
+                            // 0,3*3=0.899999999999 WTF??!!
+                            val value = bonus.baseBonus.toBigDecimal().add(bonus.bonusForEachRating.toBigDecimal().multiply(event.rate.toBigDecimal()))
                             result += "=$value;"
                         }
                     }
