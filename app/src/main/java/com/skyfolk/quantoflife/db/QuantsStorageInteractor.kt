@@ -46,6 +46,10 @@ class QuantsStorageInteractor(private val dbInteractor: DBInteractor) : IQuantsS
         return getAllQuantsList(true).find { it.id == id }
     }
 
+    override fun getQuantByName(name: String): QuantBase? {
+        return getAllQuantsList(true).find { it.name == name }
+    }
+
     override fun incrementQuantUsage(id: String) {
         dbInteractor.getDB().executeTransaction {
             dbInteractor.getDB().where(QuantDbEntity::class.java).equalTo("id", id).findFirst().usageCount++

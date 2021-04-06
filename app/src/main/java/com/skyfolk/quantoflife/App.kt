@@ -28,13 +28,14 @@ class App: Application() {
             single{ EventsStorageInteractor(get()) }
             single<IGoalStorageInteractor> { GoalStorageInteractor() }
             single { SettingsInteractor(androidContext().getSharedPreferences("qol_preferences", Context.MODE_PRIVATE))}
+            single<IDateTimeRepository> { DateTimeRepository() }
         }
 
         val viewModelModule = module {
-            viewModel { NowViewModel(get(), get(), get(), get()) }
+            viewModel { NowViewModel(get(), get(), get(), get(), get()) }
             viewModel { SettingsViewModel(get(), get(), get(), get())}
-            viewModel { FeedsViewModel(get(), get(), get()) }
-            viewModel { StatisticViewModel(get(), get(), get()) }
+            viewModel { FeedsViewModel(get(), get(), get(), get()) }
+            viewModel { StatisticViewModel(get(), get(), get(), get()) }
             viewModel { OnBoardingViewModel(get()) }
         }
 

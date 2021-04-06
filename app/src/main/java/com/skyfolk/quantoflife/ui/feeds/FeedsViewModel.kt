@@ -1,8 +1,12 @@
 package com.skyfolk.quantoflife.ui.feeds
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.skyfolk.quantoflife.DateTimeRepository
+import com.skyfolk.quantoflife.IDateTimeRepository
 import com.skyfolk.quantoflife.db.EventsStorageInteractor
 import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
 import com.skyfolk.quantoflife.entity.*
@@ -10,147 +14,125 @@ import com.skyfolk.quantoflife.feeds.getStarTotal
 import com.skyfolk.quantoflife.utils.getStartDateCalendar
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.feeds.getTotal
+import com.skyfolk.quantoflife.ui.feeds.FeedsFragmentState.EventsListLoading.Companion.updateStateToLoading
+import com.skyfolk.quantoflife.ui.feeds.FeedsFragmentState.LoadingEventsListCompleted.Companion.updateStateToCompleted
 import com.skyfolk.quantoflife.utils.getEndDateCalendar
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
 
 class FeedsViewModel(
     private val eventsStorageInteractor: EventsStorageInteractor,
     private val settingsInteractor: SettingsInteractor,
-    private val quantsStorageInteractor: IQuantsStorageInteractor
+    private val quantsStorageInteractor: IQuantsStorageInteractor,
+    private val dateTimeRepository: IDateTimeRepository
 ) : ViewModel() {
-    private val _listOfEvents = MutableLiveData<ArrayList<EventBase>>().apply {
-        value = eventsStorageInteractor.getAllEvents()
-    }
-    val listOfEvents: LiveData<ArrayList<EventBase>> = _listOfEvents
-
-    private val _listOfQuants = MutableLiveData<ArrayList<QuantBase>>().apply {
-        value = quantsStorageInteractor.getAllQuantsList(false)
-    }
-    val listOfQuants: LiveData<ArrayList<QuantBase>> = _listOfQuants
-
-    private val _totalPhysicalFound = MutableLiveData<Double>().apply {
-        value = getTotal(
-            quantsStorageInteractor,
-            eventsStorageInteractor.getAllEvents(),
-            QuantCategory.Physical
+    private val _state = MutableLiveData<FeedsFragmentState>().apply {
+        value = FeedsFragmentState.EventsListLoading(
+            listOfQuants = quantsStorageInteractor.getAllQuantsList(false),
+            selectedTimeInterval = TimeInterval.toTimeInterval(
+                settingsInteractor.getStatisticTimeIntervalSelectedElement(),
+                settingsInteractor.getStatisticTimeStart(),
+                settingsInteractor.getStatisticTimeEnd()
+            ),
+            selectedEventFilter = settingsInteractor.getSelectedEventFiler()
         )
     }
-    val totalPhysicalFound: LiveData<Double> = _totalPhysicalFound
+    val state: LiveData<FeedsFragmentState> = _state
 
-    private val _totalEmotionalFound = MutableLiveData<Double>().apply {
-        value = getTotal(
-            quantsStorageInteractor,
-            eventsStorageInteractor.getAllEvents(),
-            QuantCategory.Emotion
-        )
-    }
-    val totalEmotionalFound: LiveData<Double> = _totalEmotionalFound
+    private fun runSearch(timeIntervalWasChanged: TimeIntervalWasChanged? = null, eventFilterWasChanged: EventFilterWasChanged? = null) {
+        viewModelScope.launch {
+            val selectedTimeInterval = timeIntervalWasChanged?.timeInterval ?: _state.value?.selectedTimeInterval
+            selectedTimeInterval?.let { interval ->
+                updateStateToLoading(_state)
 
-    private val _totalEvolutionFound = MutableLiveData<Double>().apply {
-        value = getTotal(
-            quantsStorageInteractor,
-            eventsStorageInteractor.getAllEvents(),
-            QuantCategory.Emotion
-        )
-    }
-    val totalEvolutionFound: LiveData<Double> = _totalEvolutionFound
+               // delay(1000)
 
-    private val _totalStarFound = MutableLiveData<Int>().apply {
-        value = getStarTotal(
-            quantsStorageInteractor,
-            eventsStorageInteractor.getAllEvents()
-        )
-    }
-    val totalStarFound: LiveData<Int> = _totalStarFound
-
-    private val _totalFound = MutableLiveData<Double>().apply {
-        value = getTotal(quantsStorageInteractor, eventsStorageInteractor.getAllEvents())
-    }
-    val totalFound: LiveData<Double> = _totalFound
-
-    private val _selectedTimeInterval = MutableLiveData<TimeInterval>().apply {
-        value = TimeInterval.toTimeInterval(
-            settingsInteractor.getStatisticTimeIntervalSelectedElement(),
-            settingsInteractor.getStatisticTimeStart(),
-            settingsInteractor.getStatisticTimeEnd()
-        )
-    }
-
-    val selectedTimeInterval: LiveData<TimeInterval> = _selectedTimeInterval
-
-    private var selectedEventFilter: String? = null
-
-    init {
-        runSearch()
-    }
-
-    fun runSearch() {
-        selectedTimeInterval.value?.let { interval ->
-            val startDate =
-                Calendar.getInstance().getStartDateCalendar(
-                    interval,
-                    settingsInteractor.getStartDayTime()
-                ).timeInMillis
-            val endDate =
-                Calendar.getInstance().getEndDateCalendar(
-                    interval,
-                    settingsInteractor.getStartDayTime()
-                ).timeInMillis
+                val startDate =
+                    dateTimeRepository.getCalendar().getStartDateCalendar(
+                        interval,
+                        settingsInteractor.getStartDayTime()
+                    ).timeInMillis
+                val endDate =
+                    dateTimeRepository.getCalendar().getEndDateCalendar(
+                        interval,
+                        settingsInteractor.getStartDayTime()
+                    ).timeInMillis
+                Log.d("skyfolk-time","start = $startDate , end = $endDate")
 
 
-            var resultList = ArrayList(
-                eventsStorageInteractor.getAllEvents()
-                    .filter { it.date in startDate until endDate })
-            if (selectedEventFilter != null) {
-                resultList = ArrayList(resultList.filter { it.quantId == selectedEventFilter })
+                var listOfEvents = ArrayList(
+                    eventsStorageInteractor.getAllEvents()
+                        .filter { it.date in startDate until endDate })
+                val selectedEventFilter = if (eventFilterWasChanged !=null) eventFilterWasChanged.eventFilter else _state.value?.selectedEventFilter
+                selectedEventFilter?.let { filter ->
+                    listOfEvents = ArrayList(listOfEvents.filter { it.quantId == filter })
+                }
+
+                updateStateToCompleted(
+                    _state,
+                    _timeInterval = interval,
+                    _selectedEventFilter = selectedEventFilter,
+                    _listOfEvents = listOfEvents,
+                    _totalPhysicalFound = getTotal(
+                        quantsStorageInteractor,
+                        listOfEvents,
+                        QuantCategory.Physical
+                    ),
+                    _totalEmotionalFound = getTotal(
+                        quantsStorageInteractor,
+                        listOfEvents,
+                        QuantCategory.Emotion
+                    ),
+                    _totalEvolutionFound = getTotal(
+                        quantsStorageInteractor,
+                        listOfEvents,
+                        QuantCategory.Evolution
+                    ),
+                    _totalFound = getTotal(quantsStorageInteractor, listOfEvents),
+                    _totalStarFound = getStarTotal(quantsStorageInteractor, listOfEvents)
+                )
+
             }
-
-            setListOfEventsValue(resultList)
         }
     }
 
-    private fun setListOfEventsValue(listOfEvents: ArrayList<EventBase>) {
-        _listOfEvents.value = listOfEvents
-        _totalPhysicalFound.value =
-            getTotal(quantsStorageInteractor, listOfEvents, QuantCategory.Physical)
-        _totalEmotionalFound.value =
-            getTotal(quantsStorageInteractor, listOfEvents, QuantCategory.Emotion)
-        _totalEvolutionFound.value =
-            getTotal(quantsStorageInteractor, listOfEvents, QuantCategory.Evolution)
-        _totalFound.value = getTotal(quantsStorageInteractor, listOfEvents)
-        _totalStarFound.value = getStarTotal(quantsStorageInteractor, listOfEvents)
-    }
-
-    fun saveTimeIntervalState(timeInterval: TimeInterval) {
+    fun setTimeIntervalState(timeInterval: TimeInterval) {
         settingsInteractor.writeStatisticTimeIntervalSelectedElement(timeInterval.javaClass.name)
         if (timeInterval is TimeInterval.Selected) {
             settingsInteractor.setStatisticTimeStart(timeInterval.start)
             settingsInteractor.setStatisticTimeEnd(timeInterval.end)
         }
-        _selectedTimeInterval.value = timeInterval
+
+        runSearch(timeIntervalWasChanged = TimeIntervalWasChanged(timeInterval))
     }
 
-    fun setSelectedEventFilter(item: String?) {
-        selectedEventFilter = if (item != null) {
-            quantsStorageInteractor.getAllQuantsList(true).first { it.name == item }.id
-        } else {
-            null
-        }
-        runSearch()
+    fun setSelectedEventFilter(itemId: String?) {
+        settingsInteractor.setSelectedEventFiler(itemId)
+        runSearch(eventFilterWasChanged = EventFilterWasChanged(itemId))
     }
 
     fun eventEdited(event: EventBase) {
         eventsStorageInteractor.addEventToDB(event)
-        _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
         runSearch()
     }
 
     fun deleteEvent(event: EventBase) {
         eventsStorageInteractor.deleteEvent(event)
-        _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
         runSearch()
     }
+
+    fun getQuantNameById(id: String): String? {
+        return quantsStorageInteractor.getQuantById(id)?.name
+    }
+
+    fun getQuantIdByName(name: String): String? {
+        return quantsStorageInteractor.getQuantByName(name)?.id
+    }
+
+    private data class TimeIntervalWasChanged(val timeInterval: TimeInterval)
+    private data class EventFilterWasChanged(val eventFilter: String?)
 }
 
 sealed class TimeInterval {
@@ -176,17 +158,67 @@ sealed class TimeInterval {
 sealed class FeedsFragmentState(
     open val listOfQuants: ArrayList<QuantBase>,
     open val selectedTimeInterval: TimeInterval,
-    open val selectedEventFilter: String
+    open val selectedEventFilter: String?
 ) {
-    data class Loading(
-        override val listOfQuants: ArrayList<QuantBase>,
-        override val selectedTimeInterval: TimeInterval,
-        override val selectedEventFilter: String
-    ) : FeedsFragmentState(listOfQuants, selectedTimeInterval, selectedEventFilter)
 
-    data class Completed(
+    data class EventsListLoading(
         override val listOfQuants: ArrayList<QuantBase>,
         override val selectedTimeInterval: TimeInterval,
-        override val selectedEventFilter: String
-    ) : FeedsFragmentState(listOfQuants, selectedTimeInterval, selectedEventFilter)
+        override val selectedEventFilter: String?
+    ) : FeedsFragmentState(listOfQuants, selectedTimeInterval, selectedEventFilter) {
+        companion object {
+            fun updateStateToLoading(state: MutableLiveData<FeedsFragmentState>) {
+                state.value?.let {
+                    state.value = EventsListLoading(
+                        it.listOfQuants,
+                        it.selectedTimeInterval,
+                        it.selectedEventFilter
+                    )
+                }
+            }
+        }
+    }
+
+    data class LoadingEventsListCompleted(
+        override val listOfQuants: ArrayList<QuantBase>,
+        override val selectedTimeInterval: TimeInterval,
+        override val selectedEventFilter: String?,
+        val listOfEvents: ArrayList<EventBase>,
+        val totalPhysicalFound: Double,
+        val totalEmotionalFound: Double,
+        val totalEvolutionFound: Double,
+        val totalStarFound: Int,
+        val totalFound: Double
+    ) : FeedsFragmentState(listOfQuants, selectedTimeInterval, selectedEventFilter) {
+        companion object {
+            fun updateStateToCompleted(
+                state: MutableLiveData<FeedsFragmentState>,
+                _timeInterval: TimeInterval,
+                _selectedEventFilter: String?,
+                _listOfEvents: ArrayList<EventBase>,
+                _totalPhysicalFound: Double,
+                _totalEmotionalFound: Double,
+                _totalEvolutionFound: Double,
+                _totalStarFound: Int,
+                _totalFound: Double
+            ) {
+                state.value?.let {
+                    state.value = LoadingEventsListCompleted(
+                        it.listOfQuants,
+                        _timeInterval,
+                        _selectedEventFilter,
+                        _listOfEvents,
+                        _totalPhysicalFound,
+                        _totalEmotionalFound,
+                        _totalEvolutionFound,
+                        _totalStarFound,
+                        _totalFound
+                    )
+                }
+            }
+        }
+    }
 }
+
+
+

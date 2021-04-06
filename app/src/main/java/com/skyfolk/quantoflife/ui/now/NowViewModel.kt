@@ -4,6 +4,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.skyfolk.quantoflife.IDateTimeRepository
 import com.skyfolk.quantoflife.db.EventsStorageInteractor
 import com.skyfolk.quantoflife.db.IGoalStorageInteractor
 import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
@@ -21,7 +22,8 @@ class NowViewModel(
     private val quantsStorageInteractor: IQuantsStorageInteractor,
     private val eventsStorageInteractor: EventsStorageInteractor,
     private val goalStorageInteractor: IGoalStorageInteractor,
-    private val settingsInteractor: SettingsInteractor
+    private val settingsInteractor: SettingsInteractor,
+    private val dateTimeRepository: IDateTimeRepository
 ) : ViewModel(), INowViewModel {
     private val _toastState = SingleLiveEvent<String>()
     val toastState: LiveData<String> get() = _toastState
@@ -83,8 +85,8 @@ class NowViewModel(
     }
 
     private fun updateTodayTotal() {
-        val startDate = Calendar.getInstance().getStartDateCalendar(TimeInterval.Today, settingsInteractor.getStartDayTime()).timeInMillis
-        val endDate = System.currentTimeMillis()
+        val startDate = dateTimeRepository.getCalendar().getStartDateCalendar(TimeInterval.Today, settingsInteractor.getStartDayTime()).timeInMillis
+        val endDate = dateTimeRepository.getTimeInMillis()
 
         val resultList = ArrayList(
             eventsStorageInteractor.getAllEvents().filter { it.date in startDate until endDate })
@@ -92,7 +94,7 @@ class NowViewModel(
         _todayTotal.value = getTotal(quantsStorageInteractor, resultList)
 
         val millisecondsInDay = 24 * 60 * 60 * 1000
-        val goalStartDate = Calendar.getInstance().getStartDateCalendar(TimeInterval.Week, settingsInteractor.getStartDayTime()).timeInMillis
+        val goalStartDate = dateTimeRepository.getCalendar().getStartDateCalendar(TimeInterval.Week, settingsInteractor.getStartDayTime()).timeInMillis
 
         val goalResultList = ArrayList(
             eventsStorageInteractor.getAllEvents().filter { it.date in goalStartDate until endDate })

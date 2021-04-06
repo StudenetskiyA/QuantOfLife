@@ -11,5 +11,6 @@ interface IQuantsStorageInteractor {
 
     fun alreadyHaveQuant(quant : QuantBase) : Boolean
     fun getQuantById(id: String) : QuantBase?
+    fun getQuantByName(name: String) : QuantBase?
     fun incrementQuantUsage(id: String)
 }

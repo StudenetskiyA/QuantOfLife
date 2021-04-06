@@ -12,10 +12,13 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.DatePicker
 import android.widget.Toast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.skyfolk.quantoflife.DateTimeRepository
+import com.skyfolk.quantoflife.IDateTimeRepository
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.databinding.CreateEventDialogBinding
 import com.skyfolk.quantoflife.entity.*
 import com.skyfolk.quantoflife.utils.toDate
+import org.koin.android.ext.android.inject
 import java.util.*
 
 class CreateEventDialogFragment(val quant: QuantBase, private val existEvent: EventBase? = null) : BottomSheetDialogFragment() {
@@ -23,16 +26,14 @@ class CreateEventDialogFragment(val quant: QuantBase, private val existEvent: Ev
 
     private lateinit var binding: CreateEventDialogBinding
 
-    private val calendar = Calendar.getInstance()
-
-    //override fun getTheme(): Int = R.style.AppTheme
+    private val dateTimeRepository: IDateTimeRepository by inject()
+    private val calendar = dateTimeRepository.getCalendar()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = CreateEventDialogBinding.inflate(inflater, container, false)
-        //setStyle(STYLE_NO_TITLE, R.style.eventDialog)
         val imageResource = requireContext().resources.getIdentifier(quant.icon, "drawable", requireContext().packageName)
         if (imageResource !=0 ) {
             binding.quantImage.setImageResource(imageResource)

@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.Entry
+import com.skyfolk.quantoflife.DateTimeRepository
+import com.skyfolk.quantoflife.IDateTimeRepository
 import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.db.EventsStorageInteractor
 import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
@@ -18,7 +20,8 @@ import kotlin.collections.ArrayList
 class StatisticViewModel(
     private val eventsStorageInteractor: EventsStorageInteractor,
     private val quantsStorageInteractor: IQuantsStorageInteractor,
-    private val settingsInteractor: SettingsInteractor
+    private val settingsInteractor: SettingsInteractor,
+    private val dateTimeRepository: IDateTimeRepository,
 ) : ViewModel() {
     private val _barEntryData = MutableLiveData<EntryAndFirstDate?>().apply {
         value = getBarEntryData()
@@ -33,7 +36,7 @@ class StatisticViewModel(
         if (allEvents.firstOrNull() == null) return null
 
         val firstDate = allEvents.first().date
-        val lastDate = System.currentTimeMillis()
+        val lastDate = dateTimeRepository.getTimeInMillis()
 
         var currentPeriodStart = firstDate
         var currentPeriodEnd = firstDate

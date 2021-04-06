@@ -11,6 +11,7 @@ class SettingsInteractor(private val preferences: SharedPreferences) {
         const val CATEGORY_NAME_ = "category_name_"
         const val ONBOARDING_COMPLETE = "onboarding_complete"
         const val START_DAY_TIME = "start_day_time"
+        const val SELECTED_EVENT_FILTER = "selected_event_filter"
     }
 
     fun writeStatisticTimeIntervalSelectedElement(element: String) {
@@ -34,6 +35,16 @@ class SettingsInteractor(private val preferences: SharedPreferences) {
     fun setStatisticTimeEnd(time: Long) {
         preferences.edit()
             .putLong(SELECTED_TIME_END, time)
+            .apply()
+    }
+
+    fun getSelectedEventFiler() : String? {
+        return preferences.getString(SELECTED_EVENT_FILTER, null)
+    }
+
+    fun setSelectedEventFiler(filter: String?) {
+        preferences.edit()
+            .putString(SELECTED_EVENT_FILTER, filter)
             .apply()
     }
 
