@@ -153,6 +153,16 @@ sealed class TimeInterval {
             }
         }
     }
+
+    fun toStringName() : String {
+        return when (this) {
+            is Today -> "сегодня"
+            is Week -> "неделю"
+            is Month -> "месяц"
+            is All -> "все время"
+            is Selected -> "выбранный интервал"
+        }
+    }
 }
 
 sealed class FeedsFragmentState(

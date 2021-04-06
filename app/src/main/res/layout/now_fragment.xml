@@ -8,10 +8,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.now.NowFragment"
-    android:paddingStart="10dp"
-    android:paddingEnd="10dp"
-    android:paddingTop="10dp"
-    android:paddingBottom="60dp">
+    android:paddingBottom="50dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.now.NowFragment"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="10dp"
+      >
 
     <TextView
         android:id="@+id/today_rating_title"
@@ -58,20 +64,21 @@
         app:layout_constraintTop_toBottomOf="@id/today_rating_score"
         android:layout_marginBottom="8dp"/>
 
-    <com.skyfolk.quantoflife.ui.now.GoalView
-        android:id="@+id/current_goal"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list_of_goals"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        tools:layout_height="70dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/total_description_line" />
+        app:layout_constraintTop_toBottomOf="@id/total_description_line"/>
+
     <View
         android:id="@+id/goal_description_line"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="8dp"
         android:background="@android:color/background_dark"
-        app:layout_constraintTop_toBottomOf="@+id/current_goal"
+        app:layout_constraintTop_toBottomOf="@+id/list_of_goals"
         android:layout_marginBottom="8dp"/>
 
     <TextView
@@ -172,19 +179,36 @@
         app:layout_constraintTop_toBottomOf="@id/list_of_other_quants"
         android:layout_marginBottom="8dp"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        app:srcCompat="@android:drawable/ic_input_add"
-        app:backgroundTint="@color/progressPrimary"
-        app:elevation="6dp"
-        app:fabSize="mini"
-        app:pressedTranslationZ="12dp"
-        android:layout_margin="16dp"
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/content_cover"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/radial_gradient"
+        android:visibility="gone"
+        tools:visibility="visible"
+        />
+
+    <uk.co.markormesher.android_fab.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:buttonIcon="@android:drawable/ic_input_add"
+        app:buttonBackgroundColour="@color/progressPrimary"
+        app:pressedTranslationZ="12dp"
+        app:buttonPosition="bottom|end"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

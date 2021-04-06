@@ -55,6 +55,7 @@ class SettingsInteractor(private val preferences: SharedPreferences) {
     }
 
     fun getCategoryName(category: QuantCategory) : String {
+        if (category == QuantCategory.All) return "Всего"
         return preferences.getString(CATEGORY_NAME_ + category.name, category.name) ?: category.name
     }
 

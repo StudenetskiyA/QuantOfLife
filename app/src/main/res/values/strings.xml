@@ -7,6 +7,7 @@
     <string name="onboarding_first_description">Здесь большое и подробное описание, как пользоваться приложением.\nС картинками и графиками.\n</string>
     <string name="onboarding_second_description">Здесь описание про то, что нужно выбрать три категории оценки и назвать их.\nЕсли не заполните - проставятся дефолтные.</string>
     <string name="about_type_quant">Описание, какие типы когда выбирать</string>
+    <string name="delete_goal_attention"></string>
 
     <string-array name="category_name">
         <item>Физическое</item>

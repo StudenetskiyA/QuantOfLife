@@ -6,4 +6,5 @@
     <color name="progressAccent">#5F635A</color>
     <color name="progressPrimary">#FBE200</color>
     <color name="progressRed">#00FBC9</color>
+    <color name="fabCover">#65000000</color>
 </resources>

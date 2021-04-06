@@ -128,7 +128,7 @@ class CreateQuantDialogFragment(
         }
 
         binding.aboutTypeButton.setOnClickListener {
-            val builder = AlertDialog.Builder(requireContext())
+            val builder = AlertDialog.Builder(requireContext(), R.style.AlertDialog)
             builder.setTitle("Тип события")
                 .setMessage(resources.getString(R.string.about_type_quant))
                 .setPositiveButton("ОК") { dialog, _ ->

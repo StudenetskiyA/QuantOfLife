@@ -1,10 +1,15 @@
 package com.skyfolk.quantoflife.ui.now
 
+import android.content.Context
+import android.graphics.Typeface
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
@@ -14,13 +19,18 @@ import com.google.android.material.snackbar.Snackbar
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.databinding.NowFragmentBinding
 import com.skyfolk.quantoflife.entity.*
-import com.skyfolk.quantoflife.utils.filterToArrayList
-import com.skyfolk.quantoflife.utils.setOnHideByTimeout
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.ui.now.CreateEventDialogFragment.DialogListener
+import com.skyfolk.quantoflife.utils.filterToArrayList
+import com.skyfolk.quantoflife.utils.setOnHideByTimeout
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
+import uk.co.markormesher.android_fab.SpeedDialMenuAdapter
+import uk.co.markormesher.android_fab.SpeedDialMenuCloseListener
+import uk.co.markormesher.android_fab.SpeedDialMenuItem
+import uk.co.markormesher.android_fab.SpeedDialMenuOpenListener
+
 
 class NowFragment : Fragment() {
     private val viewModel: NowViewModel by viewModel()
@@ -64,9 +74,27 @@ class NowFragment : Fragment() {
         })
 
         viewModel.listOfGoal.observe(viewLifecycleOwner, {
-            if (it == null) binding.currentGoal.visibility = View.GONE
-            it?.let {
-                binding.currentGoal.updateViewState(it)
+            if (it.size == 0) binding.listOfGoals.visibility = View.GONE
+            else {
+                binding.listOfGoals.visibility = View.VISIBLE
+                binding.listOfGoals.layoutManager =
+                    LinearLayoutManager(this.context, RecyclerView.VERTICAL, false)
+                val adapterGoals = GoalsListDataAdapter(it, settingsInteractor) {
+                    Log.d("skyfolk-time", "long click on goal ${it.type}")
+                    val builder = AlertDialog.Builder(requireContext(), R.style.AlertDialog)
+                    builder.setTitle("Цель")
+                        .setMessage(resources.getString(R.string.about_type_quant))
+                        .setPositiveButton("Удалить эту цель") { dialog, _ ->
+                            dialog.cancel()
+                        }.setNeutralButton("Добавить еще цель") { dialog, _ ->
+                            dialog.cancel()
+                        }.setNegativeButton("Отмена") { dialog, _ ->
+                            dialog.cancel()
+                        }
+                    builder.show()
+                    true
+                }
+                binding.listOfGoals.adapter = adapterGoals
             }
         })
 
@@ -151,8 +179,61 @@ class NowFragment : Fragment() {
             }
         }
 
-        binding.fab.setOnClickListener {
-            viewModel.openCreateNewQuantDialog(null)
-        }
+        binding.fab.setOnSpeedDialMenuOpenListener(object : SpeedDialMenuOpenListener {
+            override fun onOpen(floatingActionButton: uk.co.markormesher.android_fab.FloatingActionButton) {
+                binding.contentCover.visibility = View.VISIBLE
+            }
+        })
+        binding.fab.setOnSpeedDialMenuCloseListener(object : SpeedDialMenuCloseListener {
+            override fun onClose(floatingActionButton: uk.co.markormesher.android_fab.FloatingActionButton) {
+                binding.contentCover.visibility = View.GONE
+            }
+        })
+
+        binding.fab.speedDialMenuAdapter = speedDialMenuAdapter
+        binding.fab.contentCoverEnabled = true
+        binding.fab.setContentCoverColour(
+            resources.getColor(
+                R.color.transparent,
+                requireContext().theme
+            )
+        )
+
     }
+
+    private val speedDialMenuAdapter = object : SpeedDialMenuAdapter() {
+        override fun getCount(): Int = 2
+
+        override fun getMenuItem(context: Context, position: Int): SpeedDialMenuItem =
+            when (position) {
+                0 -> SpeedDialMenuItem(context, R.drawable.ic_close, "Создать событие")
+                1 -> SpeedDialMenuItem(context, R.drawable.ic_feed, "Создать цель")
+                else -> throw IllegalArgumentException("No menu item: $position")
+            }
+
+        override fun onMenuItemClick(position: Int): Boolean {
+            when (position) {
+                0 -> viewModel.openCreateNewQuantDialog(null)
+                1 -> {
+                }
+            }
+            return true
+        }
+
+        override fun onPrepareItemLabel(context: Context, position: Int, label: TextView) {
+            label.setTypeface(label.typeface, Typeface.BOLD)
+        }
+
+        // rotate the "+" icon only
+        // override fun fabRotationDegrees(): Float = 0F//if (buttonIcon == 0) 135F else 0F
+    }
+
+    private val speedDialSizeOptions = arrayOf(
+        Pair("None", 0),
+        Pair("1 item", 1),
+        Pair("2 items", 2),
+        Pair("3 items", 3),
+        Pair("4 items", 4)
+    )
+
 }

@@ -10,6 +10,7 @@ data class Goal(
 
 data class GoalPresent(
     var duration: TimeInterval,
+    var durationInDays: Int,
     var target: Double,
     var comleted: Double,
     var daysGone: Int,
