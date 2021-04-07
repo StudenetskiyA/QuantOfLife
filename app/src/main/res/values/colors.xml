@@ -5,7 +5,7 @@
     <color name="colorAccent">#03DAC5</color>
     <color name="progressAccent">#5F635A</color>
     <color name="progressPrimary">#FBE200</color>
-    <color name="progressRed">#FB0000</color>
+    <color name="progressCompleted">#00FB2A</color>
     <color name="fabCover">#65000000</color>
     <color name="transparent">#00000000</color>
     <color name="bottom_menu_background">#2C2626</color>

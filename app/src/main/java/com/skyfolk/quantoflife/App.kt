@@ -3,7 +3,6 @@ package com.skyfolk.quantoflife
 import android.app.Application
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import com.skyfolk.quantoflife.db.*
 import com.skyfolk.quantoflife.ui.now.NowViewModel
@@ -26,7 +25,7 @@ class App: Application() {
             single { DBInteractor(get()) }
             single<IQuantsStorageInteractor> { QuantsStorageInteractor(get()) }
             single{ EventsStorageInteractor(get()) }
-            single<IGoalStorageInteractor> { GoalStorageInteractor() }
+            single<IGoalStorageInteractor> { GoalStorageInteractor(get()) }
             single { SettingsInteractor(androidContext().getSharedPreferences("qol_preferences", Context.MODE_PRIVATE))}
             single<IDateTimeRepository> { DateTimeRepository() }
         }

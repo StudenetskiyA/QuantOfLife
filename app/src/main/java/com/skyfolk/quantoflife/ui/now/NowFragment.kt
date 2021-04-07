@@ -20,6 +20,7 @@ import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.databinding.NowFragmentBinding
 import com.skyfolk.quantoflife.entity.*
 import com.skyfolk.quantoflife.settings.SettingsInteractor
+import com.skyfolk.quantoflife.ui.goals.GoalsListDataAdapter
 import com.skyfolk.quantoflife.ui.now.CreateEventDialogFragment.DialogListener
 import com.skyfolk.quantoflife.utils.filterToArrayList
 import com.skyfolk.quantoflife.utils.setOnHideByTimeout
@@ -74,24 +75,13 @@ class NowFragment : Fragment() {
         })
 
         viewModel.listOfGoal.observe(viewLifecycleOwner, {
-            if (it.size == 0) binding.listOfGoals.visibility = View.GONE
+            if (it.size == 0) binding.goalsLayout.visibility = View.GONE
             else {
-                binding.listOfGoals.visibility = View.VISIBLE
+                binding.goalsLayout.visibility = View.VISIBLE
                 binding.listOfGoals.layoutManager =
                     LinearLayoutManager(this.context, RecyclerView.VERTICAL, false)
-                val adapterGoals = GoalsListDataAdapter(it, settingsInteractor) {
-                    Log.d("skyfolk-time", "long click on goal ${it.type}")
-                    val builder = AlertDialog.Builder(requireContext(), R.style.AlertDialog)
-                    builder.setTitle("Цель")
-                        .setMessage(resources.getString(R.string.about_type_quant))
-                        .setPositiveButton("Удалить эту цель") { dialog, _ ->
-                            dialog.cancel()
-                        }.setNeutralButton("Добавить еще цель") { dialog, _ ->
-                            dialog.cancel()
-                        }.setNegativeButton("Отмена") { dialog, _ ->
-                            dialog.cancel()
-                        }
-                    builder.show()
+                val adapterGoals = GoalsListDataAdapter(it, settingsInteractor) { goalPresent ->
+                    viewModel.openCreateNewGoalDialog(Goal(goalPresent.id, goalPresent.duration, goalPresent.target, goalPresent.type))
                     true
                 }
                 binding.listOfGoals.adapter = adapterGoals
@@ -206,16 +196,15 @@ class NowFragment : Fragment() {
 
         override fun getMenuItem(context: Context, position: Int): SpeedDialMenuItem =
             when (position) {
-                0 -> SpeedDialMenuItem(context, R.drawable.ic_close, "Создать событие")
-                1 -> SpeedDialMenuItem(context, R.drawable.ic_feed, "Создать цель")
+                0 -> SpeedDialMenuItem(context, R.drawable.ic_pen, "Создать событие")
+                1 -> SpeedDialMenuItem(context, R.drawable.ic_target, "Создать цель")
                 else -> throw IllegalArgumentException("No menu item: $position")
             }
 
         override fun onMenuItemClick(position: Int): Boolean {
             when (position) {
                 0 -> viewModel.openCreateNewQuantDialog(null)
-                1 -> {
-                }
+                1 -> viewModel.openCreateNewGoalDialog(null)
             }
             return true
         }
@@ -225,15 +214,6 @@ class NowFragment : Fragment() {
         }
 
         // rotate the "+" icon only
-        // override fun fabRotationDegrees(): Float = 0F//if (buttonIcon == 0) 135F else 0F
+         override fun fabRotationDegrees(): Float = 135F//if (buttonIcon == 0) 135F else 0F
     }
-
-    private val speedDialSizeOptions = arrayOf(
-        Pair("None", 0),
-        Pair("1 item", 1),
-        Pair("2 items", 2),
-        Pair("3 items", 3),
-        Pair("4 items", 4)
-    )
-
 }

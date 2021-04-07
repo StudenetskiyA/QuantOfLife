@@ -14,6 +14,7 @@ import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.feeds.getTotal
 import com.skyfolk.quantoflife.ui.create_quant.CreateQuantDialogFragment
 import com.skyfolk.quantoflife.ui.feeds.TimeInterval
+import com.skyfolk.quantoflife.ui.goals.CreateGoalDialogFragment
 import com.skyfolk.quantoflife.utils.SingleLiveEvent
 import java.util.*
 import kotlin.collections.ArrayList
@@ -76,6 +77,24 @@ class NowViewModel(
         _dialogState.value = dialog
     }
 
+    override fun openCreateNewGoalDialog(existGoal: Goal?) {
+        val dialog = CreateGoalDialogFragment(existGoal, settingsInteractor)
+        dialog.setDialogListener(object : CreateGoalDialogFragment.DialogListener {
+            override fun onConfirm(goal: Goal) {
+                goalStorageInteractor.addGoalToDB(goal)
+                updateTodayTotal()
+            }
+
+            override fun onDelete(goal: Goal) {
+                goalStorageInteractor.deleteGoal(goal)
+                updateTodayTotal()
+            }
+
+            override fun onDecline() {}
+        })
+        _dialogState.value = dialog
+    }
+
     override fun onEventCreated(event: EventBase) {
         eventsStorageInteractor.addEventToDB(event)
         quantsStorageInteractor.incrementQuantUsage(event.quantId)
@@ -111,7 +130,7 @@ class NowViewModel(
                 is TimeInterval.All -> 0
                 is TimeInterval.Selected -> 0
             }
-            goalsPresentList.add(GoalPresent(goal.duration, durationInDays, goal.target, completed, daysGone, goal.type))
+            goalsPresentList.add(GoalPresent(goal.id, goal.duration, durationInDays, goal.target, completed, daysGone, goal.type))
         }
 
         _listOfGoals.value = goalsPresentList

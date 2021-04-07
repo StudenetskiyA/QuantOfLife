@@ -20,6 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -33,11 +34,10 @@
         android:layout_gravity="center"
         app:indicatorColor="@color/progressPrimary"
         app:trackColor="@color/progressAccent"
-        tools:progress="70"
+        tools:progress="50"
         app:trackThickness = "20dp"
         app:trackCornerRadius = "4dp"
         android:paddingLeft="15dp"
-
         android:paddingRight="15dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/goal_title"
@@ -47,6 +47,7 @@
         android:id="@+id/goal_progress_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        style="@style/ShadowedText"
         android:gravity="center"
         android:textStyle="bold"
         android:paddingLeft="5dp"
@@ -54,7 +55,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/goal_title"
-        tools:text="50 из 100" />
+        tools:text="50 из 100"/>
 
     <TextView
         android:id="@+id/goal_more"

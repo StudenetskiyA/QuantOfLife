@@ -1,5 +1,6 @@
 package com.skyfolk.quantoflife.entity
 
+import android.util.Log
 import java.util.*
 
 sealed class QuantBase(
@@ -106,4 +107,16 @@ sealed class QuantBonusBase(
 
 enum class QuantCategory {
     Physical, Emotion, Evolution, Other, None, All
+}
+
+fun String.toQuantCategory() : QuantCategory {
+   return when (this) {
+       QuantCategory.All.name -> QuantCategory.All
+       QuantCategory.Physical.name -> QuantCategory.Physical
+       QuantCategory.Emotion.name -> QuantCategory.Emotion
+       QuantCategory.Evolution.name -> QuantCategory.Evolution
+       QuantCategory.Other.name -> QuantCategory.Other
+       QuantCategory.None.name -> QuantCategory.None
+       else -> QuantCategory.None
+   }
 }
