@@ -1,6 +1,5 @@
 package com.skyfolk.quantoflife.ui.feeds
 
-import android.R
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.util.Log
@@ -11,34 +10,27 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.DatePicker
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.skyfolk.quantoflife.IDateTimeRepository
 import com.skyfolk.quantoflife.databinding.FeedsFragmentBinding
-import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
 import com.skyfolk.quantoflife.entity.EventBase
 import com.skyfolk.quantoflife.entity.QuantCategory
-import com.skyfolk.quantoflife.utils.setOnHideByTimeout
-import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.ui.now.CreateEventDialogFragment
+import com.skyfolk.quantoflife.utils.setOnHideByTimeout
 import com.skyfolk.quantoflife.utils.toDateWithoutHourAndMinutes
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.util.*
 
 class FeedsFragment : Fragment() {
     private val viewModel: FeedsViewModel by viewModel()
     private lateinit var binding: FeedsFragmentBinding
-    private val quantStorageInteractor: IQuantsStorageInteractor by inject()
-    private val settingsInteractor: SettingsInteractor by inject()
 
-    private val dateTimeRepository: IDateTimeRepository by inject()
-    private val startIntervalCalendar = dateTimeRepository.getCalendar()
-    private val endIntervalCalendar = dateTimeRepository.getCalendar()
+   // private val dateTimeRepository: IDateTimeRepository by inject()
+    private val startIntervalCalendar = Calendar.getInstance() //dateTimeRepository.getCalendar()
+    private val endIntervalCalendar =  Calendar.getInstance() // = dateTimeRepository.getCalendar()
 
     // Иначе дурацкие спиннеры лишние раз тригерятся
     private var selectedEventFilterName: String? = null
@@ -54,27 +46,69 @@ class FeedsFragment : Fragment() {
         val listOfEvents: RecyclerView = binding.listOfEvents
         listOfEvents.layoutManager = LinearLayoutManager(this.context, RecyclerView.VERTICAL, false)
 
-        val categoryArray = mutableListOf(
-            settingsInteractor.getCategoryName(QuantCategory.Physical),
-            settingsInteractor.getCategoryName(QuantCategory.Emotion),
-            settingsInteractor.getCategoryName(QuantCategory.Evolution),
-            settingsInteractor.getCategoryName(QuantCategory.Other)
-        )
-        binding.physicalDescription.text = "Всего ${categoryArray[0]} :"
-        binding.emotionalDescription.text = "Всего ${categoryArray[1]} :"
-        binding.evolutionDescription.text = "Всего ${categoryArray[2]} :"
-
         lifecycleScope.launch {
+            viewModel.singleLifeEvent.observe(
+                viewLifecycleOwner,
+                { event ->
+                    when (event) {
+                        is FeedsFragmentSingleLifeEvent.ShowEditEventDialog -> {
+                            val dialog = CreateEventDialogFragment(event.quant, event.event)
+                            dialog.setDialogListener(object :
+                                CreateEventDialogFragment.DialogListener {
+                                override fun onConfirm(event: EventBase, name: String) {
+                                    val snackBar = Snackbar.make(
+                                        requireActivity().findViewById(android.R.id.content),
+                                        "Событие '${name}' изменено",
+                                        Snackbar.LENGTH_LONG
+                                    )
+                                    snackBar.setAction("Отмена") {
+                                    }
+                                    snackBar.setOnHideByTimeout {
+                                        viewModel.eventEdited(event)
+                                    }
+                                    snackBar.show()
+                                }
+
+                                override fun onDecline() {
+                                }
+
+                                override fun onDelete(event: EventBase, name: String) {
+                                    val snackBar = Snackbar.make(
+                                        requireActivity().findViewById(android.R.id.content),
+                                        "Событие '${name}' удалено",
+                                        Snackbar.LENGTH_LONG
+                                    )
+                                    snackBar.setAction("Отмена") {
+                                    }
+                                    snackBar.setOnHideByTimeout {
+                                        viewModel.deleteEvent(event)
+                                    }
+                                    snackBar.show()
+                                }
+                            })
+                            dialog.show(requireActivity().supportFragmentManager, dialog.tag)
+                        }
+                    }
+                }
+            )
+
             viewModel.state.observe(
                 viewLifecycleOwner,
                 { state: FeedsFragmentState ->
+                    // Descriptions
+                    val categoryArray = mutableListOf(
+                        state.quantCategoryNames.firstOrNull { it.first == QuantCategory.Physical }?.second ?: "",
+                        state.quantCategoryNames.firstOrNull { it.first == QuantCategory.Emotion }?.second ?: "",
+                        state.quantCategoryNames.firstOrNull { it.first == QuantCategory.Evolution }?.second ?: "",
+                        state.quantCategoryNames.firstOrNull { it.first == QuantCategory.Other }?.second ?: ""
+                    )
+                    binding.physicalDescription.text = "Всего ${categoryArray[0]} :"
+                    binding.emotionalDescription.text = "Всего ${categoryArray[1]} :"
+                    binding.evolutionDescription.text = "Всего ${categoryArray[2]} :"
+
                     // Selected time interval
                     val timeInterval = state.selectedTimeInterval
 
-                    Log.d(
-                        "skyfolk-spinner",
-                        "observe.timeIntervalSpinner, $selectedTimeInterval, ${timeInterval.javaClass.name}"
-                    )
                     when (timeInterval) {
                         is TimeInterval.Today -> {
                             //selectedTimeInterval = binding.timeIntervalSpinner.getItemAtPosition(0).toString()
@@ -111,10 +145,10 @@ class FeedsFragment : Fragment() {
                     listOfQuantName.add(0, "Все события")
                     val quantsSpinnerAdapter = ArrayAdapter(
                         requireContext(),
-                        R.layout.simple_spinner_item,
+                        android.R.layout.simple_spinner_item,
                         listOfQuantName
                     )
-                    quantsSpinnerAdapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
+                    quantsSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                     binding.spinner.adapter = quantsSpinnerAdapter
                     state.selectedEventFilter?.let {
                         val filterName = viewModel.getQuantNameById(it)
@@ -136,49 +170,9 @@ class FeedsFragment : Fragment() {
                         is FeedsFragmentState.LoadingEventsListCompleted -> {
                             val eventsListAdapter = EventListDataAdapter(
                                 state.listOfEvents,
-                                quantStorageInteractor,
-                                settingsInteractor
-                            ) { event ->
-                                quantStorageInteractor.getQuantById(event.quantId)?.let { quant ->
-                                    val dialog = CreateEventDialogFragment(quant, event)
-
-                                    dialog.setDialogListener(object :
-                                        CreateEventDialogFragment.DialogListener {
-                                        override fun onConfirm(event: EventBase, name: String) {
-                                            val snackBar = Snackbar.make(
-                                                requireActivity().findViewById(R.id.content),
-                                                "Событие '${name}' изменено",
-                                                Snackbar.LENGTH_LONG
-                                            )
-                                            snackBar.setAction("Отмена") {
-                                            }
-                                            snackBar.setOnHideByTimeout {
-                                                viewModel.eventEdited(event)
-                                            }
-                                            snackBar.show()
-                                        }
-
-                                        override fun onDecline() {
-                                        }
-
-                                        override fun onDelete(event: EventBase, name: String) {
-                                            val snackBar = Snackbar.make(
-                                                requireActivity().findViewById(R.id.content),
-                                                "Событие '${name}' удалено",
-                                                Snackbar.LENGTH_LONG
-                                            )
-                                            snackBar.setAction("Отмена") {
-                                            }
-                                            snackBar.setOnHideByTimeout {
-                                                viewModel.deleteEvent(event)
-                                            }
-                                            snackBar.show()
-                                        }
-                                    })
-                                    val fm: FragmentManager =
-                                        requireActivity().supportFragmentManager
-                                    dialog.show(fm, dialog.tag)
-                                }
+                                state.quantCategoryNames
+                            ) { eventId ->
+                                viewModel.editEvent(eventId)
                             }
 
                             binding.eventListLoadingProgress.visibility = View.GONE

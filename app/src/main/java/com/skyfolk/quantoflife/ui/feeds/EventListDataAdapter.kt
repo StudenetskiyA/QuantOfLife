@@ -7,28 +7,25 @@ import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.R
-import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
-import com.skyfolk.quantoflife.entity.EventBase
-import com.skyfolk.quantoflife.entity.QuantBase
-import com.skyfolk.quantoflife.settings.SettingsInteractor
+import com.skyfolk.quantoflife.entity.EventDisplayable
+import com.skyfolk.quantoflife.entity.QuantCategory
 import com.skyfolk.quantoflife.utils.toDate
 import kotlin.collections.ArrayList
 
 class EventListDataAdapter(
-    private val eventsList: ArrayList<EventBase>,
-    private val quantsStorageInteractor: IQuantsStorageInteractor,
-    private val settingsInteractor: SettingsInteractor,
-    private val clickListener: (EventBase) -> Unit
+    private val eventsList: ArrayList<EventDisplayable>,
+    private val quantCategoryNames: ArrayList<Pair<QuantCategory, String>>,
+    private val clickListener: (String) -> Unit
 ) : RecyclerView.Adapter<EventListDataAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.item_event, parent, false)
-        return ViewHolder(v, quantsStorageInteractor, settingsInteractor)
+        return ViewHolder(v, quantCategoryNames)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindItems(eventsList.reversed()[position], clickListener)
+        holder.bindItems(eventsList.reversed()[position],
+            clickListener)
     }
 
     override fun getItemCount(): Int {
@@ -37,26 +34,24 @@ class EventListDataAdapter(
 
     class ViewHolder(
         itemView: View,
-        private val quantsStorageInteractor: IQuantsStorageInteractor,
-        private val settingsInteractor: SettingsInteractor
+        private val quantCategoryName: ArrayList<Pair<QuantCategory, String>>
     ) : RecyclerView.ViewHolder(itemView) {
 
-        fun bindItems(event: EventBase, clickListener: (EventBase) -> Unit) {
+        fun bindItems(event: EventDisplayable,
+                      clickListener: (String) -> Unit) {
             val eventNameView = itemView.findViewById(R.id.event_name) as TextView
             val eventImage = itemView.findViewById(R.id.quant_image) as ImageView
 
-            val quant = quantsStorageInteractor.getAllQuantsList(true)
-                .firstOrNull { it.id == event.quantId }
-            eventNameView.text = quant?.name ?: "Unknown"
+            eventNameView.text = event.name
 
-            if (quant != null && itemView.context.resources.getIdentifier(
-                    quant.icon,
+            if (itemView.context.resources.getIdentifier(
+                    event.icon,
                     "drawable",
                     itemView.context.packageName
                 ) != 0
             ) {
                 val imageResource = itemView.context.resources.getIdentifier(
-                    quant.icon,
+                    event.icon,
                     "drawable",
                     itemView.context.packageName
                 )
@@ -78,29 +73,32 @@ class EventListDataAdapter(
             eventDateView.text = event.date.toDate()
 
             val eventBonusesView = itemView.findViewById(R.id.event_bonuses) as TextView
-            when (event) {
-                is EventBase.EventRated -> {
+
+            when {
+                ((event.bonuses != null) && (event.value != null)) -> {
                     var result = ":"
-                    val foundQuant = quantsStorageInteractor.getQuantById(event.quantId)
-                    if (foundQuant is QuantBase.QuantRated) {
-                        for (bonus in foundQuant.bonuses) {
-                            result += " " + settingsInteractor.getCategoryName(bonus.category)
-                            // 0,3*3=0.899999999999 WTF??!!
-                            val value = bonus.baseBonus.toBigDecimal().add(bonus.bonusForEachRating.toBigDecimal().multiply(event.rate.toBigDecimal()))
-                            result += "=$value;"
-                        }
+                    for (bonus in event.bonuses) {
+                        result += " " + (quantCategoryName.firstOrNull {
+                            it.first == bonus.category
+                        }?.second ?: "")
+                        // 0,3*3=0.899999999999 WTF??!!
+                        val value = bonus.baseBonus.toBigDecimal().add(
+                            bonus.bonusForEachRating.toBigDecimal()
+                                .multiply(event.value.toBigDecimal())
+                        )
+                        result += "=$value;"
                     }
                     eventBonusesView.text = result
                     eventBonusesView.visibility = View.VISIBLE
                     eventRatingView.visibility = View.VISIBLE
-                    eventRatingView.rating = event.rate.toFloat()
+                    eventRatingView.rating = event.value.toFloat()
                 }
-                is EventBase.EventMeasure -> {
+                ((event.bonuses == null) && (event.value != null)) -> {
                     eventBonusesView.text = event.value.toString()
                     eventBonusesView.visibility = View.VISIBLE
                     eventRatingView.visibility = View.GONE
                 }
-                is EventBase.EventNote -> {
+                ((event.bonuses == null) && (event.value == null)) -> {
                     eventBonusesView.visibility = View.GONE
                     eventRatingView.visibility = View.GONE
                 }
@@ -110,7 +108,7 @@ class EventListDataAdapter(
             eventNotesView.text = event.note
 
             itemView.setOnLongClickListener {
-                clickListener(event)
+                clickListener(event.id)
                 true
             }
         }

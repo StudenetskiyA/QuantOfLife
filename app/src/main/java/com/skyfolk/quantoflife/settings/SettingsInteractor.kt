@@ -60,6 +60,17 @@ class SettingsInteractor(private val preferences: SharedPreferences) {
         return preferences.getString(CATEGORY_NAME_ + category.name, category.name) ?: category.name
     }
 
+    fun getCategoryNames() : ArrayList<Pair<QuantCategory, String>> {
+        var result = arrayListOf<Pair<QuantCategory,String>>()
+//        result.add(Pair(QuantCategory.All, "Всего"))
+//        result.add(Pair(QuantCategory.None, "Не задана"))
+
+        enumValues<QuantCategory>().forEach {
+            result.add(Pair(it, preferences.getString(CATEGORY_NAME_ + it.name, it.name) ?: it.name))
+        }
+        return result
+    }
+
     fun setCategoryName(category: QuantCategory, name: String) {
         preferences.edit()
             .putString(CATEGORY_NAME_ + category.name, name)

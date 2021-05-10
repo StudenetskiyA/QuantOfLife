@@ -1,5 +1,16 @@
 package com.skyfolk.quantoflife.entity
 
+data class EventDisplayable(
+    val id: String,
+    val name: String,
+    val quantId: String,
+    val icon: String,
+    val date: Long,
+    val note: String,
+    val value: Int?,
+    val bonuses:  ArrayList<QuantBonusBase.QuantBonusRated>?
+)
+
 sealed class EventBase(
     open val id: String,
     open var quantId: String,
