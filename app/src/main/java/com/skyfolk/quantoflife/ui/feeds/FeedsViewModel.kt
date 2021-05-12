@@ -23,6 +23,7 @@ import com.skyfolk.quantoflife.ui.now.CreateEventDialogFragment
 import com.skyfolk.quantoflife.utils.SingleLiveEvent
 import com.skyfolk.quantoflife.utils.getEndDateCalendar
 import com.skyfolk.quantoflife.utils.setOnHideByTimeout
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.collections.ArrayList
 
@@ -136,13 +137,11 @@ class FeedsViewModel(
     }
 
     fun eventEdited(event: EventBase) {
-        eventsStorageInteractor.addEventToDB(event)
-        runSearch()
+        eventsStorageInteractor.addEventToDB(event) { runSearch() }
     }
 
     fun deleteEvent(event: EventBase) {
-        eventsStorageInteractor.deleteEvent(event)
-        runSearch()
+        eventsStorageInteractor.deleteEvent(event) { runSearch() }
     }
 
     fun getQuantNameById(id: String): String? {

@@ -2,13 +2,16 @@ package com.skyfolk.quantoflife.db
 
 import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.entity.*
+import io.realm.Realm
 
 class EventsStorageInteractor(private val dbInteractor: DBInteractor) {
     fun clearDataBase() {
-        dbInteractor.getDB().executeTransaction { dbInteractor.getDB().deleteAll() } //TODO Separate
+        dbInteractor.getDB().executeTransactionAsync {
+            it.deleteAll()
+        }
     }
 
-    fun addEventToDB(event: EventBase) {
+    fun addEventToDB(event: EventBase, onComplete: () -> Unit) {
         var rate: Int? = null
         var numericValue: Int? = null
 
@@ -25,8 +28,8 @@ class EventsStorageInteractor(private val dbInteractor: DBInteractor) {
         val eventDbElement =
             EventDbEntity(event.quantId, event.date, rate, numericValue, event.note)
 
-        dbInteractor.getDB().executeTransaction {
-            val existEvent = existEventOrNull(event)
+        dbInteractor.getDB().executeTransactionAsync( {
+            val existEvent = existEventOrNull(it, event)
             if (existEvent != null) {
                 QLog.d("edit event")
                 existEvent.date = event.date
@@ -34,20 +37,24 @@ class EventsStorageInteractor(private val dbInteractor: DBInteractor) {
                 existEvent.numericValue = numericValue
                 existEvent.note = event.note
             } else {
-                dbInteractor.getDB().insertOrUpdate(eventDbElement)
+                it.insertOrUpdate(eventDbElement)
             }
-        }
+        }, {
+           onComplete()
+        }, null)
     }
 
-    fun deleteEvent(event: EventBase) {
-        dbInteractor.getDB().executeTransaction {
-            existEventOrNull(event)?.deleteFromRealm()
-        }
+    fun deleteEvent(event: EventBase, onComplete: () -> Unit) {
+        dbInteractor.getDB().executeTransactionAsync( {
+            existEventOrNull(it, event)?.deleteFromRealm()
+        }, {
+           onComplete()
+        }, null)
     }
 
     fun getAllEvents(): ArrayList<EventBase> {
         val result = ArrayList<EventBase>()
-        for (r in dbInteractor.getDB().where(EventDbEntity::class.java).findAll()
+        for (r in dbInteractor.getDB().where(EventDbEntity::class.java).findAll() //TODO Async
             .sortedBy { it.date }) {
             when {
                 (r.rate != null) -> {
@@ -72,8 +79,8 @@ class EventsStorageInteractor(private val dbInteractor: DBInteractor) {
         return false
     }
 
-    private fun existEventOrNull(event: EventBase): EventDbEntity? {
-        return dbInteractor.getDB().where(EventDbEntity::class.java)
+    private fun existEventOrNull(realm: Realm, event: EventBase): EventDbEntity? {
+        return realm.where(EventDbEntity::class.java)
             .equalTo("id", event.id)
             .findFirst()
     }

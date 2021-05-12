@@ -50,7 +50,7 @@ class NowViewModel(
     init {
         if (quantsStorageInteractor.getAllQuantsList(false).isEmpty()) {
             for (quant in quantsStorageInteractor.getPresetQuantsList()) {
-                quantsStorageInteractor.addQuantToDB(quant)
+                quantsStorageInteractor.addQuantToDB(quant) {}
             }
             _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
         }
@@ -62,14 +62,16 @@ class NowViewModel(
         val dialog = CreateQuantDialogFragment(existQuant, settingsInteractor)
         dialog.setDialogListener(object : CreateQuantDialogFragment.DialogListener {
             override fun onConfirm(quant: QuantBase) {
-                quantsStorageInteractor.addQuantToDB(quant)
-                _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
-                updateTodayTotal()
+                quantsStorageInteractor.addQuantToDB(quant) {
+                    _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
+                    updateTodayTotal()
+                }
             }
 
             override fun onDelete(quant: QuantBase) {
-                quantsStorageInteractor.deleteQuant(quant)
-                _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
+                quantsStorageInteractor.deleteQuant(quant) {
+                    _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
+                }
             }
 
             override fun onDecline() {}
@@ -96,11 +98,11 @@ class NowViewModel(
     }
 
     override fun onEventCreated(event: EventBase) {
-        eventsStorageInteractor.addEventToDB(event)
-        quantsStorageInteractor.incrementQuantUsage(event.quantId)
-        _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
-
-        updateTodayTotal()
+        eventsStorageInteractor.addEventToDB(event) {
+            quantsStorageInteractor.incrementQuantUsage(event.quantId)
+            _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
+            updateTodayTotal()
+        }
     }
 
     private fun updateTodayTotal() {

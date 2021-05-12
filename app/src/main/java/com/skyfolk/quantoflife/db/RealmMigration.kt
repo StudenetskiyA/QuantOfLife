@@ -14,12 +14,12 @@ class RealmMigration : RealmMigration {
         Log.d("skyfolk-db","oldVersion = $oldVersion, newVersion = $newVersion")
         if (oldVersion == 5L) {
             schema["EventDbEntity"]
-                .addField("id", String::class.java)
-                .transform { oldObject ->
+                ?.addField("id", String::class.java)
+                ?.transform { oldObject ->
                     oldObject.setString("id", UUID.randomUUID().toString())
                 }
-                .addIndex("id")
-                .addPrimaryKey("id")
+                ?.addIndex("id")
+                ?.addPrimaryKey("id")
         }
 
         if (oldVersion == 6L) {
@@ -28,6 +28,28 @@ class RealmMigration : RealmMigration {
                 .addField("duration", String::class.java)
                 .addField("target", Double::class.java)
                 .addField("type", String::class.java)
+        }
+
+        if (oldVersion == 7L) {
+            schema["EventDbEntity"]?.let {
+                it.setRequired("quantId",true)
+                it.setRequired("note",true)
+                it.setRequired("id",true)
+            }
+            schema["GoalDbEntity"]?.let {
+                it.setRequired("id",true)
+                it.setRequired("duration",true)
+                it.setRequired("type",true)
+            }
+            schema["QuantBonusDbEntity"]?.setRequired("categoryDescription",true)
+            schema["QuantDbEntity"]?.let {
+                it.setRequired("id",true)
+                it.setRequired("name",true)
+                it.setRequired("icon",true)
+                it.setRequired("primalCategoryDescription",true)
+                it.setRequired("typeDescription",true)
+                it.setRequired("description",true)
+            }
         }
     }
 }

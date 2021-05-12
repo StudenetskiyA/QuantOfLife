@@ -71,12 +71,12 @@ class SettingsViewModel(
                 //Merge
                 for (event in oldEvents) {
                     if (!eventsStorageInteractor.alreadyHaveEvent(event)) {
-                        eventsStorageInteractor.addEventToDB(event)
+                        eventsStorageInteractor.addEventToDB(event) {}
                     }
                 }
                 for (quant in oldQuants) {
                     if (!quantsStorageInteractor.alreadyHaveQuant(quant)) {
-                        quantsStorageInteractor.addQuantToDB(quant)
+                        quantsStorageInteractor.addQuantToDB(quant) {}
                     }
                 }
 

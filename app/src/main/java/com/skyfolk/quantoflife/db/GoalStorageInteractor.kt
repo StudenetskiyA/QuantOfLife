@@ -1,6 +1,7 @@
 package com.skyfolk.quantoflife.db
 
 import com.skyfolk.quantoflife.entity.Goal
+import io.realm.Realm
 
 class GoalStorageInteractor(private val dbInteractor: DBInteractor): IGoalStorageInteractor {
     override fun getListOfGoals(): ArrayList<Goal> {
@@ -14,19 +15,19 @@ class GoalStorageInteractor(private val dbInteractor: DBInteractor): IGoalStorag
     }
 
     override fun addGoalToDB(goal: Goal) {
-        dbInteractor.getDB().executeTransaction {
-                 dbInteractor.getDB().insertOrUpdate(GoalDbEntity(goal.duration.javaClass.name, goal.target, goal.type.name, goal.id))
+        dbInteractor.getDB().executeTransactionAsync {
+                 it.insertOrUpdate(GoalDbEntity(goal.duration.javaClass.name, goal.target, goal.type.name, goal.id))
         }
     }
 
     override fun deleteGoal(goal: Goal) {
-        dbInteractor.getDB().executeTransaction {
-            existGoalOrNull(goal.id)?.deleteFromRealm()
+        dbInteractor.getDB().executeTransactionAsync {
+            existGoalOrNull(it, goal.id)?.deleteFromRealm()
         }
     }
 
-    private fun existGoalOrNull(goalId: String): GoalDbEntity? {
-        return dbInteractor.getDB().where(GoalDbEntity::class.java)
+    private fun existGoalOrNull(realm: Realm, goalId: String): GoalDbEntity? {
+        return realm.where(GoalDbEntity::class.java)
             .equalTo("id", goalId)
             .findFirst()
     }

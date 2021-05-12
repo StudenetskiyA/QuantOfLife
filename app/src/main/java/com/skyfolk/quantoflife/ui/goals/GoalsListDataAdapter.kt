@@ -47,7 +47,7 @@ class GoalsListDataAdapter(
                 "Цель - ${goalPresent.target} ${settingsInteractor.getCategoryName(goalPresent.type)} за ${goalPresent.duration.toStringName()}."
 
             val progress = (goalPresent.comleted / goalPresent.target) * 100
-            progressBar.setProgress(progress.toInt(), true)
+            progressBar.setProgress(progress.toInt(), false)
             if (progress > 100) {
                 progressText.text = "Цель выполнена!"
                 moreText.visibility = View.INVISIBLE

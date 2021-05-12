@@ -1,29 +1,34 @@
 package com.skyfolk.quantoflife.db
 
 import com.skyfolk.quantoflife.entity.*
+import io.realm.Realm
 import kotlin.collections.ArrayList
 
 class QuantsStorageInteractor(private val dbInteractor: DBInteractor) : IQuantsStorageInteractor {
-    override fun addQuantToDB(quant: QuantBase) {
-        dbInteractor.getDB().executeTransaction {
-            val existQuant = existEventOrNull(quant)
+    override fun addQuantToDB(quant: QuantBase, onComplete: () -> Unit) {
+        dbInteractor.getDB().executeTransactionAsync( {
+            val existQuant = existEventOrNull(it, quant)
             var usageCount = 0
             if (existQuant != null) {
                 usageCount = existQuant.usageCount
             }
             val quantDbEntity = QuantDbEntity.toQuantDbEntity(quant)
             quantDbEntity.usageCount = usageCount
-            dbInteractor.getDB().insertOrUpdate(quantDbEntity)
-        }
+            it.insertOrUpdate(quantDbEntity)
+        }, {
+            onComplete()
+        }, null)
     }
 
-    override fun deleteQuant(quant: QuantBase) {
-        dbInteractor.getDB().executeTransaction {
-            val result: QuantDbEntity =
-                dbInteractor.getDB().where(QuantDbEntity::class.java).equalTo("id", quant.id)
-                    .findFirst()
-            result.isDeleted = true
-        }
+    override fun deleteQuant(quant: QuantBase, onComplete: () -> Unit) {
+        dbInteractor.getDB().executeTransactionAsync( { realm ->
+            realm.where(QuantDbEntity::class.java).equalTo("id", quant.id)
+                    .findFirst()?.let {
+                    it.isDeleted = true
+                }
+        }, {
+            onComplete()
+        }, null)
     }
 
     override fun getAllQuantsList(includeDeleted: Boolean): ArrayList<QuantBase> {
@@ -51,13 +56,15 @@ class QuantsStorageInteractor(private val dbInteractor: DBInteractor) : IQuantsS
     }
 
     override fun incrementQuantUsage(id: String) {
-        dbInteractor.getDB().executeTransaction {
-            dbInteractor.getDB().where(QuantDbEntity::class.java).equalTo("id", id).findFirst().usageCount++
+        dbInteractor.getDB().executeTransactionAsync { realm ->
+            realm.where(QuantDbEntity::class.java).equalTo("id", id).findFirst()?.let {
+              it.usageCount++
+            }
         }
     }
 
-    private fun existEventOrNull(quant: QuantBase): QuantDbEntity? {
-        return dbInteractor.getDB().where(QuantDbEntity::class.java)
+    private fun existEventOrNull(realm: Realm, quant: QuantBase): QuantDbEntity? {
+        return realm.where(QuantDbEntity::class.java)
             .equalTo("id", quant.id)
             .findFirst()
     }
