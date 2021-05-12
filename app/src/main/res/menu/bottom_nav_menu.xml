@@ -12,6 +12,11 @@
         android:title="@string/title_feeds" />
 
     <item
+        android:id="@+id/navigation_feeds_old"
+        android:icon="@drawable/ic_feed"
+        android:title="@string/title_feeds" />
+
+    <item
         android:id="@+id/navigation_statistic"
         android:icon="@drawable/ic_statistic"
         android:title="@string/title_statistic" />
