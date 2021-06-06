@@ -3,6 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../layout/compose-model-1622980270398.xml" value="0.1" />
+        <entry key="../../../../layout/compose-model-1622980926109.xml" value="0.5842592592592593" />
+        <entry key="../../../../layout/compose-model-1622982095845.xml" value="0.18412162162162163" />
+        <entry key="../../../../layout/compose-model-1622982130927.xml" value="0.5" />
+        <entry key="../../../../layout/compose-model-1622983018141.xml" value="0.5537037037037037" />
+        <entry key="../../../../layout/compose-model-1622990955660.xml" value="2.0" />
+        <entry key="../../../../layout/custom_preview.xml" value="0.1" />
         <entry key="..\:/Code/QuantOfLife/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.22135416666666666" />
         <entry key="..\:/Code/QuantOfLife/app/src/main/res/drawable/ic_home_black_24dp.xml" value="0.22135416666666666" />
         <entry key="..\:/Code/QuantOfLife/app/src/main/res/drawable/ic_notifications_black_24dp.xml" value="0.22135416666666666" />
@@ -10,6 +17,7 @@
         <entry key="..\:/Code/QuantOfLife/app/src/main/res/layout/feeds_fragment_compose.xml" value="0.25" />
         <entry key="..\:/Code/QuantOfLife/app/src/main/res/menu/bottom_nav_menu.xml" value="0.21979166666666666" />
         <entry key="..\:/Users/wowda/AppData/Local/Android/Sdk/platforms/android-30/data/res/drawable/btn_dropdown.xml" value="0.22135416666666666" />
+        <entry key="app/src/main/res/layout/item_event.xml" value="0.5" />
       </map>
     </option>
   </component>

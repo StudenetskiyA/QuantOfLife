@@ -1,11 +1,13 @@
 package com.skyfolk.quantoflife.ui.feeds
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
+import androidx.compose.foundation.clickable
 import androidx.recyclerview.widget.RecyclerView
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.entity.EventDisplayable
@@ -109,6 +111,7 @@ class EventListDataAdapter(
 
             itemView.setOnLongClickListener {
                 clickListener(event.id)
+                        Log.d("skyfolk-compose","internal click id = ${event.id}")
                 true
             }
         }

@@ -128,9 +128,14 @@ class FeedsViewModel(
         runSearch(eventFilterWasChanged = EventFilterWasChanged(itemId))
     }
 
+    fun getSelectedEventFilter(): String?{
+        return settingsInteractor.getSelectedEventFiler()
+    }
+
     fun editEvent(eventId: String) {
         eventsStorageInteractor.getAllEvents().firstOrNull { it.id == eventId }?.let { event ->
             quantsStorageInteractor.getQuantById(event.quantId)?.let { quant ->
+                Log.d("skyfolk-compose","show dialog")
               _singleLifeEvent.value = FeedsFragmentSingleLifeEvent.ShowEditEventDialog(quant, event)
             }
         }
