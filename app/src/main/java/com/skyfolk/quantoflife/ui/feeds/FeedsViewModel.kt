@@ -280,7 +280,12 @@ fun ArrayList<EventBase>.toDisplayableEvents(quantStorageInteractor: IQuantsStor
 
     for (event in this) {
         quantStorageInteractor.getQuantById(event.quantId)?.let {
-            val value = if (event is EventBase.EventRated) event.rate else null
+            val value = when {
+                (event is EventBase.EventRated) -> event.rate
+                (event is EventBase.EventMeasure) -> event.value
+                else -> null
+            }
+
             val bonuses = if (it is QuantBase.QuantRated) it.bonuses else null
             result.add(
                 EventDisplayable(

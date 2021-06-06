@@ -2,6 +2,8 @@ package com.skyfolk.quantoflife.ui.feeds
 
 import android.app.DatePickerDialog
 import android.content.Context
+import android.util.Log
+import android.view.View
 import android.widget.DatePicker
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -265,16 +267,18 @@ fun EventItem(event: EventDisplayable, modifier: Modifier) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = modifier.fillMaxWidth()
                 ) {
-
-
-                    event.value?.toFloat()?.let {
-                        RatingBar(
-                            rating = it,
-                            color = Color.Cyan,
-                            modifier = modifier.height(20.dp)
-                        )
+                    when {
+                        ((event.bonuses != null) && (event.value != null)) -> {
+                            RatingBar(
+                                rating = event.value.toFloat(),
+                                color = Color.Cyan,
+                                modifier = modifier.height(20.dp)
+                            )
+                        }
+                        ((event.bonuses == null) && (event.value != null)) -> {
+                            Text(event.value.toString())
+                        }
                     }
-                    Text("Bonuses")
                 }
                 Text(event.note)
             }
