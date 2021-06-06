@@ -4,12 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.databinding.StatisticFragmentBinding
 import com.skyfolk.quantoflife.statistic.DayAxisValueFormatter
@@ -22,6 +25,8 @@ import org.koin.android.viewmodel.ext.android.viewModel
 class StatisticFragment : Fragment() {
     private val viewModel: StatisticViewModel by viewModel()
     private lateinit var binding: StatisticFragmentBinding
+    // Иначе дурацкие спиннеры лишние раз тригерятся
+    private var selectedEventFilterName: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,8 +38,6 @@ class StatisticFragment : Fragment() {
         binding.chart.description.isEnabled = false
         binding.chart.setPinchZoom(false)
         binding.chart.setDrawGridBackground(false)
-
-
 
         binding.chart.legend.isEnabled = false
 
@@ -58,17 +61,58 @@ class StatisticFragment : Fragment() {
                 xAxis.labelRotationAngle = -45F
 
                 xAxis.granularity = (data.entry[1].x - data.entry[0].x)
+                QLog.d("skyfolk-statistic","granularity = ${ (data.entry[1].x - data.entry[0].x)}")
+
                 xAxis.labelCount = data.entry.size
 
                 val xAxisFormatter = WeekAxisValueFormatter(data.firstDate)
                 xAxis.valueFormatter = xAxisFormatter
 
+                binding.chart.invalidate()
                 binding.chart.data = barData
             } else {
                 // Not enough data
                 binding.chart.visibility = View.GONE
             }
         })
+
+        viewModel.listOfQuants.observe(viewLifecycleOwner, { listOfQuants ->
+            // List of quants for spinner
+            val listOfQuantName = listOfQuants.map { it.name }.toMutableList()
+            listOfQuantName.add(0, "Все события")
+            val quantsSpinnerAdapter = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                listOfQuantName
+            )
+            quantsSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            binding.eventSpinner.adapter = quantsSpinnerAdapter
+        })
+
+        binding.eventSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>,
+                    view: View,
+                    position: Int,
+                    id: Long
+                ) {
+                    if (selectedEventFilterName != parent.getItemAtPosition(position).toString()) {
+                        selectedEventFilterName = parent.getItemAtPosition(position).toString()
+                        if (position == 0) {
+                            viewModel.setSelectedEventFilter(null)
+                        } else {
+                            viewModel.setSelectedEventFilter(
+                                viewModel.getQuantIdByName(
+                                    parent.getItemAtPosition(position).toString()
+                                )
+                            )
+                        }
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>) {}
+            }
 
         return binding.root
     }
