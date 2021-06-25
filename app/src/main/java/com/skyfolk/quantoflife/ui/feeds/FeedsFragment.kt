@@ -24,6 +24,9 @@ import kotlinx.coroutines.launch
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.util.*
 
+@Deprecated("Устаревшая версия экрана, вместо неё используйте FeedsComposeFragment",
+    ReplaceWith("FeedsComposeFragment"),
+    DeprecationLevel.WARNING)
 class FeedsFragment : Fragment() {
     private val viewModel: FeedsViewModel by viewModel()
     private lateinit var binding: FeedsFragmentBinding
