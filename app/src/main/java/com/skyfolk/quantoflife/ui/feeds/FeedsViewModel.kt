@@ -22,9 +22,9 @@ import com.skyfolk.quantoflife.ui.feeds.FeedsFragmentState.LoadingEventsListComp
 import com.skyfolk.quantoflife.ui.now.CreateEventDialogFragment
 import com.skyfolk.quantoflife.utils.SingleLiveEvent
 import com.skyfolk.quantoflife.utils.getEndDateCalendar
-import com.skyfolk.quantoflife.utils.setOnHideByTimeout
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
 import kotlin.collections.ArrayList
 
 class FeedsViewModel(
@@ -54,13 +54,13 @@ class FeedsViewModel(
         timeIntervalWasChanged: TimeIntervalWasChanged? = null,
         eventFilterWasChanged: EventFilterWasChanged? = null
     ) {
+        Log.d("skyfolk-timer", "runSearchStart: ${System.currentTimeMillis()}" )
+
         viewModelScope.launch {
             val selectedTimeInterval =
                 timeIntervalWasChanged?.timeInterval ?: _state.value?.selectedTimeInterval
             selectedTimeInterval?.let { interval ->
                 updateStateToLoading(_state)
-
-                // delay(1000)
 
                 val startDate =
                     dateTimeRepository.getCalendar().getStartDateCalendar(
@@ -72,8 +72,6 @@ class FeedsViewModel(
                         interval,
                         settingsInteractor.getStartDayTime()
                     ).timeInMillis
-                Log.d("skyfolk-time", "start = $startDate , end = $endDate")
-
 
                 var listOfEvents = ArrayList(
                     eventsStorageInteractor.getAllEvents()
@@ -83,6 +81,8 @@ class FeedsViewModel(
                 selectedEventFilter?.let { filter ->
                     listOfEvents = ArrayList(listOfEvents.filter { it.quantId == filter })
                 }
+
+                Log.d("skyfolk-timer", "runSearchEnd: ${System.currentTimeMillis()}" )
 
                 updateStateToCompleted(
                     _state,
@@ -113,6 +113,10 @@ class FeedsViewModel(
         }
     }
 
+    fun getDefaultCalendar(): Calendar {
+        return dateTimeRepository.getCalendar()
+    }
+
     fun setTimeIntervalState(timeInterval: TimeInterval) {
         settingsInteractor.writeStatisticTimeIntervalSelectedElement(timeInterval.javaClass.name)
         if (timeInterval is TimeInterval.Selected) {
@@ -133,10 +137,13 @@ class FeedsViewModel(
     }
 
     fun editEvent(eventId: String) {
-        eventsStorageInteractor.getAllEvents().firstOrNull { it.id == eventId }?.let { event ->
-            quantsStorageInteractor.getQuantById(event.quantId)?.let { quant ->
-                Log.d("skyfolk-compose","show dialog")
-              _singleLifeEvent.value = FeedsFragmentSingleLifeEvent.ShowEditEventDialog(quant, event)
+        viewModelScope.launch {
+            eventsStorageInteractor.getAllEvents().firstOrNull { it.id == eventId }?.let { event ->
+                quantsStorageInteractor.getQuantById(event.quantId)?.let { quant ->
+                    Log.d("skyfolk-compose", "show dialog")
+                    _singleLifeEvent.value =
+                        FeedsFragmentSingleLifeEvent.ShowEditEventDialog(quant, event)
+                }
             }
         }
     }

@@ -3,6 +3,7 @@ package com.skyfolk.quantoflife.ui.settings
 import android.os.Environment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.skyfolk.quantoflife.db.DBInteractor
 import com.skyfolk.quantoflife.db.EventsStorageInteractor
 import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
@@ -10,6 +11,7 @@ import com.skyfolk.quantoflife.entity.*
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.utils.SingleLiveEvent
 import com.skyfolk.quantoflife.utils.toCalendarOnlyHourAndMinute
+import kotlinx.coroutines.launch
 import java.io.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -46,42 +48,46 @@ class SettingsViewModel(
     fun importAllEventsAndQuantsFromFile() {
         _permissionRequestState.value =
             PermissionRequest("android.permission.WRITE_EXTERNAL_STORAGE") {
-                val mainPath = dbInteractor.getDBPath()
-                //Copy
-                var eventsImported = 0
-                var quantsImported = 0
-                val oldEvents = ArrayList<EventBase>()
-                for (oldEvent in eventsStorageInteractor.getAllEvents()) {
-                    eventsImported++
-                    oldEvents.add(oldEvent.copy())
-                }
-                val oldQuants = ArrayList<QuantBase>()
-                for (oldQuant in quantsStorageInteractor.getAllQuantsList(true)) {
-                    quantsImported++
-                    oldQuants.add(oldQuant.copy())
-                }
-
-                dbInteractor.close()
-                val restoreFilePath = file.path
-                copyBundledRealmFile(restoreFilePath, mainPath)
-
-                quantsImported = quantsStorageInteractor.getAllQuantsList(true).size - quantsImported
-                eventsImported = eventsStorageInteractor.getAllEvents().size - eventsImported
-
-                //Merge
-                for (event in oldEvents) {
-                    if (!eventsStorageInteractor.alreadyHaveEvent(event)) {
-                        eventsStorageInteractor.addEventToDB(event) {}
+                viewModelScope.launch {
+                    val mainPath = dbInteractor.getDBPath()
+                    //Copy
+                    var eventsImported = 0
+                    var quantsImported = 0
+                    val oldEvents = ArrayList<EventBase>()
+                    for (oldEvent in eventsStorageInteractor.getAllEvents()) {
+                        eventsImported++
+                        oldEvents.add(oldEvent.copy())
                     }
-                }
-                for (quant in oldQuants) {
-                    if (!quantsStorageInteractor.alreadyHaveQuant(quant)) {
-                        quantsStorageInteractor.addQuantToDB(quant) {}
+                    val oldQuants = ArrayList<QuantBase>()
+                    for (oldQuant in quantsStorageInteractor.getAllQuantsList(true)) {
+                        quantsImported++
+                        oldQuants.add(oldQuant.copy())
                     }
-                }
 
-                //Count
-                _toastState.value = "Импорт успешен\nИмпортировано новых типов событий - $quantsImported\nИмпортировано новых событий - $eventsImported"
+                    dbInteractor.close()
+                    val restoreFilePath = file.path
+                    copyBundledRealmFile(restoreFilePath, mainPath)
+
+                    quantsImported =
+                        quantsStorageInteractor.getAllQuantsList(true).size - quantsImported
+                    eventsImported = eventsStorageInteractor.getAllEvents().size - eventsImported
+
+                    //Merge
+                    for (event in oldEvents) {
+                        if (!eventsStorageInteractor.alreadyHaveEvent(event)) {
+                            eventsStorageInteractor.addEventToDB(event) {}
+                        }
+                    }
+                    for (quant in oldQuants) {
+                        if (!quantsStorageInteractor.alreadyHaveQuant(quant)) {
+                            quantsStorageInteractor.addQuantToDB(quant) {}
+                        }
+                    }
+
+                    //Count
+                    _toastState.value =
+                        "Импорт успешен\nИмпортировано новых типов событий - $quantsImported\nИмпортировано новых событий - $eventsImported"
+                }
             }
     }
 

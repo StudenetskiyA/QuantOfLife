@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.Entry
 import com.skyfolk.quantoflife.DateTimeRepository
@@ -18,6 +19,7 @@ import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.ui.feeds.FeedsFragmentState
 import com.skyfolk.quantoflife.ui.feeds.TimeInterval
 import com.skyfolk.quantoflife.utils.*
+import kotlinx.coroutines.launch
 import kotlin.collections.ArrayList
 
 class StatisticViewModel(
@@ -26,77 +28,82 @@ class StatisticViewModel(
     private val settingsInteractor: SettingsInteractor,
     private val dateTimeRepository: IDateTimeRepository,
 ) : ViewModel() {
-    private val _barEntryData = MutableLiveData<EntryAndFirstDate?>().apply {
-        value = getBarEntryData()
+    private val _barEntryData = MutableLiveData<StatisticFragmentState>().apply {
+        value = StatisticFragmentState.Loading
     }
-    val barEntryData: LiveData<EntryAndFirstDate?> = _barEntryData
+    val barEntryData: LiveData<StatisticFragmentState> = _barEntryData
 
     private val _listOfQuants = MutableLiveData<ArrayList<QuantBase>>().apply {
         value = quantsStorageInteractor.getAllQuantsList(false)
     }
     val listOfQuants: LiveData<ArrayList<QuantBase>> = _listOfQuants
 
-    private fun getBarEntryData(): EntryAndFirstDate? {
-        return runSearch(null)
-    }
-
     fun setSelectedEventFilter(itemId: String?) {
-        runSearch(itemId)?.let {
-
-            _barEntryData.value = it
-        }
+        runSearch(itemId)
     }
 
-    fun runSearch(onlyQuant: String?): EntryAndFirstDate? {
-        val result = ArrayList<Entry>()
-        var resultCount = 0
-        val allEvents = eventsStorageInteractor.getAllEvents().filter {
-            if (onlyQuant != null) {
-                it.quantId == onlyQuant
-            } else {
-                true
+    private fun runSearch(onlyQuant: String?) {
+        viewModelScope.launch {
+            val result = ArrayList<Entry>()
+            var resultCount = 0
+            val allEvents = eventsStorageInteractor.getAllEvents().filter {
+                if (onlyQuant != null) {
+                    it.quantId == onlyQuant
+                } else {
+                    true
+                }
             }
+
+            if (allEvents.firstOrNull() == null) {
+                _barEntryData.value = null
+            }
+
+            val firstDate = allEvents.first().date
+            val lastDate = dateTimeRepository.getTimeInMillis()
+
+            var currentPeriodStart = firstDate
+            var currentPeriodEnd = firstDate
+
+            viewModelScope.launch {
+
+            }
+            while (currentPeriodEnd <= lastDate) {
+                currentPeriodEnd = currentPeriodStart.toCalendar().getEndDateCalendar(
+                    TimeInterval.Week,
+                    settingsInteractor.getStartDayTime()
+                ).timeInMillis
+                val filteredEvents =
+                    allEvents.filter { it.date in currentPeriodStart until currentPeriodEnd }
+
+                val totalByPeriod = getTotal(
+                    quantsStorageInteractor,
+                    filteredEvents
+                )
+                QLog.d(
+                    "skyfolk-statistic",
+                    "count = ${filteredEvents.size}, total = ${totalByPeriod}"
+                )
+
+                result.add(BarEntry((resultCount).toFloat(), totalByPeriod.toFloat()))
+                resultCount++
+                currentPeriodStart = currentPeriodEnd + 1
+            }
+
+            _barEntryData.value = StatisticFragmentState.EntryAndFirstDate(result, firstDate)
         }
-
-        if (allEvents.firstOrNull() == null) return null
-
-        QLog.d("skyfolk-statistic","total count = ${allEvents.size}")
-
-        val firstDate = allEvents.first().date
-        val lastDate = dateTimeRepository.getTimeInMillis()
-
-        var currentPeriodStart = firstDate
-        var currentPeriodEnd = firstDate
-
-        while (currentPeriodEnd <= lastDate) {
-            currentPeriodEnd = currentPeriodStart.toCalendar().getEndDateCalendar(
-                TimeInterval.Week,
-                settingsInteractor.getStartDayTime()
-            ).timeInMillis
-            val filteredEvents =   allEvents.filter { it.date in currentPeriodStart until currentPeriodEnd }
-
-            val totalByPeriod = getTotal(
-                quantsStorageInteractor,
-                filteredEvents
-              )
-            QLog.d("skyfolk-statistic","count = ${filteredEvents.size}, total = ${totalByPeriod}")
-
-            result.add(BarEntry((resultCount).toFloat(), totalByPeriod.toFloat()))
-            resultCount++
-            currentPeriodStart = currentPeriodEnd + 1
-        }
-
-        // QLog.d("skyfolk-statistic", "firstDate = $firstDate is ${firstDate.toShortDate()}")
-
-        return EntryAndFirstDate(result, firstDate)
     }
+
 
     fun getQuantIdByName(name: String): String? {
         return quantsStorageInteractor.getQuantByName(name)?.id
     }
 }
 
-data class EntryAndFirstDate(
-    val entry: ArrayList<Entry>,
-    val firstDate: Long
-)
+sealed class StatisticFragmentState() {
+    data class EntryAndFirstDate(
+        val entry: ArrayList<Entry>,
+        val firstDate: Long
+    ): StatisticFragmentState()
+    object Loading: StatisticFragmentState()
+}
+

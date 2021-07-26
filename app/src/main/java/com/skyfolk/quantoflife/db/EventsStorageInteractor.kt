@@ -3,6 +3,8 @@ package com.skyfolk.quantoflife.db
 import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.entity.*
 import io.realm.Realm
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class EventsStorageInteractor(private val dbInteractor: DBInteractor) {
     fun clearDataBase() {
@@ -52,9 +54,9 @@ class EventsStorageInteractor(private val dbInteractor: DBInteractor) {
         }, null)
     }
 
-    fun getAllEvents(): ArrayList<EventBase> {
+    suspend fun getAllEvents(): ArrayList<EventBase> = withContext(Dispatchers.IO){
         val result = ArrayList<EventBase>()
-        for (r in dbInteractor.getDB().where(EventDbEntity::class.java).findAll() //TODO Async
+        for (r in dbInteractor.getDB().freeze().where(EventDbEntity::class.java).findAll() //TODO Async
             .sortedBy { it.date }) {
             when {
                 (r.rate != null) -> {
@@ -68,15 +70,15 @@ class EventsStorageInteractor(private val dbInteractor: DBInteractor) {
                 }
             }
         }
-        return result
+        return@withContext result
     }
 
     //TODO This is bad implementation
-    fun alreadyHaveEvent(event: EventBase): Boolean {
+    suspend fun alreadyHaveEvent(event: EventBase): Boolean = withContext(Dispatchers.IO){
         for (storedEvent in getAllEvents()) {
-            if (event.isEqual(storedEvent)) return true
+            if (event.isEqual(storedEvent)) return@withContext true
         }
-        return false
+        return@withContext false
     }
 
     private fun existEventOrNull(realm: Realm, event: EventBase): EventDbEntity? {

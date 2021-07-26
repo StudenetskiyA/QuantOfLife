@@ -4,6 +4,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.skyfolk.quantoflife.IDateTimeRepository
 import com.skyfolk.quantoflife.db.EventsStorageInteractor
 import com.skyfolk.quantoflife.db.IGoalStorageInteractor
@@ -16,6 +17,7 @@ import com.skyfolk.quantoflife.ui.create_quant.CreateQuantDialogFragment
 import com.skyfolk.quantoflife.ui.feeds.TimeInterval
 import com.skyfolk.quantoflife.ui.goals.CreateGoalDialogFragment
 import com.skyfolk.quantoflife.utils.SingleLiveEvent
+import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -106,35 +108,56 @@ class NowViewModel(
     }
 
     private fun updateTodayTotal() {
-        val startDate = dateTimeRepository.getCalendar().getStartDateCalendar(TimeInterval.Today, settingsInteractor.getStartDayTime()).timeInMillis
-        val endDate = dateTimeRepository.getTimeInMillis()
+        viewModelScope.launch {
+            val startDate = dateTimeRepository.getCalendar().getStartDateCalendar(
+                TimeInterval.Today,
+                settingsInteractor.getStartDayTime()
+            ).timeInMillis
+            val endDate = dateTimeRepository.getTimeInMillis()
 
-        val resultList = ArrayList(
-            eventsStorageInteractor.getAllEvents().filter { it.date in startDate until endDate })
+            val resultList = ArrayList(
+                eventsStorageInteractor.getAllEvents()
+                    .filter { it.date in startDate until endDate })
 
-        _todayTotal.value = getTotal(quantsStorageInteractor, resultList)
+            _todayTotal.value = getTotal(quantsStorageInteractor, resultList)
 
-        val millisecondsInDay = 24 * 60 * 60 * 1000
-        val goals = goalStorageInteractor.getListOfGoals()
-        val goalsPresentList: ArrayList<GoalPresent> = arrayListOf()
-        for (goal in goals) {
-            val goalStartDate = dateTimeRepository.getCalendar().getStartDateCalendar(goal.duration, settingsInteractor.getStartDayTime()).timeInMillis
+            val millisecondsInDay = 24 * 60 * 60 * 1000
+            val goals = goalStorageInteractor.getListOfGoals()
+            val goalsPresentList: ArrayList<GoalPresent> = arrayListOf()
+            for (goal in goals) {
+                val goalStartDate = dateTimeRepository.getCalendar().getStartDateCalendar(
+                    goal.duration,
+                    settingsInteractor.getStartDayTime()
+                ).timeInMillis
 
-            val goalResultList = ArrayList(
-                eventsStorageInteractor.getAllEvents().filter { it.date in goalStartDate until endDate })
+                val goalResultList = ArrayList(
+                    eventsStorageInteractor.getAllEvents()
+                        .filter { it.date in goalStartDate until endDate })
 
-            val daysGone = ((endDate - goalStartDate) / millisecondsInDay).toInt() + 1
-            val completed = getTotal(quantsStorageInteractor, goalResultList, goal.type)
-            val durationInDays = when (goal.duration) {
-                is TimeInterval.Today -> 1
-                is TimeInterval.Week -> 7
-                is TimeInterval.Month -> dateTimeRepository.getCalendar().getActualMaximum(Calendar.DAY_OF_MONTH)
-                is TimeInterval.All -> 0
-                is TimeInterval.Selected -> 0
+                val daysGone = ((endDate - goalStartDate) / millisecondsInDay).toInt() + 1
+                val completed = getTotal(quantsStorageInteractor, goalResultList, goal.type)
+                val durationInDays = when (goal.duration) {
+                    is TimeInterval.Today -> 1
+                    is TimeInterval.Week -> 7
+                    is TimeInterval.Month -> dateTimeRepository.getCalendar()
+                        .getActualMaximum(Calendar.DAY_OF_MONTH)
+                    is TimeInterval.All -> 0
+                    is TimeInterval.Selected -> 0
+                }
+                goalsPresentList.add(
+                    GoalPresent(
+                        goal.id,
+                        goal.duration,
+                        durationInDays,
+                        goal.target,
+                        completed,
+                        daysGone,
+                        goal.type
+                    )
+                )
             }
-            goalsPresentList.add(GoalPresent(goal.id, goal.duration, durationInDays, goal.target, completed, daysGone, goal.type))
-        }
 
-        _listOfGoals.value = goalsPresentList
+            _listOfGoals.value = goalsPresentList
+        }
     }
 }

@@ -8,6 +8,7 @@ import android.widget.DatePicker
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -21,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.entity.EventDisplayable
+import com.skyfolk.quantoflife.entity.QuantCategory
 import com.skyfolk.quantoflife.ui.theme.Orange
 import com.skyfolk.quantoflife.ui.theme.Typography
 import com.skyfolk.quantoflife.utils.toDate
@@ -93,24 +95,21 @@ fun SeparatorLine() {
 }
 
 @Composable
-fun TotalValues(
-    descriptionsList: List<String>,
-    valuesList: List<Double>,
-    totalFound: Double,
-    totalStar: Int,
-    totalEventFound: Int
-) {
+fun TotalValues(state: FeedsFragmentState.LoadingEventsListCompleted) {
+    val descriptionsList = getCategoryArrayNames(state)
+    val valuesList = getCategoryArrayValues(state)
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 5.dp)
     ) {
-        SmallSubtitle(text = "Итого за период найдено $totalEventFound событий.")
+        SmallSubtitle(text = "Итого за период найдено ${state.listOfEvents.size} событий.")
         TotalValue(description = descriptionsList[0], value = valuesList[0])
         TotalValue(description = descriptionsList[1], value = valuesList[1])
         TotalValue(description = descriptionsList[2], value = valuesList[2])
-        TotalValue(description = "звезд", value = totalStar.toDouble(), valueFormatAfterDot = 0)
-        TotalValue(description = "", value = totalFound, style = Typography.subtitle2)
+        TotalValue(description = "звезд", value = state.totalStarFound.toDouble(), valueFormatAfterDot = 0)
+        TotalValue(description = "", value =  state.totalFound, style = Typography.subtitle2)
         SeparatorLine()
     }
 }
@@ -287,6 +286,21 @@ fun EventItem(event: EventDisplayable, modifier: Modifier) {
 }
 
 @Composable
+fun EventsList(modifier: Modifier, events: List<EventDisplayable>, onItemClick: (String) -> Unit) {
+    LazyColumn(modifier = modifier) {
+        events.map {
+            item {
+                EventItem(
+                    event = it,
+                    modifier = Modifier.clickable {
+                        onItemClick(it.id)
+                    })
+            }
+        }
+    }
+}
+
+@Composable
 fun SelectedTimeInterval(
     context: Context,
     setTimeInterval: (TimeInterval.Selected) -> Unit,
@@ -355,4 +369,25 @@ fun SelectedTimeInterval(
                 .show()
         }
     }
+}
+
+private fun getCategoryArrayNames(state: FeedsFragmentState.LoadingEventsListCompleted): List<String> {
+    return listOf(
+        state.quantCategoryNames.firstOrNull { it.first == QuantCategory.Physical }?.second
+            ?: "",
+        state.quantCategoryNames.firstOrNull { it.first == QuantCategory.Emotion }?.second
+            ?: "",
+        state.quantCategoryNames.firstOrNull { it.first == QuantCategory.Evolution }?.second
+            ?: "",
+        state.quantCategoryNames.firstOrNull { it.first == QuantCategory.Other }?.second
+            ?: ""
+    )
+}
+
+private fun getCategoryArrayValues(state: FeedsFragmentState.LoadingEventsListCompleted): List<Double> {
+    return listOf(
+        state.totalPhysicalFound,
+        state.totalEmotionalFound,
+        state.totalEvolutionFound
+    )
 }
