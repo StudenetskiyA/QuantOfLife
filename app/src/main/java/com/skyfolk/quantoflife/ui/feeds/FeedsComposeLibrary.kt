@@ -48,7 +48,7 @@ fun HalfHorizontalLayout(modifier: Modifier, children: @Composable () -> Unit) {
 @Composable
 fun TotalValue(
     description: String,
-    value: Double, valueFormatAfterDot: Int = 1,
+    value: Double?, valueFormatAfterDot: Int = 1,
     style: TextStyle = LocalTextStyle.current
 ) {
     Row(
@@ -63,7 +63,7 @@ fun TotalValue(
             style = style
         )
         Text(
-            text = String.format("%.${valueFormatAfterDot}f", value),
+            text = if (value!=null) String.format("%.${valueFormatAfterDot}f", value) else "",
             textAlign = TextAlign.Right,
             style = style
         )
@@ -95,21 +95,40 @@ fun SeparatorLine() {
 }
 
 @Composable
-fun TotalValues(state: FeedsFragmentState.LoadingEventsListCompleted) {
+fun TotalValues(state: FeedsFragmentState) {
     val descriptionsList = getCategoryArrayNames(state)
-    val valuesList = getCategoryArrayValues(state)
+    val valuesList = when (state) {
+        is FeedsFragmentState.EventsListLoading -> arrayOfNulls<Double?>(descriptionsList.size).toList()
+        is FeedsFragmentState.LoadingEventsListCompleted -> getCategoryArrayValues(state)
+    }
+    val subtitle = when (state) {
+        is FeedsFragmentState.EventsListLoading -> "...."
+        is FeedsFragmentState.LoadingEventsListCompleted -> "Итого за период найдено ${state.listOfEvents.size} событий."
+    }
+    val totalStarFound: Double? = when (state) {
+        is FeedsFragmentState.EventsListLoading -> null
+        is FeedsFragmentState.LoadingEventsListCompleted -> state.totalStarFound.toDouble()
+    }
+    val totalFound: Double? = when (state) {
+        is FeedsFragmentState.EventsListLoading -> null
+        is FeedsFragmentState.LoadingEventsListCompleted -> state.totalFound
+    }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 5.dp)
     ) {
-        SmallSubtitle(text = "Итого за период найдено ${state.listOfEvents.size} событий.")
+        SmallSubtitle(text = subtitle)
         TotalValue(description = descriptionsList[0], value = valuesList[0])
         TotalValue(description = descriptionsList[1], value = valuesList[1])
         TotalValue(description = descriptionsList[2], value = valuesList[2])
-        TotalValue(description = "звезд", value = state.totalStarFound.toDouble(), valueFormatAfterDot = 0)
-        TotalValue(description = "", value =  state.totalFound, style = Typography.subtitle2)
+        TotalValue(
+            description = "звезд",
+            value = totalStarFound,
+            valueFormatAfterDot = 0
+        )
+        TotalValue(description = "", value = totalFound, style = Typography.subtitle2)
         SeparatorLine()
     }
 }
@@ -371,7 +390,7 @@ fun SelectedTimeInterval(
     }
 }
 
-private fun getCategoryArrayNames(state: FeedsFragmentState.LoadingEventsListCompleted): List<String> {
+private fun getCategoryArrayNames(state: FeedsFragmentState): List<String> {
     return listOf(
         state.quantCategoryNames.firstOrNull { it.first == QuantCategory.Physical }?.second
             ?: "",

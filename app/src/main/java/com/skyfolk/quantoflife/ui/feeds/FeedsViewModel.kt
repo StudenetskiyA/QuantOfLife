@@ -1,28 +1,25 @@
 package com.skyfolk.quantoflife.ui.feeds
 
-import android.R
-import android.app.Activity
 import android.util.Log
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.material.snackbar.Snackbar
 import com.skyfolk.quantoflife.IDateTimeRepository
 import com.skyfolk.quantoflife.db.EventsStorageInteractor
 import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
-import com.skyfolk.quantoflife.entity.*
+import com.skyfolk.quantoflife.entity.EventBase
+import com.skyfolk.quantoflife.entity.EventDisplayable
+import com.skyfolk.quantoflife.entity.QuantBase
+import com.skyfolk.quantoflife.entity.QuantCategory
 import com.skyfolk.quantoflife.feeds.getStarTotal
-import com.skyfolk.quantoflife.utils.getStartDateCalendar
-import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.feeds.getTotal
+import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.ui.feeds.FeedsFragmentState.EventsListLoading.Companion.updateStateToLoading
 import com.skyfolk.quantoflife.ui.feeds.FeedsFragmentState.LoadingEventsListCompleted.Companion.updateStateToCompleted
-import com.skyfolk.quantoflife.ui.now.CreateEventDialogFragment
 import com.skyfolk.quantoflife.utils.SingleLiveEvent
 import com.skyfolk.quantoflife.utils.getEndDateCalendar
-import kotlinx.coroutines.delay
+import com.skyfolk.quantoflife.utils.getStartDateCalendar
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
@@ -84,31 +81,45 @@ class FeedsViewModel(
 
                 Log.d("skyfolk-timer", "runSearchEnd: ${System.currentTimeMillis()}" )
 
+                val allQuantsFound = quantsStorageInteractor.getAllQuantsList(false)
+
+                val totalPhysicalFound = getTotal(
+                    allQuantsFound,
+                    listOfEvents,
+                    QuantCategory.Physical
+                )
+
+                val totalEmotionalFound = getTotal(
+                   allQuantsFound,
+                    listOfEvents,
+                    QuantCategory.Emotion
+                )
+
+                val totalEvolutionFound = getTotal(
+                   allQuantsFound,
+                    listOfEvents,
+                    QuantCategory.Evolution
+                )
+
+                val totalFound = getTotal(allQuantsFound, listOfEvents)
+                val starFound = getStarTotal(allQuantsFound, listOfEvents)
+
+                Log.d("skyfolk-timer", "runSearchValuesEnd: ${System.currentTimeMillis()}" )
+
                 updateStateToCompleted(
                     _state,
                     _timeInterval = interval,
                     _selectedEventFilter = selectedEventFilter,
                     _quantCategoryName = settingsInteractor.getCategoryNames(),
-                    _listOfEvents = listOfEvents.toDisplayableEvents(quantsStorageInteractor),
-                    _totalPhysicalFound = getTotal(
-                        quantsStorageInteractor,
-                        listOfEvents,
-                        QuantCategory.Physical
-                    ),
-                    _totalEmotionalFound = getTotal(
-                        quantsStorageInteractor,
-                        listOfEvents,
-                        QuantCategory.Emotion
-                    ),
-                    _totalEvolutionFound = getTotal(
-                        quantsStorageInteractor,
-                        listOfEvents,
-                        QuantCategory.Evolution
-                    ),
-                    _totalFound = getTotal(quantsStorageInteractor, listOfEvents),
-                    _totalStarFound = getStarTotal(quantsStorageInteractor, listOfEvents)
+                    _listOfEvents = listOfEvents.toDisplayableEvents(allQuantsFound),
+                    _totalPhysicalFound = totalPhysicalFound,
+                    _totalEmotionalFound = totalEmotionalFound,
+                    _totalEvolutionFound = totalEvolutionFound,
+                    _totalFound = totalFound,
+                    _totalStarFound = starFound
                 )
 
+                Log.d("skyfolk-timer", "runSearchUpdateStateEnd: ${System.currentTimeMillis()}" )
             }
         }
     }
@@ -282,11 +293,11 @@ sealed class FeedsFragmentState(
     }
 }
 
-fun ArrayList<EventBase>.toDisplayableEvents(quantStorageInteractor: IQuantsStorageInteractor): ArrayList<EventDisplayable> {
+fun ArrayList<EventBase>.toDisplayableEvents(quants: List<QuantBase>): ArrayList<EventDisplayable> {
     val result = arrayListOf<EventDisplayable>()
 
     for (event in this) {
-        quantStorageInteractor.getQuantById(event.quantId)?.let {
+        quants.filter { it.id == event.quantId }.firstOrNull()?.let {
             val value = when {
                 (event is EventBase.EventRated) -> event.rate
                 (event is EventBase.EventMeasure) -> event.value

@@ -1,15 +1,16 @@
 package com.skyfolk.quantoflife.ui.feeds
 
-import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Button
+import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,6 +53,7 @@ class FeedsComposeFragment : Fragment() {
                     val state by viewModel.state.observeAsState()
                     val startIntervalCalendar = remember { viewModel.getDefaultCalendar() }
                     val endIntervalCalendar = remember { viewModel.getDefaultCalendar() }
+                   // var count = remember { mutableStateOf(0) }
 
                     ComposeFlowTestTheme {
                         Column(
@@ -59,6 +61,10 @@ class FeedsComposeFragment : Fragment() {
                                 .fillMaxWidth()
                                 .padding(vertical = 5.dp)
                         ) {
+//                            Button(onClick = { count.value++ }) {
+//                                Text("${count.value.toString()}")
+//                            }
+
                             when (state) {
                                 is FeedsFragmentState.EventsListLoading -> {
                                     binding.progress.visibility = View.VISIBLE
@@ -68,7 +74,7 @@ class FeedsComposeFragment : Fragment() {
                                             .fillMaxHeight(0.6f)
                                             .fillMaxWidth()
                                     ) {
-                                        CircularProgressIndicator()
+                                        //CircularProgressIndicator()
                                     }
                                 }
                                 is FeedsFragmentState.LoadingEventsListCompleted -> {
@@ -87,7 +93,6 @@ class FeedsComposeFragment : Fragment() {
 
                                     SeparatorLine()
 
-                                    TotalValues(state)
                                     Log.d("skyfolk-timer", "middleUpdateState: ${System.currentTimeMillis()}" )
 
                                 }
@@ -103,6 +108,8 @@ class FeedsComposeFragment : Fragment() {
                                     val filterName = viewModel.getQuantNameById(it)
                                     listOfQuantName.indexOf(filterName)
                                 }
+
+                                TotalValues(state)
 
                                 FilterBlock(
                                     listOfQuantNames = listOfQuantName,

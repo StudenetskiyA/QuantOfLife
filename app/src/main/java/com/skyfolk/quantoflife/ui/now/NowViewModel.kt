@@ -119,7 +119,7 @@ class NowViewModel(
                 eventsStorageInteractor.getAllEvents()
                     .filter { it.date in startDate until endDate })
 
-            _todayTotal.value = getTotal(quantsStorageInteractor, resultList)
+            _todayTotal.value = getTotal(quantsStorageInteractor.getAllQuantsList(false), resultList)
 
             val millisecondsInDay = 24 * 60 * 60 * 1000
             val goals = goalStorageInteractor.getListOfGoals()
@@ -135,7 +135,7 @@ class NowViewModel(
                         .filter { it.date in goalStartDate until endDate })
 
                 val daysGone = ((endDate - goalStartDate) / millisecondsInDay).toInt() + 1
-                val completed = getTotal(quantsStorageInteractor, goalResultList, goal.type)
+                val completed = getTotal(quantsStorageInteractor.getAllQuantsList(false), goalResultList, goal.type)
                 val durationInDays = when (goal.duration) {
                     is TimeInterval.Today -> 1
                     is TimeInterval.Week -> 7

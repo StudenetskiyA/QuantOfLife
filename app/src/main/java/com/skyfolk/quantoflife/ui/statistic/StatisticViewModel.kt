@@ -19,6 +19,7 @@ import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.ui.feeds.FeedsFragmentState
 import com.skyfolk.quantoflife.ui.feeds.TimeInterval
 import com.skyfolk.quantoflife.utils.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.collections.ArrayList
 
@@ -64,9 +65,6 @@ class StatisticViewModel(
             var currentPeriodStart = firstDate
             var currentPeriodEnd = firstDate
 
-            viewModelScope.launch {
-
-            }
             while (currentPeriodEnd <= lastDate) {
                 currentPeriodEnd = currentPeriodStart.toCalendar().getEndDateCalendar(
                     TimeInterval.Week,
@@ -76,7 +74,7 @@ class StatisticViewModel(
                     allEvents.filter { it.date in currentPeriodStart until currentPeriodEnd }
 
                 val totalByPeriod = getTotal(
-                    quantsStorageInteractor,
+                    quantsStorageInteractor.getAllQuantsList(false),
                     filteredEvents
                 )
                 QLog.d(
