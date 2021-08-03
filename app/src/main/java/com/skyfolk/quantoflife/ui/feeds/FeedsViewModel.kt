@@ -15,6 +15,7 @@ import com.skyfolk.quantoflife.entity.QuantCategory
 import com.skyfolk.quantoflife.feeds.getStarTotal
 import com.skyfolk.quantoflife.feeds.getTotal
 import com.skyfolk.quantoflife.settings.SettingsInteractor
+import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.ui.feeds.FeedsFragmentState.EventsListLoading.Companion.updateStateToLoading
 import com.skyfolk.quantoflife.ui.feeds.FeedsFragmentState.LoadingEventsListCompleted.Companion.updateStateToCompleted
 import com.skyfolk.quantoflife.utils.SingleLiveEvent
@@ -38,7 +39,7 @@ class FeedsViewModel(
                 settingsInteractor.getStatisticTimeStart(),
                 settingsInteractor.getStatisticTimeEnd()
             ),
-            selectedEventFilter = settingsInteractor.getSelectedEventFiler(),
+            selectedEventFilter = getQuantNameById(settingsInteractor.getSelectedEventFiler()),
             quantCategoryNames = settingsInteractor.getCategoryNames()
         )
     }
@@ -74,7 +75,8 @@ class FeedsViewModel(
                     eventsStorageInteractor.getAllEvents()
                         .filter { it.date in startDate until endDate })
                 val selectedEventFilter =
-                    if (eventFilterWasChanged != null) eventFilterWasChanged.eventFilter else _state.value?.selectedEventFilter
+                    if (eventFilterWasChanged != null) eventFilterWasChanged.eventFilter else
+                        getQuantIdByName(_state.value?.selectedEventFilter)
                 selectedEventFilter?.let { filter ->
                     listOfEvents = ArrayList(listOfEvents.filter { it.quantId == filter })
                 }
@@ -90,13 +92,13 @@ class FeedsViewModel(
                 )
 
                 val totalEmotionalFound = getTotal(
-                   allQuantsFound,
+                    allQuantsFound,
                     listOfEvents,
                     QuantCategory.Emotion
                 )
 
                 val totalEvolutionFound = getTotal(
-                   allQuantsFound,
+                    allQuantsFound,
                     listOfEvents,
                     QuantCategory.Evolution
                 )
@@ -109,7 +111,7 @@ class FeedsViewModel(
                 updateStateToCompleted(
                     _state,
                     _timeInterval = interval,
-                    _selectedEventFilter = selectedEventFilter,
+                    _selectedEventFilter = getQuantNameById(selectedEventFilter),
                     _quantCategoryName = settingsInteractor.getCategoryNames(),
                     _listOfEvents = listOfEvents.toDisplayableEvents(allQuantsFound),
                     _totalPhysicalFound = totalPhysicalFound,
@@ -138,20 +140,19 @@ class FeedsViewModel(
         runSearch(timeIntervalWasChanged = TimeIntervalWasChanged(timeInterval))
     }
 
-    fun setSelectedEventFilter(itemId: String?) {
-        settingsInteractor.setSelectedEventFiler(itemId)
-        runSearch(eventFilterWasChanged = EventFilterWasChanged(itemId))
-    }
-
-    fun getSelectedEventFilter(): String?{
-        return settingsInteractor.getSelectedEventFiler()
+    fun setSelectedEventFilter(itemName: String?, valueNotChange: Boolean = false) {
+        if (valueNotChange) {
+            runSearch(eventFilterWasChanged = EventFilterWasChanged(settingsInteractor.getSelectedEventFiler()))
+        } else {
+            settingsInteractor.setSelectedEventFiler(getQuantIdByName(itemName))
+            runSearch(eventFilterWasChanged = EventFilterWasChanged(getQuantIdByName(itemName)))
+        }
     }
 
     fun editEvent(eventId: String) {
         viewModelScope.launch {
             eventsStorageInteractor.getAllEvents().firstOrNull { it.id == eventId }?.let { event ->
                 quantsStorageInteractor.getQuantById(event.quantId)?.let { quant ->
-                    Log.d("skyfolk-compose", "show dialog")
                     _singleLifeEvent.value =
                         FeedsFragmentSingleLifeEvent.ShowEditEventDialog(quant, event)
                 }
@@ -167,137 +168,29 @@ class FeedsViewModel(
         eventsStorageInteractor.deleteEvent(event) { runSearch() }
     }
 
-    fun getQuantNameById(id: String): String? {
-        return quantsStorageInteractor.getQuantById(id)?.name
+    private fun getQuantNameById(id: String?): String? {
+        id?.let {
+            return quantsStorageInteractor.getQuantById(it)?.name
+        }
+            return null
     }
 
-    fun getQuantIdByName(name: String): String? {
-        return quantsStorageInteractor.getQuantByName(name)?.id
+    private fun getQuantIdByName(name: String?): String? {
+        name?.let {
+            return quantsStorageInteractor.getQuantByName(it)?.id
+        }
+        return null
     }
 
     private data class TimeIntervalWasChanged(val timeInterval: TimeInterval)
     private data class EventFilterWasChanged(val eventFilter: String?)
 }
 
-sealed class TimeInterval {
-    object Today : TimeInterval()
-    object Week : TimeInterval()
-    object Month : TimeInterval()
-    class Selected(val start: Long, val end: Long) : TimeInterval()
-    object All : TimeInterval()
-
-    companion object {
-        fun toTimeInterval(enumString: String, start: Long, end: Long): TimeInterval {
-            return when (enumString) {
-                Today.javaClass.name -> Today
-                Week.javaClass.name -> Week
-                Month.javaClass.name -> Month
-                Selected(start, end).javaClass.name -> Selected(start, end)
-                else -> All
-            }
-        }
-    }
-
-    fun toStringName(): String {
-        return when (this) {
-            is Today -> "сегодня"
-            is Week -> "неделю"
-            is Month -> "месяц"
-            is All -> "все время"
-            is Selected -> "выбранный интервал"
-        }
-    }
-}
-
-sealed class FeedsFragmentSingleLifeEvent {
-    data class ShowEditEventDialog(val quant: QuantBase, val event: EventBase?) : FeedsFragmentSingleLifeEvent()
-}
-
-sealed class FeedsFragmentState(
-    open val listOfQuants: ArrayList<QuantBase>,
-    open val selectedTimeInterval: TimeInterval,
-    open val selectedEventFilter: String?,
-    open val quantCategoryNames: ArrayList<Pair<QuantCategory, String>>
-) {
-    data class EventsListLoading(
-        override val listOfQuants: ArrayList<QuantBase>,
-        override val selectedTimeInterval: TimeInterval,
-        override val selectedEventFilter: String?,
-        override val quantCategoryNames: ArrayList<Pair<QuantCategory, String>>
-    ) : FeedsFragmentState(
-        listOfQuants,
-        selectedTimeInterval,
-        selectedEventFilter,
-        quantCategoryNames
-    ) {
-        companion object {
-            fun updateStateToLoading(state: MutableLiveData<FeedsFragmentState>) {
-                state.value?.let {
-                    state.value = EventsListLoading(
-                        it.listOfQuants,
-                        it.selectedTimeInterval,
-                        it.selectedEventFilter,
-                        it.quantCategoryNames
-                    )
-                }
-            }
-        }
-    }
-
-    data class LoadingEventsListCompleted(
-        override val listOfQuants: ArrayList<QuantBase>,
-        override val selectedTimeInterval: TimeInterval,
-        override val selectedEventFilter: String?,
-        override val quantCategoryNames: ArrayList<Pair<QuantCategory, String>>,
-        val listOfEvents: ArrayList<EventDisplayable>,
-        val totalPhysicalFound: Double,
-        val totalEmotionalFound: Double,
-        val totalEvolutionFound: Double,
-        val totalStarFound: Int,
-        val totalFound: Double
-    ) : FeedsFragmentState(
-        listOfQuants,
-        selectedTimeInterval,
-        selectedEventFilter,
-        quantCategoryNames
-    ) {
-        companion object {
-            fun updateStateToCompleted(
-                state: MutableLiveData<FeedsFragmentState>,
-                _timeInterval: TimeInterval,
-                _selectedEventFilter: String?,
-                _quantCategoryName: ArrayList<Pair<QuantCategory, String>>,
-                _listOfEvents: ArrayList<EventDisplayable>,
-                _totalPhysicalFound: Double,
-                _totalEmotionalFound: Double,
-                _totalEvolutionFound: Double,
-                _totalStarFound: Int,
-                _totalFound: Double
-            ) {
-                state.value?.let {
-                    state.value = LoadingEventsListCompleted(
-                        it.listOfQuants,
-                        _timeInterval,
-                        _selectedEventFilter,
-                        _quantCategoryName,
-                        _listOfEvents,
-                        _totalPhysicalFound,
-                        _totalEmotionalFound,
-                        _totalEvolutionFound,
-                        _totalStarFound,
-                        _totalFound
-                    )
-                }
-            }
-        }
-    }
-}
-
 fun ArrayList<EventBase>.toDisplayableEvents(quants: List<QuantBase>): ArrayList<EventDisplayable> {
     val result = arrayListOf<EventDisplayable>()
 
     for (event in this) {
-        quants.filter { it.id == event.quantId }.firstOrNull()?.let {
+        quants.firstOrNull { it.id == event.quantId }?.let {
             val value = when {
                 (event is EventBase.EventRated) -> event.rate
                 (event is EventBase.EventMeasure) -> event.value

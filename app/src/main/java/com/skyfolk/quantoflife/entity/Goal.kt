@@ -1,6 +1,6 @@
 package com.skyfolk.quantoflife.entity
 
-import com.skyfolk.quantoflife.ui.feeds.TimeInterval
+import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import java.util.*
 
 data class Goal(

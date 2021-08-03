@@ -1,9 +1,9 @@
 package com.skyfolk.quantoflife.statistic
 
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.utils.getEndDateCalendar
 import com.skyfolk.quantoflife.utils.getStartDateCalendar
-import com.skyfolk.quantoflife.ui.feeds.TimeInterval
 import com.skyfolk.quantoflife.utils.toCalendar
 import com.skyfolk.quantoflife.utils.toShortDate
 

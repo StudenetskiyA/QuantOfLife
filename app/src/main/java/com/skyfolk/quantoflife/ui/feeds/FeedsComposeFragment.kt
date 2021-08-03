@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.databinding.FeedsFragmentComposeBinding
 import com.skyfolk.quantoflife.entity.EventBase
+import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.ui.now.CreateEventDialogFragment
 import com.skyfolk.quantoflife.ui.theme.ComposeFlowTestTheme
 import com.skyfolk.quantoflife.utils.fromPositionToTimeInterval
@@ -36,7 +37,7 @@ class FeedsComposeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         Log.d("skyfolk-timer", "onResume: ${System.currentTimeMillis()}" )
-        viewModel.setSelectedEventFilter(viewModel.getSelectedEventFilter())
+        viewModel.setSelectedEventFilter(null, true)
     }
 
     override fun onCreateView(
@@ -105,8 +106,7 @@ class FeedsComposeFragment : Fragment() {
                                 listOfQuantName.add(0, "Все события")
 
                                 val selectedQuantPosition = state.selectedEventFilter?.let {
-                                    val filterName = viewModel.getQuantNameById(it)
-                                    listOfQuantName.indexOf(filterName)
+                                    if (listOfQuantName.indexOf(it) != -1) listOfQuantName.indexOf(it) else 0
                                 }
 
                                 TotalValues(state)
@@ -118,11 +118,7 @@ class FeedsComposeFragment : Fragment() {
                                         if (position == 0) {
                                             viewModel.setSelectedEventFilter(null)
                                         } else {
-                                            viewModel.setSelectedEventFilter(
-                                                viewModel.getQuantIdByName(
-                                                    listOfQuantName[position]
-                                                )
-                                            )
+                                            viewModel.setSelectedEventFilter(listOfQuantName[position])
                                         }
                                     },
                                     listOfTimeInterval = resources.getStringArray(R.array.time_interval)

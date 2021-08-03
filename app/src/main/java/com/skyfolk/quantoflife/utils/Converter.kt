@@ -1,7 +1,7 @@
 package com.skyfolk.quantoflife.utils
 
 import com.skyfolk.quantoflife.entity.QuantCategory
-import com.skyfolk.quantoflife.ui.feeds.TimeInterval
+import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime

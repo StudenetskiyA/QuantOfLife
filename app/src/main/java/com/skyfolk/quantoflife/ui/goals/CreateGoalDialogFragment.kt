@@ -11,7 +11,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.skyfolk.quantoflife.databinding.CreateGoalDialogBinding
 import com.skyfolk.quantoflife.entity.*
 import com.skyfolk.quantoflife.settings.SettingsInteractor
-import com.skyfolk.quantoflife.ui.feeds.TimeInterval
+import com.skyfolk.quantoflife.timeInterval.TimeInterval
 
 class CreateGoalDialogFragment(
     private val goal: Goal?,

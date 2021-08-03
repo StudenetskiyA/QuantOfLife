@@ -3,7 +3,7 @@ package com.skyfolk.quantoflife.db
 import com.skyfolk.quantoflife.entity.Goal
 import com.skyfolk.quantoflife.entity.QuantCategory
 import com.skyfolk.quantoflife.entity.toQuantCategory
-import com.skyfolk.quantoflife.ui.feeds.TimeInterval
+import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import java.util.*

@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.entity.EventDisplayable
 import com.skyfolk.quantoflife.entity.QuantCategory
+import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.ui.theme.Orange
 import com.skyfolk.quantoflife.ui.theme.Typography
 import com.skyfolk.quantoflife.utils.toDate
@@ -178,7 +179,7 @@ fun DropdownSpinner(content: List<String>, selectedItemIndex: Int, onItemSelect:
                 style = Typography.body2,
             )
             Image(
-                painter = painterResource(R.drawable.ic_feed),
+                painter = painterResource(R.drawable.ic_dropdown),
                 contentDescription = "",
                 Modifier.size(size = 20.dp)
             )
@@ -188,6 +189,7 @@ fun DropdownSpinner(content: List<String>, selectedItemIndex: Int, onItemSelect:
             onDismissRequest = { expanded = false },
             modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight(0.5f)
         ) {
             content.forEachIndexed { index, s ->
                 DropdownMenuItem(onClick = {

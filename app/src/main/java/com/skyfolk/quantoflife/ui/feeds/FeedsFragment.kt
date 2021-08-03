@@ -17,6 +17,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.skyfolk.quantoflife.databinding.FeedsFragmentBinding
 import com.skyfolk.quantoflife.entity.EventBase
 import com.skyfolk.quantoflife.entity.QuantCategory
+import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.ui.now.CreateEventDialogFragment
 import com.skyfolk.quantoflife.utils.setOnHideByTimeout
 import com.skyfolk.quantoflife.utils.toDateWithoutHourAndMinutes
@@ -154,9 +155,8 @@ class FeedsFragment : Fragment() {
                     quantsSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                     binding.spinner.adapter = quantsSpinnerAdapter
                     state.selectedEventFilter?.let {
-                        val filterName = viewModel.getQuantNameById(it)
-                        val index = listOfQuantName.indexOf(filterName)
-                        selectedEventFilterName = filterName
+                        val index = listOfQuantName.indexOf(it)
+                        selectedEventFilterName = it
                         binding.spinner.setSelection(index, false)
                     } ?: run {
                         selectedEventFilterName = listOfQuantName[0]
@@ -287,9 +287,7 @@ class FeedsFragment : Fragment() {
                             viewModel.setSelectedEventFilter(null)
                         } else {
                             viewModel.setSelectedEventFilter(
-                                viewModel.getQuantIdByName(
                                     parent.getItemAtPosition(position).toString()
-                                )
                             )
                         }
                     }

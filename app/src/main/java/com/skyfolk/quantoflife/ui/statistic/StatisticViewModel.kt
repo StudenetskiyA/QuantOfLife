@@ -16,8 +16,8 @@ import com.skyfolk.quantoflife.entity.QuantBase
 import com.skyfolk.quantoflife.feeds.getTotal
 import com.skyfolk.quantoflife.utils.getEndDateCalendar
 import com.skyfolk.quantoflife.settings.SettingsInteractor
+import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.ui.feeds.FeedsFragmentState
-import com.skyfolk.quantoflife.ui.feeds.TimeInterval
 import com.skyfolk.quantoflife.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
