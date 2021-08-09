@@ -65,7 +65,8 @@ open class QuantDbEntity(
                     icon,
                     QuantCategory.valueOf(primalCategoryDescription),
                     bonusList,
-                    description
+                    description,
+                    usageCount
                 )
             }
             QuantBase.QuantMeasure::class.java.name -> {
@@ -74,7 +75,8 @@ open class QuantDbEntity(
                     name,
                     icon,
                     QuantCategory.valueOf(primalCategoryDescription),
-                    description
+                    description,
+                    usageCount
                 )
             }
             else -> {
@@ -83,7 +85,8 @@ open class QuantDbEntity(
                     name,
                     icon,
                     QuantCategory.valueOf(primalCategoryDescription),
-                    description
+                    description,
+                    usageCount
                 )
             }
         }

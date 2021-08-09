@@ -78,7 +78,8 @@ class QuantsStorageInteractor(private val dbInteractor: DBInteractor) : IQuantsS
                     icon = "quant_gym",
                     primalCategory = QuantCategory.Physical,
                     bonuses = arrayListOf(QuantBonusBase.QuantBonusRated(QuantCategory.Physical, 0.5, 0.2)),
-                    description = "Сколько пятиминуток?"
+                    description = "Сколько пятиминуток?",
+                    0
                 ),
 
                 QuantBase.QuantRated(
@@ -87,7 +88,8 @@ class QuantsStorageInteractor(private val dbInteractor: DBInteractor) : IQuantsS
                     icon = "quant_swim",
                     primalCategory = QuantCategory.Physical,
                     bonuses = arrayListOf(QuantBonusBase.QuantBonusRated(QuantCategory.Physical, 1.0, 0.1)),
-                    description = "Насколько выложился?"
+                    description = "Насколько выложился?",
+                    0
                 ),
 
                 QuantBase.QuantMeasure(

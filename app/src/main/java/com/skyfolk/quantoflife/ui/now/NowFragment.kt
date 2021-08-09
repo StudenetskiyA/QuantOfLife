@@ -24,6 +24,7 @@ import com.skyfolk.quantoflife.ui.goals.GoalsListDataAdapter
 import com.skyfolk.quantoflife.ui.now.CreateEventDialogFragment.DialogListener
 import com.skyfolk.quantoflife.utils.filterToArrayList
 import com.skyfolk.quantoflife.utils.setOnHideByTimeout
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -61,18 +62,21 @@ class NowFragment : Fragment() {
                 dialog.show(fm, dialog.tag)
             }
         })
-        viewModel.todayTotal.observe(viewLifecycleOwner, {
-            binding.todayRating.text = String.format("%.1f", it)
-            val todayScore = resources.getStringArray(R.array.today_score)
-            binding.todayRatingScore.text = when (it) {
-                in -Double.MAX_VALUE..2.0 -> todayScore[0]
-                in 2.0..4.0 -> todayScore[1]
-                in 4.0..6.0 -> todayScore[2]
-                in 6.0..8.0 -> todayScore[3]
-                in 8.0..Double.MAX_VALUE -> todayScore[4]
-                else -> ""
+
+        lifecycleScope.launchWhenResumed {
+            viewModel.todayTotal.collect {
+                binding.todayRating.text = String.format("%.1f", it)
+                val todayScore = resources.getStringArray(R.array.today_score)
+                binding.todayRatingScore.text = when (it) {
+                    in -Double.MAX_VALUE..2.0 -> todayScore[0]
+                    in 2.0..4.0 -> todayScore[1]
+                    in 4.0..6.0 -> todayScore[2]
+                    in 6.0..8.0 -> todayScore[3]
+                    in 8.0..Double.MAX_VALUE -> todayScore[4]
+                    else -> ""
+                }
             }
-        })
+        }
 
         viewModel.listOfGoal.observe(viewLifecycleOwner, {
             if (it.size == 0) binding.goalsLayout.visibility = View.GONE
@@ -81,7 +85,14 @@ class NowFragment : Fragment() {
                 binding.listOfGoals.layoutManager =
                     LinearLayoutManager(this.context, RecyclerView.VERTICAL, false)
                 val adapterGoals = GoalsListDataAdapter(it, settingsInteractor) { goalPresent ->
-                    viewModel.openCreateNewGoalDialog(Goal(goalPresent.id, goalPresent.duration, goalPresent.target, goalPresent.type))
+                    viewModel.openCreateNewGoalDialog(
+                        Goal(
+                            goalPresent.id,
+                            goalPresent.duration,
+                            goalPresent.target,
+                            goalPresent.type
+                        )
+                    )
                     true
                 }
                 binding.listOfGoals.adapter = adapterGoals
@@ -108,7 +119,6 @@ class NowFragment : Fragment() {
 
         val quantListClickListener: (quant: QuantBase) -> Unit = {
             val dialog = CreateEventDialogFragment(it)
-            val theme = dialog.theme
             dialog.setDialogListener(object : DialogListener {
                 override fun onConfirm(event: EventBase, name: String) {
                     val snackBar = Snackbar.make(
@@ -214,6 +224,6 @@ class NowFragment : Fragment() {
         }
 
         // rotate the "+" icon only
-         override fun fabRotationDegrees(): Float = 135F//if (buttonIcon == 0) 135F else 0F
+        override fun fabRotationDegrees(): Float = 135F//if (buttonIcon == 0) 135F else 0F
     }
 }

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -51,7 +52,7 @@ class FeedsComposeFragment : Fragment() {
                 composeView.setContent {
                     Log.d("skyfolk-timer", "topUpdateState: ${System.currentTimeMillis()}" )
 
-                    val state by viewModel.state.observeAsState()
+                    val state by viewModel.state.collectAsState()
                     val startIntervalCalendar = remember { viewModel.getDefaultCalendar() }
                     val endIntervalCalendar = remember { viewModel.getDefaultCalendar() }
                    // var count = remember { mutableStateOf(0) }

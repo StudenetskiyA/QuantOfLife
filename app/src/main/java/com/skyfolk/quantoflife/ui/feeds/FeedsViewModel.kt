@@ -2,7 +2,6 @@ package com.skyfolk.quantoflife.ui.feeds
 
 import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skyfolk.quantoflife.IDateTimeRepository
@@ -21,6 +20,9 @@ import com.skyfolk.quantoflife.ui.feeds.FeedsFragmentState.LoadingEventsListComp
 import com.skyfolk.quantoflife.utils.SingleLiveEvent
 import com.skyfolk.quantoflife.utils.getEndDateCalendar
 import com.skyfolk.quantoflife.utils.getStartDateCalendar
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
@@ -31,8 +33,7 @@ class FeedsViewModel(
     private val quantsStorageInteractor: IQuantsStorageInteractor,
     private val dateTimeRepository: IDateTimeRepository
 ) : ViewModel() {
-    private val _state = MutableLiveData<FeedsFragmentState>().apply {
-        value = FeedsFragmentState.EventsListLoading(
+    private val _state = MutableStateFlow<FeedsFragmentState>(FeedsFragmentState.EventsListLoading(
             listOfQuants = quantsStorageInteractor.getAllQuantsList(false),
             selectedTimeInterval = TimeInterval.toTimeInterval(
                 settingsInteractor.getStatisticTimeIntervalSelectedElement(),
@@ -41,9 +42,8 @@ class FeedsViewModel(
             ),
             selectedEventFilter = getQuantNameById(settingsInteractor.getSelectedEventFiler()),
             quantCategoryNames = settingsInteractor.getCategoryNames()
-        )
-    }
-    val state: LiveData<FeedsFragmentState> = _state
+        ))
+    val state: StateFlow<FeedsFragmentState> = _state.asStateFlow()
 
     private val _singleLifeEvent = SingleLiveEvent<FeedsFragmentSingleLifeEvent>()
     val singleLifeEvent: LiveData<FeedsFragmentSingleLifeEvent> get() = _singleLifeEvent
@@ -56,8 +56,8 @@ class FeedsViewModel(
 
         viewModelScope.launch {
             val selectedTimeInterval =
-                timeIntervalWasChanged?.timeInterval ?: _state.value?.selectedTimeInterval
-            selectedTimeInterval?.let { interval ->
+                timeIntervalWasChanged?.timeInterval ?: _state.value.selectedTimeInterval
+            selectedTimeInterval.let { interval ->
                 updateStateToLoading(_state)
 
                 val startDate =
@@ -76,7 +76,7 @@ class FeedsViewModel(
                         .filter { it.date in startDate until endDate })
                 val selectedEventFilter =
                     if (eventFilterWasChanged != null) eventFilterWasChanged.eventFilter else
-                        getQuantIdByName(_state.value?.selectedEventFilter)
+                        getQuantIdByName(_state.value.selectedEventFilter)
                 selectedEventFilter?.let { filter ->
                     listOfEvents = ArrayList(listOfEvents.filter { it.quantId == filter })
                 }

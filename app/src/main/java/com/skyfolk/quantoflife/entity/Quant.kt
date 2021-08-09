@@ -1,6 +1,5 @@
 package com.skyfolk.quantoflife.entity
 
-import android.util.Log
 import java.util.*
 
 sealed class QuantBase(
@@ -8,17 +7,19 @@ sealed class QuantBase(
     open var name: String,
     open var icon: String,
     open var primalCategory: QuantCategory,
-    open var description: String
+    open var description: String,
+    open var usageCount: Int = 0
 ) {
     data class QuantNote(
         override var id: String = UUID.randomUUID().toString(),
         override var name: String,
         override var icon: String,
         override var primalCategory: QuantCategory,
-        override var description: String
-    ) : QuantBase(id, name, icon, primalCategory, description) {
+        override var description: String,
+        override var usageCount: Int = 0
+    ) : QuantBase(id, name, icon, primalCategory, description, usageCount) {
         override fun copy(): QuantNote {
-            return QuantNote(id, name, icon, primalCategory, description)
+            return QuantNote(id, name, icon, primalCategory, description, usageCount)
         }
     }
 
@@ -28,8 +29,9 @@ sealed class QuantBase(
         override var icon: String,
         override var primalCategory: QuantCategory,
         var bonuses: ArrayList<QuantBonusBase.QuantBonusRated>,
-        override var description: String
-    ) : QuantBase(id, name, icon, primalCategory, description) {
+        override var description: String,
+        override var usageCount: Int = 0
+    ) : QuantBase(id, name, icon, primalCategory, description, usageCount) {
         fun getBonusFor(category: QuantCategory): QuantBonusBase.QuantBonusRated? {
             for (bonus in bonuses) {
                 if (bonus.category == category) return bonus
@@ -41,7 +43,7 @@ sealed class QuantBase(
             for (bonus in bonuses) {
                 oldBonuses.add(bonus.copy())
             }
-            return QuantRated(id, name, icon, primalCategory, oldBonuses, description)
+            return QuantRated(id, name, icon, primalCategory, oldBonuses, description, usageCount)
         }
     }
 
@@ -50,10 +52,11 @@ sealed class QuantBase(
         override var name: String,
         override var icon: String,
         override var primalCategory: QuantCategory,
-        override var description: String
-    ) : QuantBase(id, name, icon, primalCategory, description) {
+        override var description: String,
+        override var usageCount: Int = 0
+    ) : QuantBase(id, name, icon, primalCategory, description, usageCount) {
         override fun copy(): QuantMeasure {
-            return QuantMeasure(id, name, icon, primalCategory, description)
+            return QuantMeasure(id, name, icon, primalCategory, description, usageCount)
         }
     }
 

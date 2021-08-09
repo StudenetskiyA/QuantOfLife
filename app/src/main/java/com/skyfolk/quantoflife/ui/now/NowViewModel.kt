@@ -18,6 +18,10 @@ import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.ui.create_quant.CreateQuantDialogFragment
 import com.skyfolk.quantoflife.ui.goals.CreateGoalDialogFragment
 import com.skyfolk.quantoflife.utils.SingleLiveEvent
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
@@ -40,10 +44,8 @@ class NowViewModel(
     }
     val listOfQuants: LiveData<ArrayList<QuantBase>> = _listOfQuants
 
-    private val _todayTotal = MutableLiveData<Double>().apply {
-        value = 0.0
-    }
-    val todayTotal: LiveData<Double> = _todayTotal
+    private val _todayTotal = MutableStateFlow(0.0)
+    val todayTotal: StateFlow<Double> = _todayTotal.asStateFlow()
 
     private val _listOfGoals = MutableLiveData<ArrayList<GoalPresent>>().apply {
         value = arrayListOf()
@@ -120,7 +122,9 @@ class NowViewModel(
                 eventsStorageInteractor.getAllEvents()
                     .filter { it.date in startDate until endDate })
 
-            _todayTotal.value = getTotal(quantsStorageInteractor.getAllQuantsList(false), resultList)
+            _todayTotal.update {
+                getTotal(quantsStorageInteractor.getAllQuantsList(false), resultList)
+            }
 
             val millisecondsInDay = 24 * 60 * 60 * 1000
             val goals = goalStorageInteractor.getListOfGoals()
@@ -135,10 +139,14 @@ class NowViewModel(
                     eventsStorageInteractor.getAllEvents()
                         .filter { it.date in goalStartDate until endDate })
 
-                Log.d("skyfolk-goals","duration = ${goal.duration}")
+                Log.d("skyfolk-goals", "duration = ${goal.duration}")
 
                 val daysGone = ((endDate - goalStartDate) / millisecondsInDay).toInt() + 1
-                val completed = getTotal(quantsStorageInteractor.getAllQuantsList(false), goalResultList, goal.type)
+                val completed = getTotal(
+                    quantsStorageInteractor.getAllQuantsList(false),
+                    goalResultList,
+                    goal.type
+                )
                 val durationInDays = when (goal.duration) {
                     is TimeInterval.Today -> 1
                     is TimeInterval.Week -> 7
@@ -147,7 +155,10 @@ class NowViewModel(
                     is TimeInterval.All -> 0
                     is TimeInterval.Selected -> 0
                 }
-                Log.d("skyfolk-goals","daysGone = $daysGone, completed = $completed, duration = $durationInDays")
+                Log.d(
+                    "skyfolk-goals",
+                    "daysGone = $daysGone, completed = $completed, duration = $durationInDays"
+                )
 
                 goalsPresentList.add(
                     GoalPresent(

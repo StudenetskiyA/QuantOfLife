@@ -21,6 +21,7 @@ import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.ui.now.CreateEventDialogFragment
 import com.skyfolk.quantoflife.utils.setOnHideByTimeout
 import com.skyfolk.quantoflife.utils.toDateWithoutHourAndMinutes
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.util.*
@@ -96,9 +97,7 @@ class FeedsFragment : Fragment() {
                 }
             )
 
-            viewModel.state.observe(
-                viewLifecycleOwner,
-                { state: FeedsFragmentState ->
+            viewModel.state.onEach { state: FeedsFragmentState ->
                     // Descriptions
                     val categoryArray = mutableListOf(
                         state.quantCategoryNames.firstOrNull { it.first == QuantCategory.Physical }?.second ?: "",
@@ -200,7 +199,7 @@ class FeedsFragment : Fragment() {
                             binding.starValue.text = state.totalStarFound.toString()
                         }
                     }
-                })
+                }
         }
 
         binding.timeIntervalSpinner.onItemSelectedListener =

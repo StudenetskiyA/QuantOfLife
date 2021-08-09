@@ -7,6 +7,33 @@ import com.skyfolk.quantoflife.utils.getStartDateCalendar
 import com.skyfolk.quantoflife.utils.toCalendar
 import com.skyfolk.quantoflife.utils.toShortDate
 
+class IntervalAxisValueFormatter(
+    private val startFirstIntervalTimeInMillis: Long,
+    private val timeInterval: TimeInterval
+) : ValueFormatter() {
+    override fun getFormattedValue(value: Float): String {
+        val nWeek = value.toInt()
+        val day: Long = 24 * 60 * 60 * 1000
+        val week: Long = day * 7
+        val month: Long = week * 4
+        val period = when (timeInterval) {
+            is TimeInterval.Week -> week
+            is TimeInterval.Month -> month
+            is TimeInterval.Today -> day
+            else -> week
+        }
+
+        val time: Long = startFirstIntervalTimeInMillis + period * nWeek
+
+        val currentPeriodStart =
+            time.toCalendar().getStartDateCalendar(timeInterval, 0).timeInMillis
+        val currentPeriodEnd =
+            time.toCalendar().getEndDateCalendar(timeInterval, 0).timeInMillis - day
+        return "${currentPeriodStart.toShortDate()} - ${currentPeriodEnd.toShortDate()}"
+    }
+}
+
+
 class WeekAxisValueFormatter(private val startFirstWeekTimeInMillis: Long) : ValueFormatter() {
     override fun getFormattedValue(value: Float): String {
         val nWeek = value.toInt()
@@ -15,8 +42,10 @@ class WeekAxisValueFormatter(private val startFirstWeekTimeInMillis: Long) : Val
 
         val time: Long = startFirstWeekTimeInMillis + week * nWeek
 
-        val currentPeriodStart = time.toCalendar().getStartDateCalendar(TimeInterval.Week, 0).timeInMillis
-        val currentPeriodEnd = time.toCalendar().getEndDateCalendar(TimeInterval.Week, 0).timeInMillis - day
+        val currentPeriodStart =
+            time.toCalendar().getStartDateCalendar(TimeInterval.Week, 0).timeInMillis
+        val currentPeriodEnd =
+            time.toCalendar().getEndDateCalendar(TimeInterval.Week, 0).timeInMillis - day
         return "${currentPeriodStart.toShortDate()} - ${currentPeriodEnd.toShortDate()}"
     }
 }
