@@ -2,8 +2,11 @@ package com.skyfolk.quantoflife.settings
 
 import android.content.SharedPreferences
 import com.skyfolk.quantoflife.entity.QuantCategory
+import com.skyfolk.quantoflife.meansure.Measure
+import com.skyfolk.quantoflife.meansure.QuantFilter
+import com.skyfolk.quantoflife.timeInterval.TimeInterval
 
-class SettingsInteractor(private val preferences: SharedPreferences) {
+open class SettingsInteractor(private val preferences: SharedPreferences) {
     companion object {
         const val SELECTED_RADIO_IN_STATISTIC = "selected_radio_in_statistic_2"
         const val SELECTED_TIME_START = "selected_time_start"
@@ -12,6 +15,57 @@ class SettingsInteractor(private val preferences: SharedPreferences) {
         const val ONBOARDING_COMPLETE = "onboarding_complete"
         const val START_DAY_TIME = "start_day_time"
         const val SELECTED_EVENT_FILTER = "selected_event_filter"
+        const val SELECTED_GRAPH_PERIOD = "selected_graph_period"
+        const val SELECTED_GRAPH_MEASURE = "selected_graph_measure"
+        const val SELECTED_GRAPH_FIRST_QUANT = "selected_graph_first_quant"
+        const val SELECTED_GRAPH_SECOND_QUANT = "selected_graph_second_quant"
+    }
+
+    fun getSelectedGraphPeriod(): TimeInterval {
+        return when (preferences.getString(SELECTED_GRAPH_PERIOD, "Неделя") ?: "Неделя") {
+            "День" -> TimeInterval.Today
+            "Неделя" -> TimeInterval.Week
+            else -> TimeInterval.Month
+        }
+    }
+
+    fun getSelectedGraphMeasure(): Measure {
+        return when (preferences.getString(SELECTED_GRAPH_MEASURE, "Общая оценка") ?: "Общая оценка") {
+            "Общая оценка" -> Measure.TotalCount
+            "Количество" -> Measure.TotalCount
+            else -> Measure.AverageRating
+        }
+    }
+
+    fun getSelectedGraphQuant(n: Int): QuantFilter {
+        val quant = when (n) {
+            1 -> preferences.getString(SELECTED_GRAPH_FIRST_QUANT, "Все события") ?: "Все события"
+            2 -> preferences.getString(SELECTED_GRAPH_SECOND_QUANT, "Ничего") ?: "Ничего"
+            else -> "Ничего"
+        }
+        return when (quant) {
+            "Ничего" -> QuantFilter.Nothing
+            "Все события" -> QuantFilter.All
+            else -> QuantFilter.OnlySelected(quant)
+        }
+    }
+
+    fun writeSelectedGraphPeriod(period: TimeInterval) {
+        preferences.edit()
+            .putString(SELECTED_GRAPH_PERIOD, period.toGraphString())
+            .apply()
+    }
+
+    fun writeSelectedGraphMeasure(measure: Measure) {
+        preferences.edit()
+            .putString(SELECTED_GRAPH_MEASURE, measure.toString())
+            .apply()
+    }
+
+    fun writeSelectedGraphQuant(n: Int, filter: QuantFilter) {
+        preferences.edit()
+            .putString(if (n == 1) SELECTED_GRAPH_FIRST_QUANT else SELECTED_GRAPH_SECOND_QUANT, filter.toString())
+            .apply()
     }
 
     fun writeStatisticTimeIntervalSelectedElement(element: String) {

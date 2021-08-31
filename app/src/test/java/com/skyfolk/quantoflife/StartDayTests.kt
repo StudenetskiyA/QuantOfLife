@@ -1,6 +1,6 @@
 package com.skyfolk.quantoflife
 
-import com.skyfolk.quantoflife.ui.feeds.TimeInterval
+import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.utils.getStartDateCalendar
 import org.junit.Assert
 import org.junit.Test

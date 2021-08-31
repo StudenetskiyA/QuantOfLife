@@ -19,6 +19,22 @@ sealed class TimeInterval {
         }
     }
 
+    fun toGraphPosition(): Int {
+        return when(this) {
+            is TimeInterval.Today -> 0
+            is TimeInterval.Week -> 1
+            else -> 2
+        }
+    }
+
+    fun toGraphString(): String {
+        return when (this) {
+            is Today -> "День"
+            is Week -> "Неделя"
+            else -> "Месяц"
+        }
+    }
+
     fun toStringName(): String {
         return when (this) {
             is Today -> "сегодня"

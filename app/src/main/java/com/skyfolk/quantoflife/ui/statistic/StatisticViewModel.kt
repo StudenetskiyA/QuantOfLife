@@ -13,8 +13,13 @@ import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
 import com.skyfolk.quantoflife.entity.EventBase
 import com.skyfolk.quantoflife.entity.QuantBase
 import com.skyfolk.quantoflife.feeds.getTotal
+import com.skyfolk.quantoflife.feeds.getTotalAverageStar
+import com.skyfolk.quantoflife.feeds.getTotalCount
+import com.skyfolk.quantoflife.meansure.Measure
+import com.skyfolk.quantoflife.meansure.QuantFilter
 import com.skyfolk.quantoflife.utils.getEndDateCalendar
 import com.skyfolk.quantoflife.settings.SettingsInteractor
+import com.skyfolk.quantoflife.statistic.IntervalAxisValueFormatter
 import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.utils.*
 import kotlinx.coroutines.launch
@@ -38,25 +43,59 @@ class StatisticViewModel(
     }
     val listOfQuants: LiveData<List<QuantBase>> = _listOfQuants
 
-    fun setSelectedEventFilter(itemId: String?, itemId2: String?) {
-        runSearch(itemId, itemId2)
+    private val _selectedTimeInterval = MutableLiveData<TimeInterval>().apply {
+        value = settingsInteractor.getSelectedGraphPeriod()
+    }
+    val selectedTimeInterval: LiveData<TimeInterval> = _selectedTimeInterval
+    private val _selectedMeasure = MutableLiveData<Measure>().apply {
+        QLog.d("skyfolk-graph","from setting = ${settingsInteractor.getSelectedGraphMeasure()}")
+        value = settingsInteractor.getSelectedGraphMeasure()
+    }
+    val selectedMeasure: LiveData<Measure> = _selectedMeasure
+    private val _selectedFirstQuantFilter = MutableLiveData<QuantFilter>().apply {
+        value = settingsInteractor.getSelectedGraphQuant(1)
+    }
+    val selectedFirstQuantFilter: LiveData<QuantFilter> = _selectedFirstQuantFilter
+    private val _selectedSecondQuantFilter = MutableLiveData<QuantFilter>().apply {
+        value = settingsInteractor.getSelectedGraphQuant(2)
+    }
+    val selectedSecondQuantFilter: LiveData<QuantFilter> = _selectedSecondQuantFilter
+
+    fun setSelectedEventFilter(
+        itemId: QuantFilter?,
+        itemId2: QuantFilter?,
+        timeInterval: TimeInterval?,
+        measure: Measure?
+    ) {
+        if (itemId !=null && itemId2 != null && timeInterval != null && measure != null) {
+            settingsInteractor.apply {
+                writeSelectedGraphMeasure(measure)
+                QLog.d("skyfolk-graph", "write setting = ${measure}")
+
+                writeSelectedGraphPeriod(timeInterval)
+                writeSelectedGraphQuant(1, itemId)
+                writeSelectedGraphQuant(2, itemId2)
+            }
+            runSearch(itemId, itemId2, timeInterval, measure)
+        }
     }
 
     private fun getEntries(
         allEvents: ArrayList<EventBase>,
         allQuants: ArrayList<QuantBase>,
-        quantFilter: String?,
+        quantFilter: QuantFilter,
         lastDate: Long,
         startDayTime: Long,
-        timeInterval: TimeInterval = TimeInterval.Week
+        timeInterval: TimeInterval = TimeInterval.Week,
+        measure: Measure
     ): StatisticFragmentState.EntryAndFirstDate {
         val result = ArrayList<Entry>()
         var resultCount = 0
         val allFilteredEvents = allEvents.filter {
-            if (quantFilter != null) {
-                it.quantId == quantFilter
-            } else {
-                true
+            when (quantFilter) {
+                QuantFilter.All -> true
+                QuantFilter.Nothing -> false
+                is QuantFilter.OnlySelected -> it.quantId == getQuantIdByName(quantFilter.selectQuant)
             }
         }
 
@@ -73,10 +112,21 @@ class StatisticViewModel(
             val filteredEvents =
                 allFilteredEvents.filter { it.date in currentPeriodStart until currentPeriodEnd }
 
-            val totalByPeriod = getTotal(
-                allQuants,
-                filteredEvents
-            )
+
+            val totalByPeriod = when (measure) {
+                Measure.TotalCount ->
+                    getTotal(
+                        allQuants,
+                        filteredEvents
+                    )
+                Measure.AverageRating ->
+                    getTotalAverageStar(
+                        allQuants,
+                        filteredEvents
+                    )
+                Measure.Quantity ->
+                    getTotalCount(filteredEvents)
+            }
 
             result.add(BarEntry((resultCount).toFloat(), totalByPeriod.toFloat()))
             resultCount++
@@ -86,40 +136,58 @@ class StatisticViewModel(
         return StatisticFragmentState.EntryAndFirstDate(result, firstDate)
     }
 
-    private fun runSearch(onlyQuant: String? = null, onlyQuant2: String? = null) {
-        QLog.d("skyfolk-statistic","onlyQuant = $onlyQuant")
+    private fun runSearch(
+        onlyQuant: QuantFilter,
+        onlyQuant2: QuantFilter,
+        timeInterval: TimeInterval?,
+        measure: Measure?
+    ) {
         viewModelScope.launch {
-            val result = getEntries(
-                allEvents = eventsStorageInteractor.getAllEvents(),
-                allQuants = quantsStorageInteractor.getAllQuantsList(false),
-                quantFilter = onlyQuant,
-                lastDate = dateTimeRepository.getTimeInMillis(),
-                startDayTime = settingsInteractor.getStartDayTime(),
-                timeInterval = TimeInterval.Month
-            )
-            val result2 = getEntries(
-                allEvents = eventsStorageInteractor.getAllEvents(),
-                allQuants = quantsStorageInteractor.getAllQuantsList(false),
-                quantFilter = onlyQuant2,
-                lastDate = dateTimeRepository.getTimeInMillis(),
-                startDayTime = settingsInteractor.getStartDayTime(),
-                timeInterval = TimeInterval.Month
-            )
+            val result: ArrayList<StatisticFragmentState.EntryAndFirstDate> = arrayListOf()
+            if (onlyQuant != QuantFilter.Nothing) {
+                result.add(
+                    getEntries(
+                        allEvents = eventsStorageInteractor.getAllEvents(),
+                        allQuants = quantsStorageInteractor.getAllQuantsList(false),
+                        quantFilter = onlyQuant,
+                        lastDate = dateTimeRepository.getTimeInMillis(),
+                        startDayTime = settingsInteractor.getStartDayTime(),
+                        timeInterval = timeInterval ?: TimeInterval.Week,
+                        measure = measure ?: Measure.TotalCount
+                    )
+                )
+            }
+            if (onlyQuant2 != QuantFilter.Nothing) {
+                result.add(
+                    getEntries(
+                        allEvents = eventsStorageInteractor.getAllEvents(),
+                        allQuants = quantsStorageInteractor.getAllQuantsList(false),
+                        quantFilter = onlyQuant2,
+                        lastDate = dateTimeRepository.getTimeInMillis(),
+                        startDayTime = settingsInteractor.getStartDayTime(),
+                        timeInterval = timeInterval ?: TimeInterval.Week,
+                        measure = measure ?: Measure.TotalCount
+                    )
+                )
+            }
 
             _barEntryData.value = StatisticFragmentState.Entries(
-                listOf(result,result2)
+                result
             )
         }
     }
 
-
-    fun getQuantIdByName(name: String): String? {
+    private fun getQuantIdByName(name: String): String? {
         return quantsStorageInteractor.getQuantByName(name)?.id
+    }
+
+    fun getFormatter(firstDate: Long, timeInterval: TimeInterval): IntervalAxisValueFormatter {
+        return IntervalAxisValueFormatter(firstDate, timeInterval, settingsInteractor)
     }
 }
 
 sealed class StatisticFragmentState {
-    class Entries(val entries: List<EntryAndFirstDate>) : StatisticFragmentState()
+    class Entries(val entries: ArrayList<EntryAndFirstDate>) : StatisticFragmentState()
     data class EntryAndFirstDate(
         val entry: ArrayList<Entry>,
         var firstDate: Long

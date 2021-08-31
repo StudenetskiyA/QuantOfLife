@@ -1,13 +1,16 @@
 package com.skyfolk.quantoflife.utils
 
+import android.util.Log
 import com.skyfolk.quantoflife.entity.QuantCategory
 import com.skyfolk.quantoflife.timeInterval.TimeInterval
+import java.sql.Time
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.*
+import kotlin.reflect.full.createInstance
 
 fun Long.toDate(): String {
     return DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
@@ -33,10 +36,10 @@ fun Long.toShortDate(): String {
     val calendar = Calendar.getInstance()
     calendar.timeInMillis = this
     val day =
-        if (calendar[Calendar.DAY_OF_MONTH] + 1 < 10) "0${calendar[Calendar.DAY_OF_MONTH]}" else calendar[Calendar.DAY_OF_MONTH]
+        if (calendar[Calendar.DAY_OF_MONTH] + 1 <= 10) "0${calendar[Calendar.DAY_OF_MONTH]}" else calendar[Calendar.DAY_OF_MONTH]
     val month =
-        if (calendar[Calendar.MONTH] + 1 < 10) "0${calendar[Calendar.MONTH] + 1}" else calendar[Calendar.MONTH] + 1
-    return "$day:$month"
+        if (calendar[Calendar.MONTH] + 1 <= 10) "0${calendar[Calendar.MONTH] + 1}" else calendar[Calendar.MONTH] + 1
+    return "$day.$month"
 }
 
 fun Long.toCalendarOnlyHourAndMinute(): Calendar {
@@ -92,5 +95,14 @@ fun TimeInterval.toPosition(): Int {
         is TimeInterval.Month -> 2
         is TimeInterval.All -> 3
         is TimeInterval.Selected -> 4
+    }
+}
+
+fun Int.fromPositionToTimeInterval(): TimeInterval {
+    return when (this) {
+        0 -> TimeInterval.Today
+        1 -> TimeInterval.Week
+        2 -> TimeInterval.Month
+        else -> TimeInterval.Week
     }
 }

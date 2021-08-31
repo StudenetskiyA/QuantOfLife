@@ -53,4 +53,16 @@
         <item>Все время</item>
         <item>Выбранный интервал</item>
     </string-array>
+
+    <string-array name="time_interval_to_graph">
+        <item>День</item>
+        <item>Неделя</item>
+        <item>Месяц</item>
+    </string-array>
+
+    <string-array name="meansure_to_graph">
+        <item>Общая оценка</item>
+        <item>Количество</item>
+        <item>Средняя оценка</item>
+    </string-array>
 </resources>

@@ -1,6 +1,6 @@
 package com.skyfolk.quantoflife
 
-import com.skyfolk.quantoflife.ui.feeds.TimeInterval
+import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.utils.getEndDateCalendar
 import org.junit.Assert
 import org.junit.Test
@@ -21,7 +21,8 @@ class EndDayTests {
     @Test
     fun selectedTimeInterval_Day() {
         //05:05
-        Assert.assertEquals(calendar[Calendar.DAY_OF_MONTH], calendar.getEndDateCalendar(TimeInterval.Today, startDayTimeInMillis)[Calendar.DAY_OF_MONTH])
+        Assert.assertEquals(calendar[Calendar.DAY_OF_MONTH], calendar.getEndDateCalendar(
+            TimeInterval.Today, startDayTimeInMillis)[Calendar.DAY_OF_MONTH])
 
         //05:25
         calendar[Calendar.HOUR_OF_DAY] = 5

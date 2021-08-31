@@ -1,18 +1,29 @@
 package com.skyfolk.quantoflife.meansure
 
-import com.skyfolk.quantoflife.timeInterval.TimeInterval
-
-enum class Meansure {
+enum class Measure {
     TotalCount,
     Quantity,
-    AverageRating
+    AverageRating;
+
+    override fun toString(): String {
+      return when (this) {
+          TotalCount -> "Общая оценка"
+          Quantity -> "Количество"
+          else -> "Средняя оценка"
+      }
+    }
+
+    fun toPosition(): Int {
+        return this.ordinal
+    }
 }
 
-fun Int.fromPositionToMea(): Meansure {
+
+fun Int.fromPositionToMeasure(): Measure {
     return when (this) {
-        0 -> Meansure.TotalCount
-        1 -> Meansure.Quantity
-        2 -> Meansure.AverageRating
-        else -> Meansure.TotalCount
+        0 -> Measure.TotalCount
+        1 -> Measure.Quantity
+        2 -> Measure.AverageRating
+        else -> Measure.TotalCount
     }
 }
