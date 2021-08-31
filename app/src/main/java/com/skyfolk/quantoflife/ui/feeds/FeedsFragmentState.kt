@@ -47,7 +47,7 @@ sealed class FeedsFragmentState(
         val totalPhysicalFound: Double,
         val totalEmotionalFound: Double,
         val totalEvolutionFound: Double,
-        val totalStarFound: Int,
+        val totalStarFound: Double,
         val totalFound: Double
     ) : FeedsFragmentState(
         listOfQuants,
@@ -65,7 +65,7 @@ sealed class FeedsFragmentState(
                 _totalPhysicalFound: Double,
                 _totalEmotionalFound: Double,
                 _totalEvolutionFound: Double,
-                _totalStarFound: Int,
+                _totalStarFound: Double,
                 _totalFound: Double
             ) {
                 state.update{

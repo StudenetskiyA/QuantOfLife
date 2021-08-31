@@ -60,7 +60,7 @@ sealed class QuantBase(
         }
     }
 
-    fun toEvent(eventId: String? = null, rate: Int, date: Long, note: String): EventBase {
+    fun toEvent(eventId: String? = null, rate: Double, date: Long, note: String): EventBase {
         when (this) {
             is QuantRated -> {
                 return EventBase.EventRated(

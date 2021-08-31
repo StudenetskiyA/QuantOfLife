@@ -36,8 +36,8 @@ fun getTotalCount(events: List<EventBase>): Double {
     return events.size.toDouble()
 }
 
-fun getStarTotal(quants: List<QuantBase>, events: List<EventBase>): Int {
-    var total = 0
+fun getStarTotal(quants: List<QuantBase>, events: List<EventBase>): Double {
+    var total: Double = 0.0
 
     for (event in events) {
         if (event is EventBase.EventRated) {

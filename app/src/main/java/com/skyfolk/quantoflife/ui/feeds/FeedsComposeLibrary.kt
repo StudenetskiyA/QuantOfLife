@@ -64,7 +64,7 @@ fun TotalValue(
             style = style
         )
         Text(
-            text = if (value!=null) String.format("%.${valueFormatAfterDot}f", value) else "",
+            text = if (value != null) String.format("%.${valueFormatAfterDot}f", value) else "",
             textAlign = TextAlign.Right,
             style = style
         )
@@ -108,7 +108,7 @@ fun TotalValues(state: FeedsFragmentState) {
     }
     val totalStarFound: Double? = when (state) {
         is FeedsFragmentState.EventsListLoading -> null
-        is FeedsFragmentState.LoadingEventsListCompleted -> state.totalStarFound.toDouble()
+        is FeedsFragmentState.LoadingEventsListCompleted -> state.totalStarFound
     }
     val totalFound: Double? = when (state) {
         is FeedsFragmentState.EventsListLoading -> null
@@ -127,9 +127,14 @@ fun TotalValues(state: FeedsFragmentState) {
         TotalValue(
             description = "звезд",
             value = totalStarFound,
-            valueFormatAfterDot = 0
+            valueFormatAfterDot = 1
         )
-        TotalValue(description = "", value = totalFound, style = Typography.subtitle2)
+        TotalValue(
+            description = "",
+            value = totalFound,
+            style = Typography.subtitle2,
+            valueFormatAfterDot = 2
+        )
         SeparatorLine()
     }
 }

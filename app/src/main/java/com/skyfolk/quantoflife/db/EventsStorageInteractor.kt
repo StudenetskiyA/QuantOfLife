@@ -14,8 +14,8 @@ class EventsStorageInteractor(private val dbInteractor: DBInteractor) {
     }
 
     fun addEventToDB(event: EventBase, onComplete: () -> Unit) {
-        var rate: Int? = null
-        var numericValue: Int? = null
+        var rate: Double? = null
+        var numericValue: Double? = null
 
         when (event) {
             is EventBase.EventRated -> {

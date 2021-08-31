@@ -106,9 +106,9 @@ class CreateEventDialogFragment(val quant: QuantBase, private val existEvent: Ev
                 quant.toEvent(
                     existEvent?.id,
                     when (quant) {
-                        is QuantBase.QuantRated -> binding.eventRating.rating.toInt()
-                        is QuantBase.QuantMeasure -> binding.eventRatingNumeric.text.toString().toInt()
-                        is QuantBase.QuantNote -> -1
+                        is QuantBase.QuantRated -> binding.eventRating.rating.toDouble()
+                        is QuantBase.QuantMeasure -> binding.eventRatingNumeric.text.toString().toDouble()
+                        is QuantBase.QuantNote -> (-1).toDouble()
                     }, calendar.timeInMillis,
                     binding.eventNote.text.toString()
                 ), quant.name

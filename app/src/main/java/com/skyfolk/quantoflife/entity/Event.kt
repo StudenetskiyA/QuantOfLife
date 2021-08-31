@@ -7,7 +7,7 @@ data class EventDisplayable(
     val icon: String,
     val date: Long,
     val note: String,
-    val value: Int?,
+    val value: Double?,
     val bonuses:  ArrayList<QuantBonusBase.QuantBonusRated>?
 )
 
@@ -32,7 +32,7 @@ sealed class EventBase(
         override var quantId: String,
         override var date: Long,
         override var note: String,
-        var value: Int
+        var value: Double
     ) : EventBase(id, quantId, date, note) {
         override fun copy(): EventMeasure {
             return EventMeasure(id, quantId, date, note, value)
@@ -43,7 +43,7 @@ sealed class EventBase(
         override var quantId: String,
         override var date: Long,
         override var note: String,
-        var rate: Int
+        var rate: Double
     ) : EventBase(id, quantId, date, note) {
         override fun copy(): EventRated {
             return EventRated(id, quantId, date, note, rate)
