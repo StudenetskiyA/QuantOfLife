@@ -17,6 +17,8 @@
         <entry key="..\:/Code/QuantOfLife/app/src/main/res/layout/feeds_fragment_compose.xml" value="0.25" />
         <entry key="..\:/Code/QuantOfLife/app/src/main/res/menu/bottom_nav_menu.xml" value="0.21979166666666666" />
         <entry key="..\:/Users/wowda/AppData/Local/Android/Sdk/platforms/android-30/data/res/drawable/btn_dropdown.xml" value="0.22135416666666666" />
+        <entry key="app/src/main/res/drawable/fade_green.xml" value="0.228125" />
+        <entry key="app/src/main/res/drawable/fade_red.xml" value="0.228125" />
         <entry key="app/src/main/res/layout/create_event_dialog.xml" value="0.21197916666666666" />
         <entry key="app/src/main/res/layout/feeds_fragment.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/layout/feeds_fragment_compose.xml" value="0.1" />

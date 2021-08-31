@@ -18,7 +18,6 @@ import com.skyfolk.quantoflife.databinding.StatisticFragmentBinding
 import com.skyfolk.quantoflife.meansure.Measure
 import com.skyfolk.quantoflife.meansure.QuantFilter
 import com.skyfolk.quantoflife.meansure.fromPositionToMeasure
-import com.skyfolk.quantoflife.statistic.IntervalAxisValueFormatter
 import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.utils.fromPositionToTimeInterval
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -33,6 +32,55 @@ class StatisticFragment : Fragment() {
     private var selectedEventTimeInterval: TimeInterval? = null
     private var selectedMeasure: Measure? = null
 
+    private fun setAxisProperties() {
+        binding.chart.xAxis.position = XAxisPosition.BOTTOM
+        binding.chart.xAxis.setDrawGridLines(true)
+        binding.chart.xAxis.gridColor = Color.rgb(255, 255, 255)
+        binding.chart.xAxis.labelRotationAngle = -60F
+        binding.chart.xAxis.textColor = Color.rgb(255, 255, 255)
+        binding.chart.axisLeft.textColor = Color.rgb(255, 255, 255)
+        binding.chart.axisRight.textColor = Color.rgb(255, 255, 255)
+    }
+    
+    private fun setDataSetProperties(
+        set: LineDataSet,
+        lineColor: Int,
+        circleColor: Int,
+        textSize: Float,
+        textColor: Int,
+        fillDrawable: Int
+    ) {
+        set.color = lineColor
+        set.setDrawFilled(true)
+        set.setDrawIcons(true)
+        set.valueTextSize = textSize
+        set.setCircleColor(circleColor)
+        set.setValueTextColors(listOf(textColor))
+        set.fillDrawable = ContextCompat.getDrawable(requireContext(), fillDrawable)
+    }
+
+    private fun setDefaultDataSetPropertiesForFirstSet(set: LineDataSet) {
+        setDataSetProperties(
+            set = set,
+            lineColor = Color.rgb(255, 0, 0),
+            circleColor = Color.rgb(255, 0, 0),
+            textSize = 10f,
+            textColor = Color.rgb(255, 0, 0),
+            fillDrawable = R.drawable.fade_red
+        )
+    }
+
+    private fun setDefaultDataSetPropertiesForSecondSet(set: LineDataSet) {
+        setDataSetProperties(
+            set = set,
+            lineColor = Color.rgb(0, 166, 55),
+            circleColor = Color.rgb(0, 166, 55),
+            textSize = 10f,
+            textColor = Color.rgb(0, 166, 55),
+            fillDrawable = R.drawable.fade_green
+        )
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -43,7 +91,10 @@ class StatisticFragment : Fragment() {
         binding.chart.description.isEnabled = false
         binding.chart.setPinchZoom(false)
         binding.chart.setDrawGridBackground(false)
-        binding.chart.legend.isEnabled = false
+
+        //TODO If one data source
+        binding.chart.legend.isEnabled = true
+        binding.chart.legend.textColor = Color.rgb(255, 255, 255)
 
         viewModel.barEntryData.observe(viewLifecycleOwner, { data ->
             when (data) {
@@ -55,44 +106,30 @@ class StatisticFragment : Fragment() {
                 is StatisticFragmentState.Entries -> {
                     if (data.entries.size > 0 && data.entries.first().entry.size > 1) {
                         val dataSets = arrayListOf<LineDataSet>()
-                        val set1 = LineDataSet(data.entries[0].entry, "")
-                        set1.color = Color.rgb(104, 241, 175)
-                        set1.setDrawFilled(true)
-                        set1.setDrawIcons(false)
-                        context?.let {
-                            set1.fillDrawable =
-                                ContextCompat.getDrawable(it, R.drawable.fade_red)
-                        }
+                        val set1 = LineDataSet(data.entries[0].entry, data.entries[0].name)
+                        setDefaultDataSetPropertiesForFirstSet(set1)
                         dataSets.add(set1)
 
                         if (data.entries.size > 1) {
-                            val set2 = LineDataSet(data.entries[1].entry, "")
-                            set2.color = Color.rgb(164, 228, 251)
-                            set2.setDrawFilled(true)
-                            set2.setDrawIcons(false)
-                            context?.let {
-                                set2.fillDrawable =
-                                    ContextCompat.getDrawable(it, R.drawable.fade_green)
-                            }
+                            val set2 = LineDataSet(data.entries[1].entry, data.entries[1].name)
+                            setDefaultDataSetPropertiesForSecondSet(set2)
                             dataSets.add(set2)
                         }
 
-                        val xAxis = binding.chart.xAxis
-                        xAxis.position = XAxisPosition.BOTTOM
-                        xAxis.setDrawGridLines(true)
-                        xAxis.labelRotationAngle = -60F
+                       setAxisProperties()
 
                         //TODO Даже в три раза меньше делений это может быть много, сделай нормально
-                        xAxis.granularity = if (data.entries[0].entry.size > 20) {
+                        binding.chart.xAxis.granularity = if (data.entries[0].entry.size > 20) {
                             (data.entries[0].entry[1].x - data.entries[0].entry[0].x) * 4
                         } else {
                             (data.entries[0].entry[1].x - data.entries[0].entry[0].x)
                         }
-                        xAxis.labelCount = data.entries[0].entry.size
+                        binding.chart.xAxis.labelCount = data.entries[0].entry.size
 
                         selectedEventTimeInterval?.let {
-                            val xAxisFormatter = viewModel.getFormatter(data.entries[0].firstDate, it)
-                            xAxis.valueFormatter = xAxisFormatter
+                            val xAxisFormatter =
+                                viewModel.getFormatter(data.entries[0].firstDate, it)
+                            binding.chart.xAxis.valueFormatter = xAxisFormatter
                         }
 
                         val dataForGraph = LineData(dataSets.toList())
@@ -153,7 +190,9 @@ class StatisticFragment : Fragment() {
                     val newSelectedEventFilterName = when (position) {
                         0 -> QuantFilter.All
                         1 -> QuantFilter.Nothing
-                        else -> QuantFilter.OnlySelected(parent.getItemAtPosition(position).toString())
+                        else -> QuantFilter.OnlySelected(
+                            parent.getItemAtPosition(position).toString()
+                        )
                     }
                     if (selectedEventFilterName != newSelectedEventFilterName) {
                         selectedEventFilterName = newSelectedEventFilterName
@@ -175,7 +214,9 @@ class StatisticFragment : Fragment() {
                     val newSelectedEventFilterName = when (position) {
                         0 -> QuantFilter.All
                         1 -> QuantFilter.Nothing
-                        else -> QuantFilter.OnlySelected(parent.getItemAtPosition(position).toString())
+                        else -> QuantFilter.OnlySelected(
+                            parent.getItemAtPosition(position).toString()
+                        )
 
                     }
                     if (selectedEventFilterName2 != newSelectedEventFilterName) {
@@ -196,7 +237,7 @@ class StatisticFragment : Fragment() {
                     id: Long
                 ) {
                     if (selectedMeasure != position.fromPositionToMeasure()) {
-                        QLog.d("skyfolk-graph","position = $position")
+                        QLog.d("skyfolk-graph", "position = $position")
                         selectedMeasure = position.fromPositionToMeasure()
                         setSelectedFilter()
                     }

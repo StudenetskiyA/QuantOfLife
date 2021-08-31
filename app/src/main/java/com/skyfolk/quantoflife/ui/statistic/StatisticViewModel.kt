@@ -133,7 +133,13 @@ class StatisticViewModel(
             currentPeriodStart = currentPeriodEnd + 1
         }
 
-        return StatisticFragmentState.EntryAndFirstDate(result, firstDate)
+        val name =  when (quantFilter) {
+            QuantFilter.All -> "Все события"
+            QuantFilter.Nothing -> "Ничего"
+            is QuantFilter.OnlySelected -> quantFilter.selectQuant
+        }
+
+        return StatisticFragmentState.EntryAndFirstDate(name, result, firstDate)
     }
 
     private fun runSearch(
@@ -189,6 +195,7 @@ class StatisticViewModel(
 sealed class StatisticFragmentState {
     class Entries(val entries: ArrayList<EntryAndFirstDate>) : StatisticFragmentState()
     data class EntryAndFirstDate(
+        val name: String,
         val entry: ArrayList<Entry>,
         var firstDate: Long
     )
