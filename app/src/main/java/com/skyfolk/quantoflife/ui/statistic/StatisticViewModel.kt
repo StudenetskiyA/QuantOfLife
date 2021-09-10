@@ -1,5 +1,7 @@
 package com.skyfolk.quantoflife.ui.statistic
 
+import android.view.View
+import android.widget.AdapterView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,6 +19,8 @@ import com.skyfolk.quantoflife.feeds.getTotalAverageStar
 import com.skyfolk.quantoflife.feeds.getTotalCount
 import com.skyfolk.quantoflife.meansure.Measure
 import com.skyfolk.quantoflife.meansure.QuantFilter
+import com.skyfolk.quantoflife.meansure.fromPositionToMeasure
+import com.skyfolk.quantoflife.meansure.fromPositionToQuantFilter
 import com.skyfolk.quantoflife.utils.getEndDateCalendar
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.statistic.IntervalAxisValueFormatter
@@ -36,54 +40,41 @@ class StatisticViewModel(
     }
     val barEntryData: LiveData<StatisticFragmentState> = _barEntryData
 
-    private val _listOfQuants = MutableLiveData<List<QuantBase>>().apply {
-        value = quantsStorageInteractor.getAllQuantsList(false)
-            .filterIsInstance<QuantBase.QuantRated>()
-            .filter { it.usageCount > 9 }
+    private val _selectedFilter = MutableLiveData<SelectedGraphFilter>().apply {
+        value = SelectedGraphFilter(
+            timeInterval = settingsInteractor.getSelectedGraphPeriod(),
+            measure = settingsInteractor.getSelectedGraphMeasure(),
+            filter = settingsInteractor.getSelectedGraphQuant(1),
+            filter2 = settingsInteractor.getSelectedGraphQuant(2),
+            listOfQuants = quantsStorageInteractor.getAllQuantsList(false)
+                .filterIsInstance<QuantBase.QuantRated>()
+                .filter { it.usageCount > 9 }
+        )
     }
-    val listOfQuants: LiveData<List<QuantBase>> = _listOfQuants
+    val selectedFilter: LiveData<SelectedGraphFilter> = _selectedFilter
 
-    private val _selectedTimeInterval = MutableLiveData<TimeInterval>().apply {
-        value = settingsInteractor.getSelectedGraphPeriod()
-    }
-    val selectedTimeInterval: LiveData<TimeInterval> = _selectedTimeInterval
-    private val _selectedMeasure = MutableLiveData<Measure>().apply {
-        QLog.d("skyfolk-graph","from setting = ${settingsInteractor.getSelectedGraphMeasure()}")
-        value = settingsInteractor.getSelectedGraphMeasure()
-    }
-    val selectedMeasure: LiveData<Measure> = _selectedMeasure
-    private val _selectedFirstQuantFilter = MutableLiveData<QuantFilter>().apply {
-        value = settingsInteractor.getSelectedGraphQuant(1)
-    }
-    val selectedFirstQuantFilter: LiveData<QuantFilter> = _selectedFirstQuantFilter
-    private val _selectedSecondQuantFilter = MutableLiveData<QuantFilter>().apply {
-        value = settingsInteractor.getSelectedGraphQuant(2)
-    }
-    val selectedSecondQuantFilter: LiveData<QuantFilter> = _selectedSecondQuantFilter
-
-    fun setSelectedEventFilter(
-        itemId: QuantFilter?,
-        itemId2: QuantFilter?,
-        timeInterval: TimeInterval?,
-        measure: Measure?
-    ) {
-        if (itemId !=null && itemId2 != null && timeInterval != null && measure != null) {
-            settingsInteractor.apply {
-                writeSelectedGraphMeasure(measure)
-                QLog.d("skyfolk-graph", "write setting = ${measure}")
-
-                writeSelectedGraphPeriod(timeInterval)
-                writeSelectedGraphQuant(1, itemId)
-                writeSelectedGraphQuant(2, itemId2)
-            }
-            runSearch(itemId, itemId2, timeInterval, measure)
+    fun setEventFilter(position: Int, filter: QuantFilter) {
+        settingsInteractor.writeSelectedGraphQuant(position, filter)
+        when (position) {
+            1 -> _selectedFilter.value = _selectedFilter.value?.copy(filter = filter)
+            2 -> _selectedFilter.value = _selectedFilter.value?.copy(filter2 = filter)
         }
+    }
+
+    fun setMeasureFilter(measure: Measure) {
+        settingsInteractor.writeSelectedGraphMeasure(measure)
+         _selectedFilter.value = _selectedFilter.value?.copy(measure = measure)
+    }
+
+    fun setTimeIntervalFilter(timeInterval: TimeInterval) {
+        settingsInteractor.writeSelectedGraphPeriod(timeInterval)
+        _selectedFilter.value = _selectedFilter.value?.copy(timeInterval = timeInterval)
     }
 
     private fun getEntries(
         allEvents: ArrayList<EventBase>,
         allQuants: ArrayList<QuantBase>,
-        quantFilter: QuantFilter,
+        quantFilter: QuantFilter?,
         lastDate: Long,
         startDayTime: Long,
         timeInterval: TimeInterval = TimeInterval.Week,
@@ -96,6 +87,7 @@ class StatisticViewModel(
                 QuantFilter.All -> true
                 QuantFilter.Nothing -> false
                 is QuantFilter.OnlySelected -> it.quantId == getQuantIdByName(quantFilter.selectQuant)
+                else -> true
             }
         }
 
@@ -133,21 +125,25 @@ class StatisticViewModel(
             currentPeriodStart = currentPeriodEnd + 1
         }
 
-        val name =  when (quantFilter) {
+        val name = when (quantFilter) {
             QuantFilter.All -> "Все события"
             QuantFilter.Nothing -> "Ничего"
             is QuantFilter.OnlySelected -> quantFilter.selectQuant
+            else -> "Все события"
         }
 
         return StatisticFragmentState.EntryAndFirstDate(name, result, firstDate)
     }
 
-    private fun runSearch(
-        onlyQuant: QuantFilter,
-        onlyQuant2: QuantFilter,
-        timeInterval: TimeInterval?,
-        measure: Measure?
-    ) {
+    fun runSearch() {
+        _barEntryData.value = StatisticFragmentState.Loading
+
+        val onlyQuant = _selectedFilter.value?.filter
+        val onlyQuant2 = _selectedFilter.value?.filter2
+        val timeInterval = _selectedFilter.value?.timeInterval
+        val measure = _selectedFilter.value?.measure
+
+        QLog.d("skyfolk-graph", "run search with ${onlyQuant}, ${onlyQuant2}, ${timeInterval}, ${measure}")
         viewModelScope.launch {
             val result: ArrayList<StatisticFragmentState.EntryAndFirstDate> = arrayListOf()
             if (onlyQuant != QuantFilter.Nothing) {
@@ -202,4 +198,12 @@ sealed class StatisticFragmentState {
 
     object Loading : StatisticFragmentState()
 }
+
+data class SelectedGraphFilter(
+    var timeInterval: TimeInterval,
+    var measure: Measure,
+    var filter: QuantFilter,
+    var filter2: QuantFilter,
+    var listOfQuants: List<QuantBase>
+)
 

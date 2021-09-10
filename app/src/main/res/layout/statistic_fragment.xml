@@ -4,6 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/statistic_fragment_root">
 
+    <data>
+
+        <variable
+            name="vm"
+            type="com.skyfolk.quantoflife.ui.statistic.StatisticViewModel" />
+    </data>
+
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -58,8 +65,7 @@
             android:layout_marginBottom="8dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            />
+            app:layout_constraintEnd_toEndOf="parent" />
         <Spinner
             android:id="@+id/event_spinner2"
             android:layout_width="match_parent"

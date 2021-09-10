@@ -5,14 +5,21 @@ sealed class QuantFilter {
     object All : QuantFilter()
     class OnlySelected(val selectQuant: String): QuantFilter()
 
-    fun toGraphPosition() : Int {
+    fun toGraphPosition(listOfQuantName: List<String>) : Int {
         return when (this) {
             is All -> 0
             is Nothing -> 1
-            else -> {
-                //TODO
-                2
+            is OnlySelected -> {
+                listOfQuantName.indexOf(selectQuant)
             }
+        }
+    }
+
+    override fun toString(): String {
+        return when (this) {
+            is Nothing -> "Ничего"
+            is All -> "Все события"
+            is OnlySelected -> this.selectQuant
         }
     }
 }

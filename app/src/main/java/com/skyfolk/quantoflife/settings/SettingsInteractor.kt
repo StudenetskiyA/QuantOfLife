@@ -1,6 +1,7 @@
 package com.skyfolk.quantoflife.settings
 
 import android.content.SharedPreferences
+import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.entity.QuantCategory
 import com.skyfolk.quantoflife.meansure.Measure
 import com.skyfolk.quantoflife.meansure.QuantFilter
@@ -32,7 +33,7 @@ open class SettingsInteractor(private val preferences: SharedPreferences) {
     fun getSelectedGraphMeasure(): Measure {
         return when (preferences.getString(SELECTED_GRAPH_MEASURE, "Общая оценка") ?: "Общая оценка") {
             "Общая оценка" -> Measure.TotalCount
-            "Количество" -> Measure.TotalCount
+            "Количество" -> Measure.Quantity
             else -> Measure.AverageRating
         }
     }
@@ -43,11 +44,13 @@ open class SettingsInteractor(private val preferences: SharedPreferences) {
             2 -> preferences.getString(SELECTED_GRAPH_SECOND_QUANT, "Ничего") ?: "Ничего"
             else -> "Ничего"
         }
-        return when (quant) {
+
+        val filter = when (quant) {
             "Ничего" -> QuantFilter.Nothing
             "Все события" -> QuantFilter.All
             else -> QuantFilter.OnlySelected(quant)
         }
+        return filter
     }
 
     fun writeSelectedGraphPeriod(period: TimeInterval) {

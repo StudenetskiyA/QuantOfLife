@@ -1,7 +1,7 @@
 buildscript {
-    ext.kotlin_version = "1.5.10"
+    ext.kotlin_version = "1.5.21"
     ext {
-        composeVersion = '1.0.0-beta09'
+        composeVersion = '1.0.2'
     }
     repositories {
         google()
@@ -10,9 +10,9 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "io.realm:realm-gradle-plugin:10.0.1"
+        classpath "io.realm:realm-gradle-plugin:10.3.0"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.android.tools.build:gradle:7.0.0'
+        classpath 'com.android.tools.build:gradle:7.0.2'
     }
 }
 
