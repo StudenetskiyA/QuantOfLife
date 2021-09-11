@@ -30,7 +30,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         />
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/event_spinner_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -42,49 +42,85 @@
             android:id="@+id/time_period_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/meansure_spinner"
             android:entries="@array/time_interval_to_graph"
             />
         <Spinner
             android:id="@+id/meansure_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/time_period_spinner"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/event_spinner"
             android:entries="@array/meansure_to_graph"
+            />
+
+        <View
+            android:id="@+id/event_spinner_color"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@android:color/holo_red_dark"
+            app:layout_constraintTop_toBottomOf="@id/meansure_spinner"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/event_spinner2"
+            app:layout_constraintEnd_toStartOf="@id/event_spinner"
             />
         <Spinner
             android:id="@+id/event_spinner"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/meansure_spinner"
+            app:layout_constraintBottom_toTopOf="@id/event_spinner2"
+            app:layout_constraintStart_toEndOf="@id/event_spinner_color"
             app:layout_constraintEnd_toEndOf="parent" />
+        <View
+            android:id="@+id/event_spinner2_color"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@android:color/holo_green_dark"
+            app:layout_constraintTop_toBottomOf="@id/event_spinner"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/event_spinner2"
+            />
         <Spinner
             android:id="@+id/event_spinner2"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/event_spinner"
+            app:layout_constraintStart_toEndOf="@id/event_spinner2_color"
             app:layout_constraintEnd_toEndOf="parent"
             />
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/chart"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/maximimum_with_text"
         app:layout_constraintTop_toBottomOf="@id/event_spinner_layout"
         tools:layout_editor_absoluteX="10dp" />
+
+    <TextView
+        android:id="@+id/maximimum_with_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/maximimum_without_text"
+        app:layout_constraintTop_toBottomOf="@id/chart"
+        />
+
+    <TextView
+        android:id="@+id/maximimum_without_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/maximimum_with_text"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

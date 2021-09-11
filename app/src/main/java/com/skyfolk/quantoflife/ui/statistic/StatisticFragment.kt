@@ -18,6 +18,7 @@ import com.skyfolk.quantoflife.databinding.StatisticFragmentBinding
 import com.skyfolk.quantoflife.meansure.QuantFilter
 import com.skyfolk.quantoflife.meansure.fromPositionToMeasure
 import com.skyfolk.quantoflife.utils.fromPositionToTimeInterval
+import com.skyfolk.quantoflife.utils.toDateWithoutHourAndMinutes
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class StatisticFragment : Fragment() {
@@ -54,16 +55,21 @@ class StatisticFragment : Fragment() {
                     binding.chart.visibility = View.INVISIBLE
                 }
                 is StatisticFragmentState.Entries -> {
-                    if (data.entries.size > 0 && data.entries.first().entry.size > 1) {
+                    if (data.entries.size > 0 && data.entries.first().entries.size > 1) {
+                        binding.maximimumWithText.text =
+                            "Максимум ${binding.timePeriodSpinner.selectedItem} подряд с ${data.entries[0].name} " +
+                                    "- ${data.entries[0].maximumWith.lenght} с ${data.entries[0].maximumWith.startDate.toDateWithoutHourAndMinutes()}"
+                        binding.maximimumWithoutText.text =
+                            "Максимум ${binding.timePeriodSpinner.selectedItem} подряд без ${data.entries[0].name} " +
+                                    "- ${data.entries[0].maximumWithout.lenght} с ${data.entries[0].maximumWithout.startDate.toDateWithoutHourAndMinutes()}"
+
                         val dataSets = arrayListOf<LineDataSet>()
-                        val set1 = LineDataSet(data.entries[0].entry, data.entries[0].name)
+                        val set1 = LineDataSet(data.entries[0].entries, data.entries[0].name)
                         setDefaultDataSetPropertiesForFirstSet(set1)
                         dataSets.add(set1)
 
                         if (data.entries.size > 1) {
-                            QLog.d("skyfolk-graph", "entries > 1")
-
-                            val set2 = LineDataSet(data.entries[1].entry, data.entries[1].name)
+                            val set2 = LineDataSet(data.entries[1].entries, data.entries[1].name)
                             setDefaultDataSetPropertiesForSecondSet(set2)
                             dataSets.add(set2)
                         }
@@ -71,18 +77,19 @@ class StatisticFragment : Fragment() {
                         setAxisProperties()
 
                         //TODO Даже в три раза меньше делений это может быть много, сделай нормально
-                        binding.chart.xAxis.granularity = if (data.entries[0].entry.size > 20) {
-                            (data.entries[0].entry[1].x - data.entries[0].entry[0].x) * 4
+                        binding.chart.xAxis.granularity = if (data.entries[0].entries.size > 20) {
+                            (data.entries[0].entries[1].x - data.entries[0].entries[0].x) * 4
                         } else {
-                            (data.entries[0].entry[1].x - data.entries[0].entry[0].x)
+                            (data.entries[0].entries[1].x - data.entries[0].entries[0].x)
                         }
-                        binding.chart.xAxis.labelCount = data.entries[0].entry.size
+                        binding.chart.xAxis.labelCount = data.entries[0].entries.size
 
-                        binding.timePeriodSpinner.selectedItemPosition.fromPositionToTimeInterval().let {
-                            val xAxisFormatter =
-                                viewModel.getFormatter(data.entries[0].firstDate, it)
-                            binding.chart.xAxis.valueFormatter = xAxisFormatter
-                        }
+                        binding.timePeriodSpinner.selectedItemPosition.fromPositionToTimeInterval()
+                            .let {
+                                val xAxisFormatter =
+                                    viewModel.getFormatter(data.entries[0].firstDate, it)
+                                binding.chart.xAxis.valueFormatter = xAxisFormatter
+                            }
 
                         val dataForGraph = LineData(dataSets.toList())
                         binding.chart.invalidate()
@@ -116,7 +123,10 @@ class StatisticFragment : Fragment() {
                 binding.meansureSpinner.setSelection(it.measure.toPosition(), false)
                 binding.timePeriodSpinner.setSelection(it.timeInterval.toGraphPosition(), false)
                 binding.eventSpinner.setSelection(it.filter.toGraphPosition(listOfQuantName), false)
-                binding.eventSpinner2.setSelection(it.filter2.toGraphPosition(listOfQuantName), false)
+                binding.eventSpinner2.setSelection(
+                    it.filter2.toGraphPosition(listOfQuantName),
+                    false
+                )
 
                 runSearch()
             }

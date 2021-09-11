@@ -1,7 +1,5 @@
 package com.skyfolk.quantoflife.ui.statistic
 
-import android.view.View
-import android.widget.AdapterView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,14 +17,13 @@ import com.skyfolk.quantoflife.feeds.getTotalAverageStar
 import com.skyfolk.quantoflife.feeds.getTotalCount
 import com.skyfolk.quantoflife.meansure.Measure
 import com.skyfolk.quantoflife.meansure.QuantFilter
-import com.skyfolk.quantoflife.meansure.fromPositionToMeasure
-import com.skyfolk.quantoflife.meansure.fromPositionToQuantFilter
 import com.skyfolk.quantoflife.utils.getEndDateCalendar
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.statistic.IntervalAxisValueFormatter
 import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.utils.*
 import kotlinx.coroutines.launch
+import java.lang.Integer.max
 import kotlin.collections.ArrayList
 
 class StatisticViewModel(
@@ -79,7 +76,7 @@ class StatisticViewModel(
         startDayTime: Long,
         timeInterval: TimeInterval = TimeInterval.Week,
         measure: Measure
-    ): StatisticFragmentState.EntryAndFirstDate {
+    ): StatisticFragmentState.EntriesAndFirstDate {
         val result = ArrayList<Entry>()
         var resultCount = 0
         val allFilteredEvents = allEvents.filter {
@@ -96,6 +93,17 @@ class StatisticViewModel(
         var currentPeriodStart = firstDate
         var currentPeriodEnd = firstDate
 
+        var maximumWith = 0
+        var totalMaximumWith = 0
+        var lastPeriodWith = false
+        var maximumWithStartTime: Long = 0
+        var totalMaximumWithStartTime: Long = 0
+        var maximumWithout = 0
+        var totalMaximumWithout = 0
+        var lastPeriodWithout = false
+        var maximumWithoutStartTime: Long = 0
+        var totalMaximumWithoutStartTime: Long = 0
+
         while (currentPeriodEnd <= lastDate) {
             currentPeriodEnd = currentPeriodStart.toCalendar().getEndDateCalendar(
                 timeInterval,
@@ -104,6 +112,42 @@ class StatisticViewModel(
             val filteredEvents =
                 allFilteredEvents.filter { it.date in currentPeriodStart until currentPeriodEnd }
 
+            when (filteredEvents.isEmpty()) {
+                true -> {
+                    when (lastPeriodWithout) {
+                        true -> {
+                            maximumWithout++
+                        }
+                        false -> {
+                            maximumWithout = 1
+                            maximumWithoutStartTime = currentPeriodStart
+                        }
+                    }
+                    if (maximumWithout > totalMaximumWithout) {
+                        totalMaximumWithoutStartTime = maximumWithoutStartTime
+                    }
+                    totalMaximumWithout = max(maximumWithout, totalMaximumWithout)
+                    lastPeriodWith = false
+                    lastPeriodWithout = true
+                }
+                false -> {
+                    when (lastPeriodWith) {
+                        true -> {
+                            maximumWith++
+                        }
+                        false -> {
+                            maximumWith = 1
+                            maximumWithStartTime = currentPeriodStart
+                        }
+                    }
+                    if (maximumWith > totalMaximumWith) {
+                        totalMaximumWithStartTime = maximumWithStartTime
+                    }
+                    totalMaximumWith = max(maximumWith, totalMaximumWith)
+                    lastPeriodWithout = false
+                    lastPeriodWith = true
+                }
+            }
 
             val totalByPeriod = when (measure) {
                 Measure.TotalCount ->
@@ -132,7 +176,13 @@ class StatisticViewModel(
             else -> "Все события"
         }
 
-        return StatisticFragmentState.EntryAndFirstDate(name, result, firstDate)
+        return StatisticFragmentState.EntriesAndFirstDate(
+            name = name,
+            entries = result,
+            firstDate = firstDate,
+            maximumWith = StatisticFragmentState.MaximumContinuously(totalMaximumWith, totalMaximumWithStartTime),
+            maximumWithout = StatisticFragmentState.MaximumContinuously(totalMaximumWithout, totalMaximumWithoutStartTime)
+        )
     }
 
     fun runSearch() {
@@ -145,7 +195,7 @@ class StatisticViewModel(
 
         QLog.d("skyfolk-graph", "run search with ${onlyQuant}, ${onlyQuant2}, ${timeInterval}, ${measure}")
         viewModelScope.launch {
-            val result: ArrayList<StatisticFragmentState.EntryAndFirstDate> = arrayListOf()
+            val result: ArrayList<StatisticFragmentState.EntriesAndFirstDate> = arrayListOf()
             if (onlyQuant != QuantFilter.Nothing) {
                 result.add(
                     getEntries(
@@ -189,12 +239,16 @@ class StatisticViewModel(
 }
 
 sealed class StatisticFragmentState {
-    class Entries(val entries: ArrayList<EntryAndFirstDate>) : StatisticFragmentState()
-    data class EntryAndFirstDate(
+    class Entries(val entries: ArrayList<EntriesAndFirstDate>) : StatisticFragmentState()
+    data class EntriesAndFirstDate(
         val name: String,
-        val entry: ArrayList<Entry>,
-        var firstDate: Long
+        val entries: ArrayList<Entry>,
+        var firstDate: Long,
+        val maximumWith: MaximumContinuously,
+        val maximumWithout: MaximumContinuously
     )
+
+    data class MaximumContinuously(val lenght: Int, val startDate: Long)
 
     object Loading : StatisticFragmentState()
 }
