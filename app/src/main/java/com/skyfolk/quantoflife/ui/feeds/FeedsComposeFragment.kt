@@ -63,10 +63,6 @@ class FeedsComposeFragment : Fragment() {
                                 .fillMaxWidth()
                                 .padding(vertical = 5.dp)
                         ) {
-//                            Button(onClick = { count.value++ }) {
-//                                Text("${count.value.toString()}")
-//                            }
-
                             when (state) {
                                 is FeedsFragmentState.EventsListLoading -> {
                                     binding.progress.visibility = View.VISIBLE

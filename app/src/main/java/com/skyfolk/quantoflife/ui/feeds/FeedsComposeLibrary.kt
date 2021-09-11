@@ -2,8 +2,6 @@ package com.skyfolk.quantoflife.ui.feeds
 
 import android.app.DatePickerDialog
 import android.content.Context
-import android.util.Log
-import android.view.View
 import android.widget.DatePicker
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -19,7 +17,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.entity.EventDisplayable
 import com.skyfolk.quantoflife.entity.QuantCategory
@@ -29,6 +29,7 @@ import com.skyfolk.quantoflife.ui.theme.Typography
 import com.skyfolk.quantoflife.utils.toDate
 import com.skyfolk.quantoflife.utils.toDateWithoutHourAndMinutes
 import java.util.*
+
 
 @Composable
 fun HalfHorizontalLayout(modifier: Modifier, children: @Composable () -> Unit) {
@@ -248,15 +249,18 @@ fun FilterBlock(
 }
 
 @Composable
-fun EventItem(event: EventDisplayable, modifier: Modifier) {
+fun EventItem(event: EventDisplayable, onItemClick: (EventDisplayable) -> Unit) {
     Card(
         backgroundColor = Orange,
-        modifier = modifier
-            .height(70.dp)
+        modifier = Modifier
+            .clickable {
+                onItemClick(event)
+            }
+            .wrapContentHeight()
             .fillMaxWidth()
             .padding(5.dp)
     ) {
-        Row(modifier = modifier) {
+        Row(modifier = Modifier) {
             var imageResource = LocalContext.current.resources.getIdentifier(
                 event.icon,
                 "drawable",
@@ -272,32 +276,32 @@ fun EventItem(event: EventDisplayable, modifier: Modifier) {
             Image(
                 painter = painterResource(imageResource),
                 contentDescription = "event_icon",
-                modifier = modifier
+                modifier = Modifier
                     .height(50.dp)
                     .width(50.dp)
             )
             Column(
-                modifier = modifier
+                modifier = Modifier
                     .padding(horizontal = 5.dp)
                     .fillMaxWidth()
             ) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(event.name)
-                    Text(event.date.toDate())
+                    Text(event.date.toDate(), fontSize = 12.sp)
                 }
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     when {
                         ((event.bonuses != null) && (event.value != null)) -> {
                             RatingBar(
                                 rating = event.value.toFloat(),
                                 color = Color.Cyan,
-                                modifier = modifier.height(20.dp)
+                                modifier = Modifier.height(20.dp)
                             )
                         }
                         ((event.bonuses == null) && (event.value != null)) -> {
@@ -305,7 +309,8 @@ fun EventItem(event: EventDisplayable, modifier: Modifier) {
                         }
                     }
                 }
-                Text(event.note)
+
+                Text(event.note, fontSize = 14.sp, maxLines = 2)
             }
         }
     }
@@ -318,7 +323,7 @@ fun EventsList(modifier: Modifier, events: List<EventDisplayable>, onItemClick: 
             item {
                 EventItem(
                     event = it,
-                    modifier = Modifier.clickable {
+                    onItemClick = {
                         onItemClick(it.id)
                     })
             }
