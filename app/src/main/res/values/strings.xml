@@ -7,19 +7,25 @@
     <string name="onboarding_first_description">Здесь большое и подробное описание, как пользоваться приложением.\nС картинками и графиками.\n</string>
     <string name="onboarding_second_description">Здесь описание про то, что нужно выбрать три категории оценки и назвать их.\nЕсли не заполните - проставятся дефолтные.</string>
     <string name="about_type_quant">Описание, какие типы когда выбирать</string>
-    <string name="delete_goal_attention"></string>
     <string name="go_onboarding_again">Пройти онбординг еще раз</string>
     <string name="settings_set_day_start_time">Задать</string>
-    <string name="clear_events">Clear events</string>
-    <string name="clear_database">Clear database</string>
-    <string name="import_database">Import database</string>
-    <string name="export_database">Export database</string>
+    <string name="settings_set_day_start_time_current">Время начала дня - %1s:%2s</string>
+    <string name="clear_events">Очистить события</string>
+    <string name="clear_database">Очистить все</string>
+    <string name="import_database">Импортировать из файла</string>
+    <string name="export_database">Экспортировать в файл"</string>
     <string name="not_enought_data_to_graph">Не достаточно данных для графика</string>
     <string name="today">Сегодня</string>
     <string name="hint_for_quant">Подсказка для выбора значения</string>
     <string name="hint_for_quant_value">За каждую ★</string>
+
     <string name="ok">OK</string>
     <string name="delete">Удалить</string>
+    <string name="cancel">Отмена</string>
+
+    <string name="menu_item_create_quant">Создать событие</string>
+    <string name="menu_item_create_goal">Создать цель</string>
+
     <string name="hint_for_fact">За факт</string>
     <string name="hint_for_name">Название</string>
     <string name="quant_type">Тип события</string>
@@ -31,11 +37,19 @@
     <string name="hint_number_value">Числовое значение</string>
     <string name="hint_note">Примечание</string>
     <string name="bonuses">%1s бонусы</string>
-    <string name="goal_title_with_values">Цель - %1d %2s за %3s.</string>
+    <string name="goal_title_with_values">Цель - %1.0f %2s за %3s.</string>
     <string name="goal_complete">Цель выполнена.</string>
     <string name="goal_complete_part">%1s из %2s</string>
     <string name="goal_to_complete_note">Чтобы выполнять цель, получите сегодня еще %1s ☆"</string>
     <string name="goal_progress_ok">Все отлично, продолжайте в том же духе!"</string>
+    <string name="settings_import_result">Импорт успешен\nИмпортировано новых типов событий - %1d\nИмпортировано новых событий - %2d</string>
+    <string name="settings_database_cleared">Все события удалены</string>
+    <string name="settings_events_cleared">Все события очищены</string>
+    <string name="settings_database_exported">Архив сохранен в папку "Загрузки"</string>
+    <string name="statistic_maximum_with">Максимум %1s подряд с %2s - %3d с %4s</string>
+    <string name="statistic_maximum_without">Максимум %1s подряд без %2s - %3d с %4s</string>
+    <string name="now_event_created">Событие \'%1s\' создано.</string>
+    <string name="create_event_not_enter_field">Не заполненны числовые поля</string>
 
     <string-array name="category_name">
         <item>Физическое</item>

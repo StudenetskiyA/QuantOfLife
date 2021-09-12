@@ -1,5 +1,6 @@
 package com.skyfolk.quantoflife.ui.statistic
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,11 +13,12 @@ import androidx.fragment.app.Fragment
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.databinding.StatisticFragmentBinding
 import com.skyfolk.quantoflife.meansure.QuantFilter
 import com.skyfolk.quantoflife.meansure.fromPositionToMeasure
+import com.skyfolk.quantoflife.ui.theme.Colors
+import com.skyfolk.quantoflife.ui.theme.toInt
 import com.skyfolk.quantoflife.utils.fromPositionToTimeInterval
 import com.skyfolk.quantoflife.utils.toDateWithoutHourAndMinutes
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -49,16 +51,25 @@ class StatisticFragment : Fragment() {
                 }
                 is StatisticFragmentState.Entries -> {
                     if (data.entries.size > 0 && data.entries.first().entries.size > 1) {
-                        binding.maximimumWithText.text =
-                            "Максимум ${binding.timePeriodSpinner.selectedItem} подряд с ${data.entries[0].name} " +
-                                    "- ${data.entries[0].maximumWith.lenght} с ${data.entries[0].maximumWith.startDate.toDateWithoutHourAndMinutes()}"
-                        binding.maximimumWithoutText.text =
-                            "Максимум ${binding.timePeriodSpinner.selectedItem} подряд без ${data.entries[0].name} " +
-                                    "- ${data.entries[0].maximumWithout.lenght} с ${data.entries[0].maximumWithout.startDate.toDateWithoutHourAndMinutes()}"
+                        binding.maximimumWithText.text = getString(R.string.statistic_maximum_with,
+                            binding.timePeriodSpinner.selectedItem.toString(),
+                            data.entries[0].name,
+                            data.entries[0].maximumWith.lenght,
+                            data.entries[0].maximumWith.startDate.toDateWithoutHourAndMinutes()
+                        )
+
+                        binding.maximimumWithoutText.text = getString(R.string.statistic_maximum_without,
+                            binding.timePeriodSpinner.selectedItem.toString(),
+                            data.entries[0].name,
+                            data.entries[0].maximumWithout.lenght,
+                            data.entries[0].maximumWithout.startDate.toDateWithoutHourAndMinutes()
+                        )
 
                         val dataSets = arrayListOf<LineDataSet>()
                         val set1 = LineDataSet(data.entries[0].entries, data.entries[0].name)
+
                         setDefaultDataSetPropertiesForFirstSet(set1)
+
                         dataSets.add(set1)
 
                         if (data.entries.size > 1) {
@@ -134,6 +145,7 @@ class StatisticFragment : Fragment() {
 
     private var isSelectionFromTouch = false
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun setListeners() {
         binding.eventSpinner.setOnTouchListener { _, _ ->
             this.isSelectionFromTouch = true
@@ -247,11 +259,11 @@ class StatisticFragment : Fragment() {
     private fun setAxisProperties() {
         binding.chart.xAxis.position = XAxisPosition.BOTTOM
         binding.chart.xAxis.setDrawGridLines(true)
-        binding.chart.xAxis.gridColor = Color.rgb(255, 255, 255)
+        binding.chart.xAxis.gridColor = Colors.White.toInt()
         binding.chart.xAxis.labelRotationAngle = -60F
-        binding.chart.xAxis.textColor = Color.rgb(255, 255, 255)
-        binding.chart.axisLeft.textColor = Color.rgb(255, 255, 255)
-        binding.chart.axisRight.textColor = Color.rgb(255, 255, 255)
+        binding.chart.xAxis.textColor = Colors.White.toInt()
+        binding.chart.axisLeft.textColor = Colors.White.toInt()
+        binding.chart.axisRight.textColor = Colors.White.toInt()
     }
 
     private fun setDataSetProperties(
@@ -274,10 +286,10 @@ class StatisticFragment : Fragment() {
     private fun setDefaultDataSetPropertiesForFirstSet(set: LineDataSet) {
         setDataSetProperties(
             set = set,
-            lineColor = Color.rgb(255, 0, 0),
-            circleColor = Color.rgb(255, 0, 0),
+            lineColor = Colors.Red.toInt(),
+            circleColor = Colors.Red.toInt(),
             textSize = 10f,
-            textColor = Color.rgb(255, 0, 0),
+            textColor = Colors.Red.toInt(),
             fillDrawable = R.drawable.fade_red
         )
     }
@@ -285,10 +297,10 @@ class StatisticFragment : Fragment() {
     private fun setDefaultDataSetPropertiesForSecondSet(set: LineDataSet) {
         setDataSetProperties(
             set = set,
-            lineColor = Color.rgb(0, 166, 55),
-            circleColor = Color.rgb(0, 166, 55),
+            lineColor = Colors.Green.toInt(),
+            circleColor = Colors.Green.toInt(),
             textSize = 10f,
-            textColor = Color.rgb(0, 166, 55),
+            textColor = Colors.Green.toInt(),
             fillDrawable = R.drawable.fade_green
         )
     }

@@ -39,7 +39,7 @@ class StatisticViewModel(
 
     private val _selectedFilter = MutableLiveData<SelectedGraphFilter>().apply {
         value = SelectedGraphFilter(
-            timeInterval = settingsInteractor.getSelectedGraphPeriod(),
+            timeInterval = settingsInteractor.getSelectedTimeInterval(),
             measure = settingsInteractor.getSelectedGraphMeasure(),
             filter = settingsInteractor.getSelectedGraphQuant(1),
             filter2 = settingsInteractor.getSelectedGraphQuant(2),
@@ -64,7 +64,7 @@ class StatisticViewModel(
     }
 
     fun setTimeIntervalFilter(timeInterval: TimeInterval) {
-        settingsInteractor.writeSelectedGraphPeriod(timeInterval)
+        settingsInteractor.writeSelectedTimeInterval(timeInterval)
         _selectedFilter.value = _selectedFilter.value?.copy(timeInterval = timeInterval)
     }
 
@@ -175,8 +175,6 @@ class StatisticViewModel(
             is QuantFilter.OnlySelected -> quantFilter.selectQuant
             else -> "Все события"
         }
-
-        QLog.d("skyfolk-name","name = $name")
 
         return StatisticFragmentState.EntriesAndFirstDate(
             name = name,

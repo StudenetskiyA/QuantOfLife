@@ -31,7 +31,6 @@ import uk.co.markormesher.android_fab.SpeedDialMenuCloseListener
 import uk.co.markormesher.android_fab.SpeedDialMenuItem
 import uk.co.markormesher.android_fab.SpeedDialMenuOpenListener
 
-
 class NowFragment : Fragment() {
     private val viewModel: NowViewModel by viewModel()
     private val settingsInteractor: SettingsInteractor by inject()
@@ -121,10 +120,10 @@ class NowFragment : Fragment() {
                 override fun onConfirm(event: EventBase, name: String) {
                     val snackBar = Snackbar.make(
                         requireActivity().findViewById(android.R.id.content),
-                        "Event '${name}' create",
+                        getString(R.string.now_event_created, name),
                         Snackbar.LENGTH_LONG
                     )
-                    snackBar.setAction("Отмена") {
+                    snackBar.setAction(getString(R.string.cancel)) {
                     }
                     snackBar.setOnHideByTimeout {
                         viewModel.onEventCreated(event)
@@ -204,8 +203,8 @@ class NowFragment : Fragment() {
 
         override fun getMenuItem(context: Context, position: Int): SpeedDialMenuItem =
             when (position) {
-                0 -> SpeedDialMenuItem(context, R.drawable.ic_pen, "Создать событие")
-                1 -> SpeedDialMenuItem(context, R.drawable.ic_target, "Создать цель")
+                0 -> SpeedDialMenuItem(context, R.drawable.ic_pen, getString(R.string.menu_item_create_quant))
+                1 -> SpeedDialMenuItem(context, R.drawable.ic_target, getString(R.string.menu_item_create_goal))
                 else -> throw IllegalArgumentException("No menu item: $position")
             }
 

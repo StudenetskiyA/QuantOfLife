@@ -1,6 +1,5 @@
 package com.skyfolk.quantoflife.db
 
-import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.entity.*
 import io.realm.Realm
 import kotlin.collections.ArrayList

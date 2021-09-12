@@ -1,6 +1,5 @@
 package com.skyfolk.quantoflife.entity
 
-import com.skyfolk.quantoflife.R
 import java.util.*
 
 sealed class QuantBase(

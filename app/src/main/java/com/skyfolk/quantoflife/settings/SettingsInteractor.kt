@@ -1,8 +1,6 @@
 package com.skyfolk.quantoflife.settings
 
 import android.content.Context
-import android.content.SharedPreferences
-import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.entity.QuantCategory
 import com.skyfolk.quantoflife.meansure.Measure
@@ -26,18 +24,18 @@ open class SettingsInteractor(private val context: Context) {
 
     private val preferences = context.getSharedPreferences("qol_preferences", Context.MODE_PRIVATE)
 
-    fun getSelectedGraphPeriod(): TimeInterval {
-        return when (preferences.getString(SELECTED_GRAPH_PERIOD, "Неделя") ?: "Неделя") {
-            "День" -> TimeInterval.Today
-            "Неделя" -> TimeInterval.Week
+    fun getSelectedTimeInterval(): TimeInterval {
+        return when (preferences.getString(SELECTED_GRAPH_PERIOD, TimeInterval.Week.toString()) ?:  TimeInterval.Week.toString()) {
+            TimeInterval.Today.toString() -> TimeInterval.Today
+            TimeInterval.Week.toString() -> TimeInterval.Week
             else -> TimeInterval.Month
         }
     }
 
     fun getSelectedGraphMeasure(): Measure {
-        return when (preferences.getString(SELECTED_GRAPH_MEASURE, "Общая оценка") ?: "Общая оценка") {
-            "Общая оценка" -> Measure.TotalCount
-            "Количество" -> Measure.Quantity
+        return when (preferences.getString(SELECTED_GRAPH_MEASURE, Measure.TotalCount.toString()) ?: Measure.TotalCount.toString()) {
+            Measure.TotalCount.toString() -> Measure.TotalCount
+            Measure.Quantity.toString() -> Measure.Quantity
             else -> Measure.AverageRating
         }
     }
@@ -57,9 +55,9 @@ open class SettingsInteractor(private val context: Context) {
         return filter
     }
 
-    fun writeSelectedGraphPeriod(period: TimeInterval) {
+    fun writeSelectedTimeInterval(period: TimeInterval) {
         preferences.edit()
-            .putString(SELECTED_GRAPH_PERIOD, period.toGraphString())
+            .putString(SELECTED_GRAPH_PERIOD, period.toString())
             .apply()
     }
 
@@ -116,17 +114,16 @@ open class SettingsInteractor(private val context: Context) {
     }
 
     fun getCategoryName(category: QuantCategory) : String {
-        if (category == QuantCategory.All) return "Всего"
-        if (category == QuantCategory.None) return "Не задана"
         val default = context.resources.getStringArray(R.array.category_name)[category.ordinal]
         return preferences.getString(CATEGORY_NAME_ + category.name, default) ?: default
     }
 
     fun getCategoryNames() : ArrayList<Pair<QuantCategory, String>> {
-        var result = arrayListOf<Pair<QuantCategory,String>>()
+        val result = arrayListOf<Pair<QuantCategory,String>>()
 
         enumValues<QuantCategory>().forEach {
-            result.add(Pair(it, preferences.getString(CATEGORY_NAME_ + it.name, it.name) ?: it.name))
+            val default = context.resources.getStringArray(R.array.category_name)[it.ordinal]
+            result.add(Pair(it, preferences.getString(CATEGORY_NAME_ + it.name, default) ?: default))
         }
         return result
     }

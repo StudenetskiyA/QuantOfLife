@@ -34,7 +34,7 @@ class App: Application() {
 
         val viewModelModule = module {
             viewModel { NowViewModel(get(), get(), get(), get(), get(), get()) }
-            viewModel { SettingsViewModel(androidContext(), get(), get(), get(), get(), get())}
+            viewModel { SettingsViewModel( get(), get(), get(), get())}
             viewModel { FeedsViewModel(get(), get(), get(), get()) }
             viewModel { StatisticViewModel(get(), get(), get(), get()) }
             viewModel { OnBoardingViewModel(get()) }

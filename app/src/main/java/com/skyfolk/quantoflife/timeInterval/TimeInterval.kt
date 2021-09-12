@@ -21,27 +21,19 @@ sealed class TimeInterval {
 
     fun toGraphPosition(): Int {
         return when(this) {
-            is TimeInterval.Today -> 0
-            is TimeInterval.Week -> 1
+            is Today -> 0
+            is Week -> 1
             else -> 2
         }
     }
 
-    fun toGraphString(): String {
+    fun toStringName(array: Array<String>): String {
         return when (this) {
-            is Today -> "День"
-            is Week -> "Неделя"
-            else -> "Месяц"
-        }
-    }
-
-    fun toStringName(): String {
-        return when (this) {
-            is Today -> "сегодня"
-            is Week -> "неделю"
-            is Month -> "месяц"
-            is All -> "все время"
-            is Selected -> "выбранный интервал"
+            is Today -> array[0]
+            is Week -> array[1]
+            is Month -> array[2]
+            is All -> array[3]
+            is Selected -> array[4]
         }
     }
 }

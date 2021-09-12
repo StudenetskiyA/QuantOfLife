@@ -94,7 +94,7 @@ class CreateEventDialogFragment(val quant: QuantBase, private val existEvent: Ev
         binding.buttonOk.setOnClickListener {
             if (quant is QuantBase.QuantMeasure) {
                 if (binding.eventRatingNumeric.text.toString().isEmpty()) {
-                    Toast.makeText(context, "Не заполненны числовые поля", Toast.LENGTH_SHORT)
+                    Toast.makeText(context, getString(R.string.create_event_not_enter_field), Toast.LENGTH_SHORT)
                         .show()
                     return@setOnClickListener
                 }

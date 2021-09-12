@@ -23,7 +23,7 @@ import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.entity.EventDisplayable
 import com.skyfolk.quantoflife.entity.QuantCategory
 import com.skyfolk.quantoflife.timeInterval.TimeInterval
-import com.skyfolk.quantoflife.ui.theme.Orange
+import com.skyfolk.quantoflife.ui.theme.Colors.Orange
 import com.skyfolk.quantoflife.ui.theme.Typography
 import com.skyfolk.quantoflife.utils.toDate
 import com.skyfolk.quantoflife.utils.toDateWithoutHourAndMinutes

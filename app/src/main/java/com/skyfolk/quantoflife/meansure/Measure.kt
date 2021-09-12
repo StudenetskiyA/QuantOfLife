@@ -5,14 +5,6 @@ enum class Measure {
     Quantity,
     AverageRating;
 
-    override fun toString(): String {
-      return when (this) {
-          TotalCount -> "Общая оценка"
-          Quantity -> "Количество"
-          else -> "Средняя оценка"
-      }
-    }
-
     fun toPosition(): Int {
         return this.ordinal
     }

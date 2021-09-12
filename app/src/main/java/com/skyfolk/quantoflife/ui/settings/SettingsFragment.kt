@@ -14,12 +14,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.skyfolk.quantoflife.QLog
+import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.databinding.SettingsFragmentBinding
-import com.skyfolk.quantoflife.db.DBInteractor
-import com.skyfolk.quantoflife.entity.QuantCategory
 import com.skyfolk.quantoflife.ui.onboarding.OnBoardingActivity
-import com.skyfolk.quantoflife.utils.toDate
-import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.util.*
 
@@ -38,20 +35,31 @@ class SettingsFragment : Fragment() {
     ): View {
         binding = SettingsFragmentBinding.inflate(inflater, container, false)
 
-        viewModel.toastState.observe(viewLifecycleOwner, { message ->
-            if (message != "") {
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-            }
+        viewModel.toastState.observe(viewLifecycleOwner, { toast ->
+            val text =
+                when (toast) {
+                    is SettingsFragmentToast.ImportComplete -> getString(
+                        toast.textResourceId,
+                        toast.eventsImported,
+                        toast.eventsTypeImported
+                    )
+                    else -> getString(toast.textResourceId)
+                }
+            Toast.makeText(context, text, Toast.LENGTH_LONG).show()
         })
 
         viewModel.dayStartTime.observe(viewLifecycleOwner, {
-            val hour = if (it[Calendar.HOUR_OF_DAY]<10) "0"+it[Calendar.HOUR_OF_DAY] else it[Calendar.HOUR_OF_DAY]
-            val minute = if (it[Calendar.MINUTE]<10) "0"+it[Calendar.MINUTE] else it[Calendar.MINUTE]
-            binding.startHour.text = "Время начала дня - $hour:${minute}"
+            val hour: String =
+                if (it[Calendar.HOUR_OF_DAY] < 10) "0" + it[Calendar.HOUR_OF_DAY] else it[Calendar.HOUR_OF_DAY].toString()
+            val minute: String =
+                if (it[Calendar.MINUTE] < 10) "0" + it[Calendar.MINUTE] else it[Calendar.MINUTE].toString()
+            binding.startHour.text =
+                resources.getString(R.string.settings_set_day_start_time_current, hour, minute)
         })
 
         viewModel.downloadFile.observe(viewLifecycleOwner, { file ->
-            val downloadManager = requireContext().getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+            val downloadManager =
+                requireContext().getSystemService(DOWNLOAD_SERVICE) as DownloadManager
             downloadManager.addCompletedDownload(
                 file.name,
                 file.name,
@@ -115,7 +123,7 @@ class SettingsFragment : Fragment() {
         }
 
         binding.submitStartHour.setOnClickListener {
-            TimePickerDialog(requireContext(),onTimeSelected, 0, 0, true)
+            TimePickerDialog(requireContext(), onTimeSelected, 0, 0, true)
                 .show()
         }
 
@@ -144,5 +152,13 @@ class SettingsFragment : Fragment() {
 
     companion object {
         const val MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 989
+    }
+
+    sealed class SettingsFragmentToast(val textResourceId: Int) {
+        object DatabaseCleared : SettingsFragmentToast(R.string.settings_database_cleared)
+        object EventsCleared : SettingsFragmentToast(R.string.settings_events_cleared)
+        object DatabaseExported : SettingsFragmentToast(R.string.settings_database_exported)
+        data class ImportComplete(val eventsImported: Int, val eventsTypeImported: Int) :
+            SettingsFragmentToast(R.string.settings_import_result)
     }
 }

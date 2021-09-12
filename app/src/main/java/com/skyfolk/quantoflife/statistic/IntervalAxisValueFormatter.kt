@@ -1,7 +1,6 @@
 package com.skyfolk.quantoflife.statistic
 
 import com.github.mikephil.charting.formatter.ValueFormatter
-import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.utils.getEndDateCalendar
@@ -31,23 +30,6 @@ class IntervalAxisValueFormatter(
             time.toCalendar().getStartDateCalendar(timeInterval, settingsInteractor.getStartDayTime()).timeInMillis
         val currentPeriodEnd =
             time.toCalendar().getEndDateCalendar(timeInterval, settingsInteractor.getStartDayTime()).timeInMillis - day
-        return "${currentPeriodStart.toShortDate()} - ${currentPeriodEnd.toShortDate()}"
-    }
-}
-
-
-class WeekAxisValueFormatter(private val startFirstWeekTimeInMillis: Long) : ValueFormatter() {
-    override fun getFormattedValue(value: Float): String {
-        val nWeek = value.toInt()
-        val day: Long = 24 * 60 * 60 * 1000
-        val week: Long = day * 7
-
-        val time: Long = startFirstWeekTimeInMillis + week * nWeek
-
-        val currentPeriodStart =
-            time.toCalendar().getStartDateCalendar(TimeInterval.Week, 0).timeInMillis
-        val currentPeriodEnd =
-            time.toCalendar().getEndDateCalendar(TimeInterval.Week, 0).timeInMillis - day
         return "${currentPeriodStart.toShortDate()} - ${currentPeriodEnd.toShortDate()}"
     }
 }

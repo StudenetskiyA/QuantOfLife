@@ -1,6 +1,5 @@
 package com.skyfolk.quantoflife.ui.now
 
-import android.content.Context
 import android.util.Log
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.LiveData
@@ -8,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skyfolk.quantoflife.IDateTimeRepository
-import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.db.EventsStorageInteractor
 import com.skyfolk.quantoflife.db.IGoalStorageInteractor
 import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
@@ -144,8 +142,6 @@ class NowViewModel(
                     eventsStorageInteractor.getAllEvents()
                         .filter { it.date in goalStartDate until endDate })
 
-                Log.d("skyfolk-goals", "duration = ${goal.duration}")
-
                 val daysGone = ((endDate - goalStartDate) / millisecondsInDay).toInt() + 1
                 val completed = getTotal(
                     quantsStorageInteractor.getAllQuantsList(false),
@@ -160,10 +156,6 @@ class NowViewModel(
                     is TimeInterval.All -> 0
                     is TimeInterval.Selected -> 0
                 }
-                Log.d(
-                    "skyfolk-goals",
-                    "daysGone = $daysGone, completed = $completed, duration = $durationInDays"
-                )
 
                 goalsPresentList.add(
                     GoalPresent(

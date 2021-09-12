@@ -29,7 +29,7 @@ fun getTotal(
 fun getTotalAverageStar(quants: List<QuantBase>, events: List<EventBase>): Double {
     if (events.isEmpty()) return 0.toDouble()
 
-    return getStarTotal(quants, events).toDouble()/events.size.toDouble()
+    return getStarTotal(quants, events) /events.size.toDouble()
 }
 
 fun getTotalCount(events: List<EventBase>): Double {
