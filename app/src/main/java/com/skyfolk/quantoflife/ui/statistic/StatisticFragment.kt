@@ -25,14 +25,6 @@ class StatisticFragment : Fragment() {
     private val viewModel: StatisticViewModel by viewModel()
     private lateinit var binding: StatisticFragmentBinding
 
-    // Иначе дурацкие спиннеры лишние раз тригерятся
-//    private var selectedFilter = SelectedGraphFilter(
-//        measure = Measure.TotalCount,
-//        timeInterval = TimeInterval.Week,
-//        filter = QuantFilter.All,
-//        filter2 = QuantFilter.Nothing
-//    )
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -53,6 +45,7 @@ class StatisticFragment : Fragment() {
                 is StatisticFragmentState.Loading -> {
                     binding.progress.visibility = View.VISIBLE
                     binding.chart.visibility = View.INVISIBLE
+                    binding.chartNotEnought.visibility = View.INVISIBLE
                 }
                 is StatisticFragmentState.Entries -> {
                     if (data.entries.size > 0 && data.entries.first().entries.size > 1) {
@@ -97,10 +90,12 @@ class StatisticFragment : Fragment() {
 
                         binding.progress.visibility = View.INVISIBLE
                         binding.chart.visibility = View.VISIBLE
+                        binding.chartNotEnought.visibility = View.INVISIBLE
                     } else {
                         // Not enough data
                         binding.progress.visibility = View.INVISIBLE
                         binding.chart.visibility = View.GONE
+                        binding.chartNotEnought.visibility = View.VISIBLE
                     }
                 }
             }
@@ -128,7 +123,7 @@ class StatisticFragment : Fragment() {
                     false
                 )
 
-                runSearch()
+                viewModel.runSearch()
             }
         })
 
@@ -247,15 +242,6 @@ class StatisticFragment : Fragment() {
 
                 override fun onNothingSelected(parent: AdapterView<*>) {}
             }
-    }
-
-    private fun runSearch() {
-//        val timeInterval = viewModel.selectedFilter.value?.timeInterval
-//        val measure = viewModel.selectedFilter.value?.measure
-//        val filter1 = viewModel.selectedFilter.value?.filter
-//        val filter2 = viewModel.selectedFilter.value?.filter2
-
-        viewModel.runSearch()
     }
 
     private fun setAxisProperties() {

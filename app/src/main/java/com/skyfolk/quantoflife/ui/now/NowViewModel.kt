@@ -1,5 +1,6 @@
 package com.skyfolk.quantoflife.ui.now
 
+import android.content.Context
 import android.util.Log
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.LiveData
@@ -14,6 +15,7 @@ import com.skyfolk.quantoflife.entity.*
 import com.skyfolk.quantoflife.utils.getStartDateCalendar
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.feeds.getTotal
+import com.skyfolk.quantoflife.import.ImportInteractor
 import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.ui.create_quant.CreateQuantDialogFragment
 import com.skyfolk.quantoflife.ui.goals.CreateGoalDialogFragment
@@ -27,11 +29,13 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class NowViewModel(
+    private val context: Context,
     private val quantsStorageInteractor: IQuantsStorageInteractor,
     private val eventsStorageInteractor: EventsStorageInteractor,
     private val goalStorageInteractor: IGoalStorageInteractor,
     private val settingsInteractor: SettingsInteractor,
-    private val dateTimeRepository: IDateTimeRepository
+    private val dateTimeRepository: IDateTimeRepository,
+    private val importInteractor: ImportInteractor
 ) : ViewModel(), INowViewModel {
     private val _toastState = SingleLiveEvent<String>()
     val toastState: LiveData<String> get() = _toastState
@@ -54,10 +58,11 @@ class NowViewModel(
 
     init {
         if (quantsStorageInteractor.getAllQuantsList(false).isEmpty()) {
-            for (quant in quantsStorageInteractor.getPresetQuantsList()) {
-                quantsStorageInteractor.addQuantToDB(quant) {}
+            viewModelScope.launch {
+                importInteractor.importEventsFromRaw(context = context) {
+                    _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
+                }
             }
-            _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
         }
 
         updateTodayTotal()

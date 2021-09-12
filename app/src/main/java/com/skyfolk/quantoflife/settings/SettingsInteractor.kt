@@ -1,13 +1,15 @@
 package com.skyfolk.quantoflife.settings
 
+import android.content.Context
 import android.content.SharedPreferences
 import com.skyfolk.quantoflife.QLog
+import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.entity.QuantCategory
 import com.skyfolk.quantoflife.meansure.Measure
 import com.skyfolk.quantoflife.meansure.QuantFilter
 import com.skyfolk.quantoflife.timeInterval.TimeInterval
 
-open class SettingsInteractor(private val preferences: SharedPreferences) {
+open class SettingsInteractor(private val context: Context) {
     companion object {
         const val SELECTED_RADIO_IN_STATISTIC = "selected_radio_in_statistic_2"
         const val SELECTED_TIME_START = "selected_time_start"
@@ -21,6 +23,8 @@ open class SettingsInteractor(private val preferences: SharedPreferences) {
         const val SELECTED_GRAPH_FIRST_QUANT = "selected_graph_first_quant"
         const val SELECTED_GRAPH_SECOND_QUANT = "selected_graph_second_quant"
     }
+
+    private val preferences = context.getSharedPreferences("qol_preferences", Context.MODE_PRIVATE)
 
     fun getSelectedGraphPeriod(): TimeInterval {
         return when (preferences.getString(SELECTED_GRAPH_PERIOD, "Неделя") ?: "Неделя") {
@@ -114,13 +118,12 @@ open class SettingsInteractor(private val preferences: SharedPreferences) {
     fun getCategoryName(category: QuantCategory) : String {
         if (category == QuantCategory.All) return "Всего"
         if (category == QuantCategory.None) return "Не задана"
-        return preferences.getString(CATEGORY_NAME_ + category.name, category.name) ?: category.name
+        val default = context.resources.getStringArray(R.array.category_name)[category.ordinal]
+        return preferences.getString(CATEGORY_NAME_ + category.name, default) ?: default
     }
 
     fun getCategoryNames() : ArrayList<Pair<QuantCategory, String>> {
         var result = arrayListOf<Pair<QuantCategory,String>>()
-//        result.add(Pair(QuantCategory.All, "Всего"))
-//        result.add(Pair(QuantCategory.None, "Не задана"))
 
         enumValues<QuantCategory>().forEach {
             result.add(Pair(it, preferences.getString(CATEGORY_NAME_ + it.name, it.name) ?: it.name))
@@ -135,7 +138,7 @@ open class SettingsInteractor(private val preferences: SharedPreferences) {
     }
 
     fun isOnBoardingCompleted() : Boolean {
-        return preferences.getBoolean(ONBOARDING_COMPLETE , false)
+        return true//preferences.getBoolean(ONBOARDING_COMPLETE , false)
     }
 
     fun setOnBoardingComplete(complete: Boolean) {

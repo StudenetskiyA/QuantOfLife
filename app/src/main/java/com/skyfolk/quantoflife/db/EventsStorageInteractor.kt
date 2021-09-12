@@ -13,6 +13,15 @@ class EventsStorageInteractor(private val dbInteractor: DBInteractor) {
         }
     }
 
+    fun clearEvents() {
+        dbInteractor.getDB().executeTransactionAsync {
+            it.delete(EventDbEntity::class.java)
+            for (quant in it.where(QuantDbEntity::class.java).findAll()) {
+                quant.usageCount = 0
+            }
+        }
+    }
+
     fun addEventToDB(event: EventBase, onComplete: () -> Unit) {
         var rate: Double? = null
         var numericValue: Double? = null

@@ -1,5 +1,6 @@
 package com.skyfolk.quantoflife.db
 
+import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.entity.*
 import io.realm.Realm
 import kotlin.collections.ArrayList
@@ -33,7 +34,11 @@ class QuantsStorageInteractor(private val dbInteractor: DBInteractor) : IQuantsS
 
     override fun getAllQuantsList(includeDeleted: Boolean): ArrayList<QuantBase> {
         val result = ArrayList<QuantBase>()
-        for (r in dbInteractor.getDB().where(QuantDbEntity::class.java).findAll().sortedByDescending { it.usageCount }) {
+        for (r in dbInteractor
+            .getDB()
+            .where(QuantDbEntity::class.java)
+            .findAll()
+            .sortedWith(quantComparator)) {
             if (!r.isDeleted || includeDeleted) result.add(r.toQuantBase())
         }
         return result
@@ -221,5 +226,20 @@ class QuantsStorageInteractor(private val dbInteractor: DBInteractor) : IQuantsS
                 )
             )
         )
+    }
+
+    private val quantComparator =  Comparator<QuantDbEntity> { entity, entity2 ->
+        when {
+            (entity.usageCount < entity2.usageCount) -> 1
+            (entity.usageCount > entity2.usageCount) -> -1
+            (entity.usageCount == entity2.usageCount) -> {
+                when {
+                        (entity.name > entity2.name) -> 1
+                        (entity.name < entity2.name) -> -1
+                    else -> 0
+                }
+            }
+            else -> 1
+        }
     }
 }

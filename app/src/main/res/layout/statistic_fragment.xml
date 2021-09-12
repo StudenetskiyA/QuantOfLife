@@ -108,6 +108,18 @@
         tools:layout_editor_absoluteX="10dp" />
 
     <TextView
+        android:id="@+id/chart_not_enought"
+        android:text= "Не достаточно данных для графика"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/maximimum_with_text"
+        app:layout_constraintTop_toBottomOf="@id/event_spinner_layout"/>
+
+    <TextView
         android:id="@+id/maximimum_with_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

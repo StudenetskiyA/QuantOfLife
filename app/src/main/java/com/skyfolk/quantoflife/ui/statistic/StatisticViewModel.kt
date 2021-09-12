@@ -88,7 +88,7 @@ class StatisticViewModel(
             }
         }
 
-        val firstDate = allEvents.first().date
+        val firstDate = if (allEvents.isNotEmpty()) allEvents.first().date else lastDate
 
         var currentPeriodStart = firstDate
         var currentPeriodEnd = firstDate
@@ -175,6 +175,8 @@ class StatisticViewModel(
             is QuantFilter.OnlySelected -> quantFilter.selectQuant
             else -> "Все события"
         }
+
+        QLog.d("skyfolk-name","name = $name")
 
         return StatisticFragmentState.EntriesAndFirstDate(
             name = name,

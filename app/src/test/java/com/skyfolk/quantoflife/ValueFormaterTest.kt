@@ -14,7 +14,7 @@ class ValueFormaterTest {
     private val calendar = Calendar.getInstance()
     private val startDayTimeInMillis = ((5 * 60 * 60 * 1000) + (20 * 60 * 1000)).toLong() //05:20
     private val preferences: SharedPreferences = mock()
-    private val settingsInteractor = SettingsInteractor(preferences)
+    private val settingsInteractor = SettingsInteractor(, preferences)
 
     @Before
     fun prepare() {

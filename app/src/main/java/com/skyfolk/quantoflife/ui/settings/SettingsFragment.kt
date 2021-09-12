@@ -98,6 +98,11 @@ class SettingsFragment : Fragment() {
         binding.clearDbButton.setOnClickListener {
             viewModel.clearDatabase()
         }
+
+        binding.clearEventsButton.setOnClickListener {
+            viewModel.clearEvents()
+        }
+
         binding.exportDbButton.setOnClickListener {
             viewModel.saveDBToFile()
         }

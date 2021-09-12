@@ -24,8 +24,10 @@
         <entry key="app/src/main/res/layout/feeds_fragment.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/layout/feeds_fragment_compose.xml" value="0.1" />
         <entry key="app/src/main/res/layout/item_event.xml" value="0.5" />
+        <entry key="app/src/main/res/layout/item_quant.xml" value="0.21197916666666666" />
+        <entry key="app/src/main/res/layout/now_fragment.xml" value="0.2046875" />
         <entry key="app/src/main/res/layout/settings_fragment.xml" value="0.20885416666666667" />
-        <entry key="app/src/main/res/layout/statistic_fragment.xml" value="0.5" />
+        <entry key="app/src/main/res/layout/statistic_fragment.xml" value="0.25" />
         <entry key="app/src/main/res/menu/bottom_nav_menu.xml" value="0.115625" />
       </map>
     </option>

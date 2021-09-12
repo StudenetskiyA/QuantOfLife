@@ -14,6 +14,8 @@
         <item>Эмоциональное</item>
         <item>Эволюционное</item>
         <item>Другое</item>
+        <item>Ничего</item>
+        <item>Все</item>
     </string-array>
 
     <string-array name="goal_category_name">
