@@ -29,23 +29,6 @@ import com.skyfolk.quantoflife.utils.toDate
 import com.skyfolk.quantoflife.utils.toDateWithoutHourAndMinutes
 import java.util.*
 
-
-@Composable
-fun HalfHorizontalLayout(modifier: Modifier, children: @Composable () -> Unit) {
-    Layout(children, modifier) { measurables, constraints ->
-        layout(constraints.maxWidth, constraints.maxHeight) {
-            val halfWidth = constraints.maxWidth / 2
-            val childConstraints = constraints.copy(
-                minWidth = minOf(constraints.minWidth, halfWidth),
-                maxWidth = halfWidth
-            )
-            require(measurables.size == 2)
-            measurables[0].measure(childConstraints).place(0, 0)
-            measurables[1].measure(childConstraints).place(halfWidth, 0)
-        }
-    }
-}
-
 @Composable
 fun TotalValue(
     description: String,
@@ -76,7 +59,7 @@ fun SmallSubtitle(text: String) {
     Text(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 8.dp),
+            .padding(bottom = 5.dp),
         text = text,
         style = Typography.subtitle1,
         textAlign = TextAlign.Center,
@@ -96,7 +79,7 @@ fun SeparatorLine() {
 }
 
 @Composable
-fun TotalValues(state: FeedsFragmentState) {
+fun TotalValues(state: FeedsFragmentState, modifier: Modifier) {
     val descriptionsList = getCategoryArrayNames(state)
     val valuesList = when (state) {
         is FeedsFragmentState.EventsListLoading -> arrayOfNulls<Double?>(descriptionsList.size).toList()
@@ -116,7 +99,7 @@ fun TotalValues(state: FeedsFragmentState) {
     }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 5.dp)
     ) {
@@ -143,10 +126,11 @@ fun TotalValues(state: FeedsFragmentState) {
 fun TimeSelectLayout(
     time: Long,
     horizontalArrangement: Arrangement.Horizontal,
+    modifier: Modifier = Modifier,
     onTimeSelectClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         horizontalArrangement = horizontalArrangement
     ) {
         Text(
@@ -180,8 +164,7 @@ fun DropdownSpinner(content: List<String>, selectedItemIndex: Int, onItemSelect:
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = content[selectedIndex],
-                style = Typography.body2,
+                text = content[selectedIndex]
             )
             Image(
                 painter = painterResource(R.drawable.ic_dropdown),
@@ -216,18 +199,17 @@ fun FilterBlock(
     onQuantFilterClick: (Int) -> Unit,
     listOfTimeInterval: List<String>,
     selectedTimeIntervalPosition: Int,
-    onTimeIntervalFilterClick: (Int) -> Unit
+    onTimeIntervalFilterClick: (Int) -> Unit,
+    modifier: Modifier
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 5.dp),
-        verticalArrangement = Arrangement.SpaceBetween
+        modifier = modifier
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.Top
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 5.dp)
         ) {
             SmallSubtitle(text = "Фильтры.")
             DropdownSpinner(
@@ -335,7 +317,8 @@ fun SelectedTimeInterval(
     context: Context,
     setTimeInterval: (TimeInterval.Selected) -> Unit,
     intervalStart: Calendar,
-    intervalEnd: Calendar
+    intervalEnd: Calendar,
+    modifier: Modifier = Modifier
 ) {
     val onStartDateSelected =
         DatePickerDialog.OnDateSetListener { _: DatePicker, year: Int, month: Int, day: Int ->
@@ -363,15 +346,15 @@ fun SelectedTimeInterval(
             )
         }
 
-    HalfHorizontalLayout(
+    Row(
         Modifier
             .fillMaxWidth()
             .padding(start = 5.dp)
     ) {
         TimeSelectLayout(
             time = intervalStart.timeInMillis,
-            horizontalArrangement = Arrangement.Start
-        ) {
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.fillMaxWidth(0.5f)) {
             DatePickerDialog(
                 context,
                 onStartDateSelected,
@@ -385,7 +368,7 @@ fun SelectedTimeInterval(
         }
         TimeSelectLayout(
             time = intervalEnd.timeInMillis,
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.Start
         ) {
             DatePickerDialog(
                 context,

@@ -36,7 +36,11 @@ open class SettingsInteractor(private val context: Context) {
         return when (preferences.getString(SELECTED_GRAPH_MEASURE, Measure.TotalCount.toString()) ?: Measure.TotalCount.toString()) {
             Measure.TotalCount.toString() -> Measure.TotalCount
             Measure.Quantity.toString() -> Measure.Quantity
-            else -> Measure.AverageRating
+            Measure.TotalPhysical.toString() -> Measure.TotalPhysical
+            Measure.TotalEmotional.toString() -> Measure.TotalEmotional
+            Measure.TotalEvolution.toString() -> Measure.TotalEvolution
+            Measure.AverageRating.toString() -> Measure.AverageRating
+            else -> Measure.TotalCount
         }
     }
 

@@ -5,7 +5,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -19,6 +21,7 @@ import com.skyfolk.quantoflife.databinding.FeedsFragmentComposeBinding
 import com.skyfolk.quantoflife.entity.EventBase
 import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.ui.now.CreateEventDialogFragment
+import com.skyfolk.quantoflife.ui.theme.Colors
 import com.skyfolk.quantoflife.ui.theme.ComposeFlowTestTheme
 import com.skyfolk.quantoflife.utils.fromPositionToTimeInterval
 import com.skyfolk.quantoflife.utils.setOnHideByTimeout
@@ -53,10 +56,33 @@ class FeedsComposeFragment : Fragment() {
                     val endIntervalCalendar = remember { viewModel.getDefaultCalendar() }
                    // var count = remember { mutableStateOf(0) }
 
+//                    ComposeFlowTestTheme {
+//                        Column(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .fillMaxHeight()
+//                                .padding(vertical = 5.dp)
+//                        ) {
+//                            Box(
+//                                modifier = Modifier.background(Colors.Green).weight(2f)) {
+//
+//                            }
+//                            Text(
+//                                text = "2:00 am",
+//                                modifier = Modifier.background(Colors.Red)
+//                            )
+//                            Text(
+//                                text = "12:00 am",
+//                                modifier = Modifier.background(Colors.Orange)
+//                            )
+//                        }
+//                    }
+
                     ComposeFlowTestTheme {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .fillMaxHeight()
                                 .padding(vertical = 5.dp)
                         ) {
                             when (state) {
@@ -65,7 +91,7 @@ class FeedsComposeFragment : Fragment() {
                                     Box(
                                         contentAlignment = Alignment.Center,
                                         modifier = Modifier
-                                            .fillMaxHeight(0.6f)
+                                            .weight(2f)
                                             .fillMaxWidth()
                                     ) {
                                         //CircularProgressIndicator()
@@ -77,7 +103,7 @@ class FeedsComposeFragment : Fragment() {
                                         state as FeedsFragmentState.LoadingEventsListCompleted
 
                                     EventsList(
-                                        modifier = Modifier.fillMaxHeight(0.6f),
+                                        modifier = Modifier.weight(2f),
                                         events = state.listOfEvents.reversed()
                                     ) { id ->
                                         viewModel.editEvent(id)
@@ -97,7 +123,7 @@ class FeedsComposeFragment : Fragment() {
                                     if (listOfQuantName.indexOf(it) != -1) listOfQuantName.indexOf(it) else 0
                                 }
 
-                                TotalValues(state)
+                                TotalValues(state, modifier = Modifier)
 
                                 FilterBlock(
                                     listOfQuantNames = listOfQuantName,
@@ -119,7 +145,8 @@ class FeedsComposeFragment : Fragment() {
                                         viewModel.setTimeIntervalState(
                                             fromPositionToTimeInterval(position, start, end)
                                         )
-                                    }
+                                    },
+                                    modifier = Modifier
                                 )
 
                                 (state.selectedTimeInterval as? TimeInterval.Selected)?.let { interval ->
@@ -130,7 +157,6 @@ class FeedsComposeFragment : Fragment() {
                                         Calendar.getInstance().timeInMillis(interval.end)
                                     )
                                 }
-                                Log.d("skyfolk-timer", "endUpdateState: ${System.currentTimeMillis()}" )
 
                             }
                         }

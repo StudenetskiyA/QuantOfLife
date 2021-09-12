@@ -12,6 +12,7 @@ import com.skyfolk.quantoflife.db.EventsStorageInteractor
 import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
 import com.skyfolk.quantoflife.entity.EventBase
 import com.skyfolk.quantoflife.entity.QuantBase
+import com.skyfolk.quantoflife.entity.QuantCategory
 import com.skyfolk.quantoflife.feeds.getTotal
 import com.skyfolk.quantoflife.feeds.getTotalAverageStar
 import com.skyfolk.quantoflife.feeds.getTotalCount
@@ -155,6 +156,27 @@ class StatisticViewModel(
                         allQuants,
                         filteredEvents
                     )
+                Measure.TotalPhysical -> {
+                    getTotal(
+                        allQuants,
+                        filteredEvents,
+                        QuantCategory.Physical
+                    )
+                }
+                Measure.TotalEmotional -> {
+                    getTotal(
+                        allQuants,
+                        filteredEvents,
+                        QuantCategory.Emotion
+                    )
+                }
+                Measure.TotalEvolution -> {
+                    getTotal(
+                        allQuants,
+                        filteredEvents,
+                        QuantCategory.Evolution
+                    )
+                }
                 Measure.AverageRating ->
                     getTotalAverageStar(
                         allQuants,

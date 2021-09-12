@@ -17,7 +17,7 @@
     <string name="not_enought_data_to_graph">Не достаточно данных для графика</string>
     <string name="today">Сегодня</string>
     <string name="hint_for_quant">Подсказка для выбора значения</string>
-    <string name="hint_for_quant_value">За каждую ★</string>
+    <string name="hint_for_quant_value">За ★</string>
 
     <string name="ok">OK</string>
     <string name="delete">Удалить</string>
@@ -110,6 +110,9 @@
 
     <string-array name="meansure_to_graph">
         <item>Общая оценка</item>
+        <item>Физическое</item>
+        <item>Эмоциональное</item>
+        <item>Эволюционное</item>
         <item>Количество</item>
         <item>Средняя оценка</item>
     </string-array>
