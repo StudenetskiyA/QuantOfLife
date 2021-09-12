@@ -17,7 +17,8 @@ import java.io.InputStream
 class ImportInteractor(
     private val eventsStorageInteractor: EventsStorageInteractor,
     private val quantsStorageInteractor: IQuantsStorageInteractor,
-    private val dbInteractor: DBInteractor
+    private val dbInteractor: DBInteractor,
+    private val inputDefaultQuantsStream: InputStream
 ) {
 
     suspend fun importAllFromFile(inputStream: InputStream, onComplete: (Int, Int) -> Unit) {
@@ -58,9 +59,8 @@ class ImportInteractor(
         onComplete(quantsImported, eventsImported)
     }
 
-    suspend fun importEventsFromRaw(context: Context, onComplete: () -> Unit) {
-        val inputStream = context.resources.openRawResource(R.raw.qol_base)
-        importAllFromFile(inputStream = inputStream) { quantsImported, eventsImported ->
+    suspend fun importEventsFromRaw(onComplete: () -> Unit) {
+        importAllFromFile(inputStream = inputDefaultQuantsStream) { quantsImported, eventsImported ->
             QLog.d("skyfolk-import",
                 "Импорт успешен\nИмпортировано новых типов событий - $quantsImported\nИмпортировано новых событий - $eventsImported")
             onComplete()

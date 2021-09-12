@@ -109,7 +109,7 @@
 
     <TextView
         android:id="@+id/chart_not_enought"
-        android:text= "Не достаточно данных для графика"
+        android:text= "@string/not_enought_data_to_graph"
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="0dp"

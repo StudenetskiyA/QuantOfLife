@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
-import androidx.compose.foundation.clickable
 import androidx.recyclerview.widget.RecyclerView
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.entity.EventDisplayable

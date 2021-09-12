@@ -73,9 +73,6 @@ class CreateEventDialogFragment(val quant: QuantBase, private val existEvent: Ev
                 binding.eventRating.visibility = View.VISIBLE
                 binding.eventRatingNumeric.visibility = View.GONE
             }
-//            is QuantBase.QuantRatedFact -> {
-//                binding.eventRating.visibility = View.GONE
-//            }
             is QuantBase.QuantMeasure -> {
                 binding.eventRating.visibility = View.GONE
                 binding.eventRatingNumeric.visibility = View.VISIBLE

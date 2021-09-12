@@ -8,6 +8,34 @@
     <string name="onboarding_second_description">Здесь описание про то, что нужно выбрать три категории оценки и назвать их.\nЕсли не заполните - проставятся дефолтные.</string>
     <string name="about_type_quant">Описание, какие типы когда выбирать</string>
     <string name="delete_goal_attention"></string>
+    <string name="go_onboarding_again">Пройти онбординг еще раз</string>
+    <string name="settings_set_day_start_time">Задать</string>
+    <string name="clear_events">Clear events</string>
+    <string name="clear_database">Clear database</string>
+    <string name="import_database">Import database</string>
+    <string name="export_database">Export database</string>
+    <string name="not_enought_data_to_graph">Не достаточно данных для графика</string>
+    <string name="today">Сегодня</string>
+    <string name="hint_for_quant">Подсказка для выбора значения</string>
+    <string name="hint_for_quant_value">За каждую ★</string>
+    <string name="ok">OK</string>
+    <string name="delete">Удалить</string>
+    <string name="hint_for_fact">За факт</string>
+    <string name="hint_for_name">Название</string>
+    <string name="quant_type">Тип события</string>
+    <string name="main_category">Основная категория</string>
+    <string name="select_goal_category">Выберите категорию цели</string>
+    <string name="select_goal_period">Выберите срок</string>
+    <string name="select_goal_value">Цель в баллах</string>
+    <string name="now">Сейчас</string>
+    <string name="hint_number_value">Числовое значение</string>
+    <string name="hint_note">Примечание</string>
+    <string name="bonuses">%1s бонусы</string>
+    <string name="goal_title_with_values">Цель - %1d %2s за %3s.</string>
+    <string name="goal_complete">Цель выполнена.</string>
+    <string name="goal_complete_part">%1s из %2s</string>
+    <string name="goal_to_complete_note">Чтобы выполнять цель, получите сегодня еще %1s ☆"</string>
+    <string name="goal_progress_ok">Все отлично, продолжайте в том же духе!"</string>
 
     <string-array name="category_name">
         <item>Физическое</item>

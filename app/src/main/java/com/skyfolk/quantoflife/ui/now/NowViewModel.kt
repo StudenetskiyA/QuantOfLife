@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skyfolk.quantoflife.IDateTimeRepository
+import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.db.EventsStorageInteractor
 import com.skyfolk.quantoflife.db.IGoalStorageInteractor
 import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
@@ -29,7 +30,6 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class NowViewModel(
-    private val context: Context,
     private val quantsStorageInteractor: IQuantsStorageInteractor,
     private val eventsStorageInteractor: EventsStorageInteractor,
     private val goalStorageInteractor: IGoalStorageInteractor,
@@ -59,7 +59,7 @@ class NowViewModel(
     init {
         if (quantsStorageInteractor.getAllQuantsList(false).isEmpty()) {
             viewModelScope.launch {
-                importInteractor.importEventsFromRaw(context = context) {
+                importInteractor.importEventsFromRaw {
                     _listOfQuants.value = quantsStorageInteractor.getAllQuantsList(false)
                 }
             }

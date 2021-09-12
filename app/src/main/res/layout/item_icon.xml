@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitCenter"
-        tools:src="@drawable/quant_disease" />
+        tools:src="@drawable/quant_lsd" />
     <ImageView
         android:id="@+id/quant_is_selected"
         android:layout_width="29dp"

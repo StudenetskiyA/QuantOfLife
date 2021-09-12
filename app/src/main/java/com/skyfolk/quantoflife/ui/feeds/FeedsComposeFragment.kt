@@ -6,12 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -76,8 +72,6 @@ class FeedsComposeFragment : Fragment() {
                                     }
                                 }
                                 is FeedsFragmentState.LoadingEventsListCompleted -> {
-                                    Log.d("skyfolk-timer", "beginUpdateState: ${System.currentTimeMillis()}" )
-
                                     binding.progress.visibility = View.GONE
                                     val state =
                                         state as FeedsFragmentState.LoadingEventsListCompleted
@@ -90,14 +84,11 @@ class FeedsComposeFragment : Fragment() {
                                     }
 
                                     SeparatorLine()
-
-                                    Log.d("skyfolk-timer", "middleUpdateState: ${System.currentTimeMillis()}" )
-
                                 }
                             }
 
                             // Common state
-                            state?.let { state ->
+                            state.let { state ->
                                 val listOfQuantName =
                                     state.listOfQuants.map { it.name }.toMutableList()
                                 listOfQuantName.add(0, "Все события")

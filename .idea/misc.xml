@@ -10,6 +10,7 @@
         <entry key="../../../../layout/compose-model-1622983018141.xml" value="0.5537037037037037" />
         <entry key="../../../../layout/compose-model-1622990955660.xml" value="2.0" />
         <entry key="../../../../layout/compose-model-1631380499225.xml" value="0.8685636856368564" />
+        <entry key="../../../../layout/compose-model-1631446252135.xml" value="0.8685636856368564" />
         <entry key="../../../../layout/custom_preview.xml" value="0.1" />
         <entry key="..\:/Code/QuantOfLife/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.22135416666666666" />
         <entry key="..\:/Code/QuantOfLife/app/src/main/res/drawable/ic_home_black_24dp.xml" value="0.22135416666666666" />
@@ -20,10 +21,15 @@
         <entry key="..\:/Users/wowda/AppData/Local/Android/Sdk/platforms/android-30/data/res/drawable/btn_dropdown.xml" value="0.22135416666666666" />
         <entry key="app/src/main/res/drawable/fade_green.xml" value="0.228125" />
         <entry key="app/src/main/res/drawable/fade_red.xml" value="0.228125" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.2046875" />
+        <entry key="app/src/main/res/layout/activity_onboarding.xml" value="0.2046875" />
         <entry key="app/src/main/res/layout/create_event_dialog.xml" value="0.21197916666666666" />
+        <entry key="app/src/main/res/layout/create_goal_dialog.xml" value="0.2046875" />
         <entry key="app/src/main/res/layout/feeds_fragment.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/layout/feeds_fragment_compose.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/goal_present.xml" value="0.21197916666666666" />
         <entry key="app/src/main/res/layout/item_event.xml" value="0.5" />
+        <entry key="app/src/main/res/layout/item_icon.xml" value="0.21197916666666666" />
         <entry key="app/src/main/res/layout/item_quant.xml" value="0.21197916666666666" />
         <entry key="app/src/main/res/layout/now_fragment.xml" value="0.2046875" />
         <entry key="app/src/main/res/layout/settings_fragment.xml" value="0.20885416666666667" />

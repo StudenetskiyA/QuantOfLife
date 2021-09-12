@@ -24,7 +24,7 @@
                 android:id="@+id/goals_type_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text = "Выберите категорию цели"
+                android:text = "@string/select_goal_category"
                 android:gravity="center_vertical"
                 />
 
@@ -50,7 +50,7 @@
                 android:id="@+id/goals_period_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text = "Выберите срок"/>
+                android:text = "@string/select_goal_period"/>
 
             <Spinner
                 android:id="@+id/spinner_period"
@@ -64,7 +64,7 @@
             android:id="@+id/goal_target"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Цель в баллах"
+            android:hint="@string/select_goal_value"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/goals_period_layout"
             android:inputType="numberSigned|numberDecimal"
@@ -77,7 +77,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:focusable="true"
-            android:text="Ok"
+            android:text="@string/ok"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@+id/button_delete"
             app:layout_constraintRight_toRightOf="parent"
@@ -88,7 +88,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:focusable="true"
-            android:text="Удалить"
+            android:text="@string/delete"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/button_ok"

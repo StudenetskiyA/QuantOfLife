@@ -1,11 +1,9 @@
 package com.skyfolk.quantoflife.ui.goals
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.skyfolk.quantoflife.R
@@ -43,18 +41,18 @@ class GoalsListDataAdapter(
             val moreText: TextView = itemView.findViewById(R.id.goal_more)
             val titleText: TextView = itemView.findViewById(R.id.goal_title)
 
-            titleText.text =
-                "Цель - ${goalPresent.target} ${settingsInteractor.getCategoryName(goalPresent.type)} за ${goalPresent.duration.toStringName()}."
+            titleText.text = itemView.context.applicationContext.getString(R.string.goal_title_with_values,
+                goalPresent.target, settingsInteractor.getCategoryName(goalPresent.type), goalPresent.duration.toStringName() )
 
             val progress = (goalPresent.comleted / goalPresent.target) * 100
             progressBar.setProgress(progress.toInt(), false)
             if (progress > 100) {
-                progressText.text = "Цель выполнена!"
+                progressText.text = itemView.context.applicationContext.getString(R.string.goal_complete)
                 moreText.visibility = View.INVISIBLE
                 progressBar.setIndicatorColor(itemView.context.resources.getColor(R.color.progressCompleted, itemView.context.theme))
             } else {
-                progressText.text =
-                    "${goalPresent.comleted.format(0)} из ${goalPresent.target.format(0)}"
+                progressText.text = itemView.context.applicationContext.getString(R.string.goal_complete_part,
+                    goalPresent.comleted.format(0), goalPresent.target.format(0))
             }
 
             val daysTotal = goalPresent.durationInDays
@@ -62,12 +60,11 @@ class GoalsListDataAdapter(
 
             val futureProgress = goalPresent.comleted / dayGone * daysTotal
             if (futureProgress >= goalPresent.target) {
-                moreText.text = "Все отлично, продолжайте в том же духе!"
+                moreText.text = itemView.context.applicationContext.getString(R.string.goal_progress_ok)
             } else {
                 val needToBeInTarget =
                     (goalPresent.target - futureProgress) * dayGone / daysTotal
-                moreText.text =
-                    "Чтобы выполнять цель, получите сегодня еще ${needToBeInTarget.format(2)} ☆"
+                moreText.text = itemView.context.applicationContext.getString(R.string.goal_to_complete_note, needToBeInTarget.format(2))
             }
 
             itemView.setOnLongClickListener {

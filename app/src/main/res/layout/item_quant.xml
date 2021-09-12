@@ -27,7 +27,7 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:src="@drawable/quant_sex" />
+                tools:src="@drawable/quant_lsd" />
 
             <TextView
                 android:id="@+id/quant_name"

@@ -1,70 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.cardview.widget.CardView
-    android:id="@+id/goal_card_view"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/goal_card_view"
     style="?attr/materialCardViewStyle"
-    app:cardUseCompatPadding="true"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:nestedScrollingEnabled="false"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    app:cardUseCompatPadding="true">
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <TextView
-        android:id="@+id/goal_title"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:paddingBottom="5dp"
-        tools:text="Вы поставили такую-то цель" />
+        android:layout_height="wrap_content">
 
-    <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/goal_progress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        app:indicatorColor="@color/progressPrimary"
-        app:trackColor="@color/progressAccent"
-        tools:progress="50"
-        app:trackThickness = "20dp"
-        app:trackCornerRadius = "4dp"
-        android:paddingLeft="15dp"
-        android:paddingRight="15dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/goal_title"
-        app:layout_constraintBottom_toBottomOf="@+id/goal_progress_text"/>
+        <TextView
+            android:id="@+id/goal_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="5dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Вы поставили такую-то цель" />
 
-    <TextView
-        android:id="@+id/goal_progress_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/ShadowedText"
-        android:gravity="center"
-        android:textStyle="bold"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/goal_title"
-        tools:text="50 из 100"/>
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/goal_progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            app:indicatorColor="@color/progressPrimary"
+            app:layout_constraintBottom_toBottomOf="@+id/goal_progress_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/goal_title"
+            app:trackColor="@color/progressAccent"
+            app:trackCornerRadius="4dp"
+            app:trackThickness="20dp"
+            tools:progress="50" />
 
-    <TextView
-        android:id="@+id/goal_more"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:text="Для выполнения цели получите сегодня еще + 10"
-        android:gravity="center"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/goal_progress"  />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/goal_progress_text"
+            style="@style/ShadowedText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/goal_title"
+            tools:text="50 из 100" />
+
+        <TextView
+            android:id="@+id/goal_more"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/goal_progress"
+            tools:text="Для выполнения цели получите сегодня еще + 10" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

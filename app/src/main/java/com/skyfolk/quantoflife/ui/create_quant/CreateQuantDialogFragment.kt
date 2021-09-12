@@ -52,9 +52,9 @@ class CreateQuantDialogFragment(
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         binding.spinnerCategory.adapter = spinnerArrayAdapter
-        binding.bonusForPhysicalName.text = categoryArray[0] + " бонусы"
-        binding.bonusForEmotionName.text = categoryArray[1] + " бонусы"
-        binding.bonusForEvolutionName.text = categoryArray[2] + " бонусы"
+        binding.bonusForPhysicalName.text = getString(R.string.bonuses, categoryArray[0])
+        binding.bonusForEmotionName.text = getString(R.string.bonuses, categoryArray[1])
+        binding.bonusForEvolutionName.text = getString(R.string.bonuses, categoryArray[2])
 
         if (quant != null) {
             binding.buttonDelete.visibility = View.VISIBLE

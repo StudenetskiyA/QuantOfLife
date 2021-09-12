@@ -29,11 +29,11 @@ class App: Application() {
             single<IGoalStorageInteractor> { GoalStorageInteractor(get()) }
             single { SettingsInteractor(androidContext())}
             single<IDateTimeRepository> { DateTimeRepository() }
-            single { ImportInteractor(get(), get(), get())}
+            single { ImportInteractor(get(), get(), get(), androidContext().resources.openRawResource(R.raw.qol_base))}
         }
 
         val viewModelModule = module {
-            viewModel { NowViewModel(androidContext(), get(), get(), get(), get(), get(), get()) }
+            viewModel { NowViewModel(get(), get(), get(), get(), get(), get()) }
             viewModel { SettingsViewModel(androidContext(), get(), get(), get(), get(), get())}
             viewModel { FeedsViewModel(get(), get(), get(), get()) }
             viewModel { StatisticViewModel(get(), get(), get(), get()) }

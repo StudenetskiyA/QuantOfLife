@@ -17,7 +17,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.skyfolk.quantoflife.R
@@ -60,7 +59,7 @@ fun TotalValue(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "Всего ${description.toLowerCase(Locale.ROOT)} :",
+            text = "Всего ${description.lowercase(Locale.ROOT)} :",
             textAlign = TextAlign.Left,
             style = style
         )
