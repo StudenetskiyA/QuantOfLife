@@ -4,6 +4,7 @@ import android.os.Environment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.db.DBInteractor
 import com.skyfolk.quantoflife.db.EventsStorageInteractor
 import com.skyfolk.quantoflife.import.ImportInteractor
@@ -13,6 +14,8 @@ import com.skyfolk.quantoflife.utils.toCalendarOnlyHourAndMinute
 import kotlinx.coroutines.launch
 import java.io.*
 import java.util.*
+import com.skyfolk.quantoflife.*
+
 
 class SettingsViewModel(
     private val eventsStorageInteractor: EventsStorageInteractor,
@@ -55,21 +58,20 @@ class SettingsViewModel(
                     // TODO If file not exist
                     val inputStream = FileInputStream(File(file.path))
                     importInteractor.importAllFromFile(inputStream) { quantsImported, eventsImported ->
-                        _toastState.value = SettingsFragment.SettingsFragmentToast.ImportComplete(eventsImported, quantsImported)
+                        _toastState.value = SettingsFragment.SettingsFragmentToast.ImportComplete(
+                            eventsImported,
+                            quantsImported
+                        )
                     }
                 }
             }
     }
 
-    fun saveDBToFile() {
-        _permissionRequestState.value =
-            PermissionRequest("android.permission.WRITE_EXTERNAL_STORAGE") {
-                file.delete()
-
-                dbInteractor.getDB().writeCopyTo(file)
-                _downloadFile.value = file
-                _toastState.value = SettingsFragment.SettingsFragmentToast.DatabaseExported
-            }
+    fun saveDBToFile(file: File) {
+        viewModelScope.launch {
+            file.delete()
+            dbInteractor.getDB().writeCopyTo(file)
+        }
     }
 
     fun setStartDayTime(timeInMillis: Long) {

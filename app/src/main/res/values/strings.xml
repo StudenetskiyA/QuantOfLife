@@ -51,6 +51,10 @@
     <string name="now_event_created">Событие \'%1s\' создано.</string>
     <string name="create_event_not_enter_field">Не заполненны числовые поля</string>
 
+    <string name="export_title">Оправить архив всех событий</string>
+    <string name="export_text">Архив QuantOfLife от %1s</string>
+    <string name="export_subject">Архив QuantOfLife</string>
+
     <string-array name="category_name">
         <item>Физическое</item>
         <item>Эмоциональное</item>

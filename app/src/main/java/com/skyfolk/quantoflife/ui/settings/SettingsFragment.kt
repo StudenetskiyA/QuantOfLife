@@ -5,19 +5,25 @@ import android.app.TimePickerDialog
 import android.content.Context.DOWNLOAD_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.databinding.SettingsFragmentBinding
 import com.skyfolk.quantoflife.ui.onboarding.OnBoardingActivity
+import com.skyfolk.quantoflife.utils.toDateWithoutHourAndMinutes
+import com.skyfolk.quantoflife.utils.toShortDate
 import org.koin.android.viewmodel.ext.android.viewModel
+import java.io.File
 import java.util.*
 
 
@@ -112,7 +118,22 @@ class SettingsFragment : Fragment() {
         }
 
         binding.exportDbButton.setOnClickListener {
-            viewModel.saveDBToFile()
+
+            val exportRealmPATH: File? = requireContext().getExternalFilesDir(null)
+            val exportRealmFileName = "qol_backup.realm"
+            val file = File(exportRealmPATH, exportRealmFileName)
+            viewModel.saveDBToFile(file)
+
+            if (file.exists()) {
+                val intentShareFile = Intent(Intent.ACTION_SEND)
+                intentShareFile.type = "application/pdf"
+                val bmpUri = FileProvider.getUriForFile(requireContext(), "com.skyfolk.quantoflife.fileprovider", file)
+                intentShareFile.putExtra(Intent.EXTRA_STREAM, bmpUri)
+                intentShareFile.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.export_subject))
+                intentShareFile.putExtra(Intent.EXTRA_TEXT, getString(R.string.export_text, System.currentTimeMillis().toDateWithoutHourAndMinutes()))
+
+                startActivity(Intent.createChooser(intentShareFile, getString(R.string.export_title)))
+            }
         }
         binding.importDbButton.setOnClickListener {
             viewModel.importAllEventsAndQuantsFromFile()

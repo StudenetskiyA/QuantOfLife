@@ -10,7 +10,6 @@ enum class Measure {
     }
 }
 
-
 fun Int.fromPositionToMeasure(): Measure {
     return when (this) {
         0 -> Measure.TotalCount
