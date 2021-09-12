@@ -7,7 +7,6 @@ interface IQuantsStorageInteractor {
     fun deleteQuant(quant: QuantBase, onComplete: () -> Unit)
 
     fun getAllQuantsList(includeDeleted: Boolean) : ArrayList<QuantBase>
-    fun getPresetQuantsList(): ArrayList<QuantBase>
 
     fun alreadyHaveQuant(quant : QuantBase) : Boolean
     fun getQuantById(id: String) : QuantBase?
