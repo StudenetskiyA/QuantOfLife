@@ -9,17 +9,28 @@
         android:layout_height="wrap_content"
         tools:background="@android:color/holo_blue_bright">
 
+        <TextView
+            android:id="@+id/create_quant_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/create_quant_title"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            app:layout_constraintBottom_toTopOf="@id/quant_name"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <EditText
             android:id="@+id/quant_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:autofillHints=""
             android:hint="@string/hint_for_name"
             android:inputType="textCapSentences"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             app:layout_constraintBottom_toTopOf="@id/spinner_quant_type_layout"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/create_quant_title"
             tools:text="Название" />
 
         <LinearLayout
@@ -27,18 +38,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toTopOf="@id/spinner_category_layout"
             app:layout_constraintTop_toBottomOf="@+id/quant_name">
 
             <Button
                 android:id="@+id/about_type_button"
                 android:background="@drawable/quant_default"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginStart="10dp"/>
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginStart="10dp"
+                android:visibility="gone"/>
 
             <TextView
-                android:layout_width="145dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/quant_type"
                 android:paddingStart="10dp"
@@ -46,12 +59,11 @@
 
             <Spinner
                 android:id="@+id/spinner_quant_type"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginBottom="8dp"
+                android:layout_weight="1"
+                android:theme="@style/AppTheme.Spinner"
                 android:entries="@array/quant_type_name"/>
-
 
         </LinearLayout>
 
@@ -60,11 +72,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toTopOf="@id/list_of_quants_icons"
             app:layout_constraintTop_toBottomOf="@+id/spinner_quant_type_layout">
 
             <TextView
-                android:layout_width="@dimen/create_quant_bonus_note_width"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/main_category"
                 android:paddingStart="10dp"
@@ -72,12 +85,10 @@
 
             <Spinner
                 android:id="@+id/spinner_category"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/list_of_quants_icons"
-                app:layout_constraintTop_toBottomOf="@+id/quant_name"
-                android:layout_marginBottom="8dp"
+                android:layout_weight="1"
+                android:theme="@style/AppTheme.Spinner"
                 tools:entries="@array/category_name"/>
 
         </LinearLayout>
@@ -111,6 +122,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_for_fact"
                 android:inputType="numberSigned|numberDecimal"
+                android:nextFocusDown="@id/bonus_for_physical_for_each"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp" />
 

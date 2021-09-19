@@ -28,8 +28,9 @@
 
     <string name="hint_for_fact">За факт</string>
     <string name="hint_for_name">Название</string>
-    <string name="quant_type">Тип события</string>
-    <string name="main_category">Основная категория</string>
+    <string name="quant_type">Тип события - </string>
+    <string name="main_category">Основная категория - </string>
+    <string name="create_quant_title">Создание нового типа события</string>
     <string name="select_goal_category">Выберите категорию цели</string>
     <string name="select_goal_period">Выберите срок</string>
     <string name="select_goal_value">Цель в баллах</string>
@@ -82,7 +83,6 @@
 
     <string-array name="quant_type_name">
         <item>Оцениваемое</item>
-        <item>Числовой индикатор</item>
         <item>Заметка</item>
     </string-array>
 

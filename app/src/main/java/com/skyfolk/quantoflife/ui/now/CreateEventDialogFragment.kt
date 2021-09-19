@@ -17,6 +17,7 @@ import com.skyfolk.quantoflife.IDateTimeRepository
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.databinding.CreateEventDialogBinding
 import com.skyfolk.quantoflife.entity.*
+import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.utils.toDate
 import org.koin.android.ext.android.inject
 import java.util.*
@@ -27,6 +28,7 @@ class CreateEventDialogFragment(val quant: QuantBase, private val existEvent: Ev
     private lateinit var binding: CreateEventDialogBinding
 
     private val dateTimeRepository: IDateTimeRepository by inject()
+    private val settingsInteractor: SettingsInteractor by inject()
     private val calendar = dateTimeRepository.getCalendar()
 
     override fun onCreateView(
@@ -44,7 +46,13 @@ class CreateEventDialogFragment(val quant: QuantBase, private val existEvent: Ev
         binding.eventDescription.text = quant.description
 
         binding.eventDateChoiceButton.setOnClickListener {
-            DatePickerDialog(requireContext(),onDateSelected, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
+            val lastCalendar = settingsInteractor.getLastSelectedCalendar()
+            DatePickerDialog(
+                requireContext(),
+                onDateSelected,
+                lastCalendar.get(Calendar.YEAR),
+                lastCalendar.get(Calendar.MONTH),
+                lastCalendar.get(Calendar.DAY_OF_MONTH))
                 .show()
         }
 
@@ -133,6 +141,7 @@ class CreateEventDialogFragment(val quant: QuantBase, private val existEvent: Ev
     private val onTimeSelected = TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
         calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
         calendar.set(Calendar.MINUTE, minute)
+        settingsInteractor.writeLastSelectedCalendar(calendar)
 
         binding.eventDate.text = calendar.timeInMillis.toDate()
     }

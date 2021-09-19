@@ -6,6 +6,8 @@ import com.skyfolk.quantoflife.entity.QuantCategory
 import com.skyfolk.quantoflife.meansure.Measure
 import com.skyfolk.quantoflife.meansure.QuantFilter
 import com.skyfolk.quantoflife.timeInterval.TimeInterval
+import java.util.*
+import kotlin.collections.ArrayList
 
 open class SettingsInteractor(private val context: Context) {
     companion object {
@@ -20,9 +22,23 @@ open class SettingsInteractor(private val context: Context) {
         const val SELECTED_GRAPH_MEASURE = "selected_graph_measure"
         const val SELECTED_GRAPH_FIRST_QUANT = "selected_graph_first_quant"
         const val SELECTED_GRAPH_SECOND_QUANT = "selected_graph_second_quant"
+        const val LAST_SELECTED_CALENDAR = "last_selected_calendar"
     }
 
     private val preferences = context.getSharedPreferences("qol_preferences", Context.MODE_PRIVATE)
+
+    fun getLastSelectedCalendar(): Calendar {
+        val timeInMillis = preferences.getLong(LAST_SELECTED_CALENDAR, System.currentTimeMillis())
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = timeInMillis
+        return calendar
+    }
+
+    fun writeLastSelectedCalendar(calendar: Calendar) {
+        preferences.edit()
+            .putLong(LAST_SELECTED_CALENDAR, calendar.timeInMillis)
+            .apply()
+    }
 
     fun getSelectedTimeInterval(): TimeInterval {
         return when (preferences.getString(SELECTED_GRAPH_PERIOD, TimeInterval.Week.toString()) ?:  TimeInterval.Week.toString()) {

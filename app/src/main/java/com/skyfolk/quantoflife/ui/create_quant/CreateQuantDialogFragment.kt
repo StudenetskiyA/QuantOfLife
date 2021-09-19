@@ -48,7 +48,7 @@ class CreateQuantDialogFragment(
             settingsInteractor.getCategoryName(QuantCategory.Other)
         )
         val spinnerArrayAdapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categoryArray)
+            ArrayAdapter(requireContext(), R.layout.right_to_left_spinner, categoryArray)
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         binding.spinnerCategory.adapter = spinnerArrayAdapter
@@ -65,8 +65,8 @@ class CreateQuantDialogFragment(
             binding.spinnerQuantType.setSelection(
                 when (quant) {
                     is QuantBase.QuantRated -> 0
-                    is QuantBase.QuantMeasure -> 1
-                    is QuantBase.QuantNote -> 2
+                    is QuantBase.QuantNote -> 1
+                    else -> 0
                 }
             )
 
@@ -142,7 +142,6 @@ class CreateQuantDialogFragment(
             val name = binding.quantName.text.toString()
             val quantType = when (binding.spinnerQuantType.selectedItemPosition) {
                 0 -> QuantBase.QuantRated::class.java.name
-                1 -> QuantBase.QuantMeasure::class.java.name
                 else -> QuantBase.QuantNote::class.java.name
             }
             val category = when (binding.spinnerCategory.selectedItemPosition) {
@@ -213,6 +212,7 @@ class CreateQuantDialogFragment(
                         description = binding.noteForQuant.text.toString()
                     )
                 }
+                // Deprecated
                 QuantBase.QuantMeasure::class.java.name -> {
                     createdQuant = QuantBase.QuantMeasure(
                         name = name,
