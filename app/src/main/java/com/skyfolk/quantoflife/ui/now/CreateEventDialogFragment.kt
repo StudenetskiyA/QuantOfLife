@@ -46,7 +46,7 @@ class CreateEventDialogFragment(val quant: QuantBase, private val existEvent: Ev
         binding.eventDescription.text = quant.description
 
         binding.eventDateChoiceButton.setOnClickListener {
-            val lastCalendar = settingsInteractor.getLastSelectedCalendar()
+            val lastCalendar = settingsInteractor.lastSelectedCalendar
             DatePickerDialog(
                 requireContext(),
                 onDateSelected,
@@ -141,7 +141,7 @@ class CreateEventDialogFragment(val quant: QuantBase, private val existEvent: Ev
     private val onTimeSelected = TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
         calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
         calendar.set(Calendar.MINUTE, minute)
-        settingsInteractor.writeLastSelectedCalendar(calendar)
+        settingsInteractor.lastSelectedCalendar = calendar
 
         binding.eventDate.text = calendar.timeInMillis.toDate()
     }

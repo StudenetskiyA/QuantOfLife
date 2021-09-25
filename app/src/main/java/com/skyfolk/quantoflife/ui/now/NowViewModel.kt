@@ -117,7 +117,7 @@ class NowViewModel(
         viewModelScope.launch {
             val startDate = dateTimeRepository.getCalendar().getStartDateCalendar(
                 TimeInterval.Today,
-                settingsInteractor.getStartDayTime()
+                settingsInteractor.startDayTime
             ).timeInMillis
             val endDate = dateTimeRepository.getTimeInMillis()
 
@@ -135,7 +135,7 @@ class NowViewModel(
             for (goal in goals) {
                 val goalStartDate = dateTimeRepository.getCalendar().getStartDateCalendar(
                     goal.duration,
-                    settingsInteractor.getStartDayTime()
+                    settingsInteractor.startDayTime
                 ).timeInMillis
 
                 val goalResultList = ArrayList(
@@ -155,6 +155,7 @@ class NowViewModel(
                         .getActualMaximum(Calendar.DAY_OF_MONTH)
                     is TimeInterval.All -> 0
                     is TimeInterval.Selected -> 0
+                    is TimeInterval.Year -> 365
                 }
 
                 goalsPresentList.add(

@@ -79,6 +79,7 @@
         <item>Месяц</item>
         <item>Все время</item>
         <item>Выбранный интервал</item>
+        <item>Год</item>
     </string-array>
 
     <string-array name="quant_type_name">

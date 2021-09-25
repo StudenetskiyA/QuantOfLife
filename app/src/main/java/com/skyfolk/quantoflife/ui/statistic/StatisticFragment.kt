@@ -11,8 +11,12 @@ import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.skyfolk.quantoflife.GraphSelectedYear
+import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.databinding.StatisticFragmentBinding
 import com.skyfolk.quantoflife.meansure.QuantFilter
@@ -65,15 +69,19 @@ class StatisticFragment : Fragment() {
                             data.entries[0].maximumWithout.startDate.toDateWithoutHourAndMinutes()
                         )
 
-                        val dataSets = arrayListOf<LineDataSet>()
-                        val set1 = LineDataSet(data.entries[0].entries, data.entries[0].name)
+                        val dataSets = arrayListOf<BarDataSet>()
+                        val set1 = BarDataSet(data.entries[0].entries, data.entries[0].name)
+
+//                        for (entry in data.entries[0].entries) {
+//                            QLog.d("skyfolk-null","entry ${entry.yVals.get(0)}")
+//                        }
 
                         setDefaultDataSetPropertiesForFirstSet(set1)
 
                         dataSets.add(set1)
 
                         if (data.entries.size > 1) {
-                            val set2 = LineDataSet(data.entries[1].entries, data.entries[1].name)
+                            val set2 = BarDataSet(data.entries[1].entries, data.entries[1].name)
                             setDefaultDataSetPropertiesForSecondSet(set2)
                             dataSets.add(set2)
                         }
@@ -95,7 +103,7 @@ class StatisticFragment : Fragment() {
                                 binding.chart.xAxis.valueFormatter = xAxisFormatter
                             }
 
-                        val dataForGraph = LineData(dataSets.toList())
+                        val dataForGraph = BarData(dataSets.toList())
                         binding.chart.invalidate()
                         binding.chart.data = dataForGraph
 
@@ -134,6 +142,18 @@ class StatisticFragment : Fragment() {
                     false
                 )
 
+                //TODO
+                val listOfYears = mutableListOf<String>("2021","2020","2019","2018","2017","2016")//it.listOfQuants.map { it.name }.toMutableList()
+                listOfYears.add(0, "Все годы")
+                val yearsSpinnerAdapter = ArrayAdapter(
+                    requireContext(),
+                    android.R.layout.simple_spinner_item,
+                    listOfYears
+                )
+                yearsSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                binding.yearPeriodSpinner.adapter = yearsSpinnerAdapter
+                binding.yearPeriodSpinner.setSelection(it.selectedYear.toGraphPosition(listOfYears), false)
+
                 viewModel.runSearch()
             }
         })
@@ -147,6 +167,11 @@ class StatisticFragment : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setListeners() {
+        binding.yearPeriodSpinner.setOnTouchListener { _, _ ->
+            this.isSelectionFromTouch = true
+            false
+        }
+
         binding.eventSpinner.setOnTouchListener { _, _ ->
             this.isSelectionFromTouch = true
             false
@@ -166,6 +191,30 @@ class StatisticFragment : Fragment() {
             this.isSelectionFromTouch = true
             false
         }
+
+        binding.yearPeriodSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>,
+                    view: View,
+                    position: Int,
+                    id: Long
+                ) {
+                    if (!isSelectionFromTouch) {
+                        return
+                    }
+                    val newSelectedYearName = when (position) {
+                        0 -> GraphSelectedYear.All
+                        else -> GraphSelectedYear.OnlyYear(
+                            parent.getItemAtPosition(position).toString().toInt()
+                        )
+                    }
+                    viewModel.setYearFilter(filter = newSelectedYearName)
+                    isSelectionFromTouch = false
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>) {}
+            }
 
         binding.eventSpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
@@ -267,7 +316,7 @@ class StatisticFragment : Fragment() {
     }
 
     private fun setDataSetProperties(
-        set: LineDataSet,
+        set: BarDataSet,
         lineColor: Int,
         circleColor: Int,
         textSize: Float,
@@ -275,15 +324,15 @@ class StatisticFragment : Fragment() {
         fillDrawable: Int
     ) {
         set.color = lineColor
-        set.setDrawFilled(true)
+        //set.setDrawFilled(true)
         set.setDrawIcons(true)
         set.valueTextSize = textSize
-        set.setCircleColor(circleColor)
+       // set.setCircleColor(circleColor)
         set.setValueTextColors(listOf(textColor))
-        set.fillDrawable = ContextCompat.getDrawable(requireContext(), fillDrawable)
+       // set.fillDrawable = ContextCompat.getDrawable(requireContext(), fillDrawable)
     }
 
-    private fun setDefaultDataSetPropertiesForFirstSet(set: LineDataSet) {
+    private fun setDefaultDataSetPropertiesForFirstSet(set: BarDataSet) {
         setDataSetProperties(
             set = set,
             lineColor = Colors.Red.toInt(),
@@ -294,7 +343,7 @@ class StatisticFragment : Fragment() {
         )
     }
 
-    private fun setDefaultDataSetPropertiesForSecondSet(set: LineDataSet) {
+    private fun setDefaultDataSetPropertiesForSecondSet(set: BarDataSet) {
         setDataSetProperties(
             set = set,
             lineColor = Colors.Green.toInt(),

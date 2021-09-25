@@ -25,11 +25,11 @@ class CreateGoalDialogFragment(
     ): View {
         binding = CreateGoalDialogBinding.inflate(inflater, container, false)
 
-        val categoryArray = mutableListOf(
-            settingsInteractor.getCategoryName(QuantCategory.Physical),
-            settingsInteractor.getCategoryName(QuantCategory.Emotion),
-            settingsInteractor.getCategoryName(QuantCategory.Evolution),
-            settingsInteractor.getCategoryName(QuantCategory.All)
+        val categoryArray = listOf(
+            settingsInteractor.categoryNames[QuantCategory.Physical],
+            settingsInteractor.categoryNames[QuantCategory.Emotion],
+            settingsInteractor.categoryNames[QuantCategory.Evolution],
+            settingsInteractor.categoryNames[QuantCategory.All]
         )
         val spinnerArrayAdapter =
             ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categoryArray)
@@ -48,6 +48,7 @@ class CreateGoalDialogFragment(
                     is TimeInterval.Month -> 2
                     is TimeInterval.All -> 3
                     is TimeInterval.Selected -> 4
+                    is TimeInterval.Year -> 5
                 }
             )
             binding.goalTarget.setText(goal.target.toString())

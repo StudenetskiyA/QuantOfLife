@@ -41,11 +41,11 @@ class CreateQuantDialogFragment(
             false
         )
 
-        val categoryArray = mutableListOf(
-            settingsInteractor.getCategoryName(QuantCategory.Physical),
-            settingsInteractor.getCategoryName(QuantCategory.Emotion),
-            settingsInteractor.getCategoryName(QuantCategory.Evolution),
-            settingsInteractor.getCategoryName(QuantCategory.Other)
+        val categoryArray = listOf(
+            settingsInteractor.categoryNames[QuantCategory.Physical],
+            settingsInteractor.categoryNames[QuantCategory.Emotion],
+            settingsInteractor.categoryNames[QuantCategory.Evolution],
+            settingsInteractor.categoryNames[QuantCategory.Other]
         )
         val spinnerArrayAdapter =
             ArrayAdapter(requireContext(), R.layout.right_to_left_spinner, categoryArray)

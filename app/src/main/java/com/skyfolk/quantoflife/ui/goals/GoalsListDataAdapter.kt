@@ -46,7 +46,7 @@ class GoalsListDataAdapter(
             titleText.text = itemView.context.applicationContext.getString(
                 R.string.goal_title_with_values,
                 goalPresent.target,
-                settingsInteractor.getCategoryName(goalPresent.type),
+                settingsInteractor.categoryNames[goalPresent.type],
                 goalPresent.duration.toStringName(
                     itemView.context.applicationContext.resources.getStringArray(R.array.goal_time_interval)
                 )

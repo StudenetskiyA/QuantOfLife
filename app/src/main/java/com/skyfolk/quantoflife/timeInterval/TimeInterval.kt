@@ -4,6 +4,7 @@ sealed class TimeInterval {
     object Today : TimeInterval()
     object Week : TimeInterval()
     object Month : TimeInterval()
+    object Year: TimeInterval()
     class Selected(val start: Long, val end: Long) : TimeInterval()
     object All : TimeInterval()
 
@@ -34,6 +35,7 @@ sealed class TimeInterval {
             is Month -> array[2]
             is All -> array[3]
             is Selected -> array[4]
+            is Year -> array[5]
         }
     }
 }
