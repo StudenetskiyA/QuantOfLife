@@ -8,15 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
 import com.skyfolk.quantoflife.GraphSelectedYear
-import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.databinding.StatisticFragmentBinding
 import com.skyfolk.quantoflife.meansure.QuantFilter
@@ -46,7 +42,7 @@ class StatisticFragment : Fragment() {
         binding.chart.legend.isEnabled = true
         binding.chart.legend.textColor = Color.rgb(255, 255, 255)
 
-        viewModel.barEntryData.observe(viewLifecycleOwner, { data ->
+        viewModel.barEntryData.observe(viewLifecycleOwner) { data ->
             when (data) {
                 is StatisticFragmentState.Loading -> {
                     binding.progress.visibility = View.VISIBLE
@@ -55,26 +51,35 @@ class StatisticFragment : Fragment() {
                 }
                 is StatisticFragmentState.Entries -> {
                     if (data.entries.size > 0 && data.entries.first().entries.size > 1) {
-                        binding.maximimumWithText.text = getString(R.string.statistic_maximum_with,
+                        binding.maximimumWithText.text = getString(
+                            R.string.statistic_maximum_with,
                             binding.timePeriodSpinner.selectedItem.toString(),
                             data.entries[0].name,
                             data.entries[0].maximumWith.lenght,
                             data.entries[0].maximumWith.startDate.toDateWithoutHourAndMinutes()
                         )
 
-                        binding.maximimumWithoutText.text = getString(R.string.statistic_maximum_without,
-                            binding.timePeriodSpinner.selectedItem.toString(),
-                            data.entries[0].name,
-                            data.entries[0].maximumWithout.lenght,
-                            data.entries[0].maximumWithout.startDate.toDateWithoutHourAndMinutes()
-                        )
+                        binding.maximimumWithoutText.text = when (data.entries[0].maximumWithout.lenght > 0) {
+                            true -> {
+                                getString(
+                                    R.string.statistic_maximum_without,
+                                    binding.timePeriodSpinner.selectedItem.toString(),
+                                    data.entries[0].name,
+                                    data.entries[0].maximumWithout.lenght,
+                                    data.entries[0].maximumWithout.startDate.toDateWithoutHourAndMinutes()
+                                )
+                            }
+                            false -> {
+                                getString(
+                                    R.string.statistic_maximum_without_no_one,
+                                    binding.timePeriodSpinner.selectedItem.toString(),
+                                    data.entries[0].name
+                                )
+                            }
+                        }
 
                         val dataSets = arrayListOf<BarDataSet>()
                         val set1 = BarDataSet(data.entries[0].entries, data.entries[0].name)
-
-//                        for (entry in data.entries[0].entries) {
-//                            QLog.d("skyfolk-null","entry ${entry.yVals.get(0)}")
-//                        }
 
                         setDefaultDataSetPropertiesForFirstSet(set1)
 
@@ -118,9 +123,9 @@ class StatisticFragment : Fragment() {
                     }
                 }
             }
-        })
+        }
 
-        viewModel.selectedFilter.observe(viewLifecycleOwner, { filter: SelectedGraphFilter? ->
+        viewModel.selectedFilter.observe(viewLifecycleOwner) { filter: SelectedGraphFilter? ->
             filter?.let { it: SelectedGraphFilter ->
                 val listOfQuantName = it.listOfQuants.map { it.name }.toMutableList()
                 listOfQuantName.add(0, "Ничего")
@@ -143,7 +148,14 @@ class StatisticFragment : Fragment() {
                 )
 
                 //TODO
-                val listOfYears = mutableListOf<String>("2021","2020","2019","2018","2017","2016")//it.listOfQuants.map { it.name }.toMutableList()
+                val listOfYears = mutableListOf<String>(
+                    "2021",
+                    "2020",
+                    "2019",
+                    "2018",
+                    "2017",
+                    "2016"
+                )//it.listOfQuants.map { it.name }.toMutableList()
                 listOfYears.add(0, "Все годы")
                 val yearsSpinnerAdapter = ArrayAdapter(
                     requireContext(),
@@ -152,11 +164,14 @@ class StatisticFragment : Fragment() {
                 )
                 yearsSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 binding.yearPeriodSpinner.adapter = yearsSpinnerAdapter
-                binding.yearPeriodSpinner.setSelection(it.selectedYear.toGraphPosition(listOfYears), false)
+                binding.yearPeriodSpinner.setSelection(
+                    it.selectedYear.toGraphPosition(listOfYears),
+                    false
+                )
 
                 viewModel.runSearch()
             }
-        })
+        }
 
         setListeners()
 
@@ -324,12 +339,9 @@ class StatisticFragment : Fragment() {
         fillDrawable: Int
     ) {
         set.color = lineColor
-        //set.setDrawFilled(true)
         set.setDrawIcons(true)
         set.valueTextSize = textSize
-       // set.setCircleColor(circleColor)
         set.setValueTextColors(listOf(textColor))
-       // set.fillDrawable = ContextCompat.getDrawable(requireContext(), fillDrawable)
     }
 
     private fun setDefaultDataSetPropertiesForFirstSet(set: BarDataSet) {

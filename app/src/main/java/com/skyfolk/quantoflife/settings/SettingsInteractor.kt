@@ -262,8 +262,15 @@ class SettingsInteractor(private val context: Context) {
             ): GraphSelectedYear {
                 return when (val value = getString(key(property), defaultValue.toString())
                     ?: defaultValue.toString()) {
-                    GraphSelectedYear::class.java.simpleName -> GraphSelectedYear.All
-                    else -> GraphSelectedYear.OnlyYear(value.toInt())
+                    GraphSelectedYear.All.toString() -> GraphSelectedYear.All
+                    else -> {
+                        if (value.toIntOrNull() != null) {
+                            GraphSelectedYear.OnlyYear(value.toInt())
+                            } else {
+                            GraphSelectedYear.All
+                        }
+
+                    }
                 }
             }
 
@@ -273,10 +280,9 @@ class SettingsInteractor(private val context: Context) {
                 value: GraphSelectedYear
             ) {
                 when (value) {
-                    GraphSelectedYear.All -> edit().putString(key(property), GraphSelectedYear::class.java.simpleName).apply()
+                    GraphSelectedYear.All -> edit().putString(key(property), GraphSelectedYear.All::class.java.canonicalName).apply()
                     is GraphSelectedYear.OnlyYear -> edit().putString(key(property), value.year.toString()).apply()
                 }
-
             }
         }
 
