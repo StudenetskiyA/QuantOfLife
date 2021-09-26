@@ -128,6 +128,10 @@ class CreateEventDialogFragment(val quant: QuantBase, private val existEvent: Ev
             dismiss()
         }
 
+        binding.buttonBack.setOnClickListener {
+            dismiss()
+        }
+
         return binding.root
     }
 

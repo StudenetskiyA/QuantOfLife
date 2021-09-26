@@ -29,14 +29,28 @@ class SettingsInteractor(private val context: Context) {
         const val SELECTED_GRAPH_FIRST_QUANT = "selected_graph_first_quant"
         const val SELECTED_GRAPH_SECOND_QUANT = "selected_graph_second_quant"
         const val LAST_SELECTED_CALENDAR = "last_selected_calendar"
+
+        const val PERIOD_WHILE_SELECTED_CALENDAR_MATTERS = 60 * 60 * 1000
     }
 
     private val preferences = context.getSharedPreferences("qol_preferences", Context.MODE_PRIVATE)
 
-    var lastSelectedCalendar by preferences.calendar (
-        key = { LAST_SELECTED_CALENDAR },
-        defaultValue = Calendar.getInstance()
-    )
+    var lastSelectedCalendar: Calendar
+    get() {
+        if (Calendar.getInstance().timeInMillis - lastSelectedCalendarWhenSelected.timeInMillis
+            > PERIOD_WHILE_SELECTED_CALENDAR_MATTERS) {
+            return Calendar.getInstance()
+        } else {
+            return lastSelectedCalendarWhatSelected
+        }
+    }
+    set(value) {
+        lastSelectedCalendarWhatSelected = value
+        lastSelectedCalendarWhenSelected = Calendar.getInstance()
+    }
+
+    private var lastSelectedCalendarWhenSelected by preferences.calendar()
+    private var lastSelectedCalendarWhatSelected by preferences.calendar()
 
     var selectedTimeInterval by preferences.timeInterval (
         key = { SELECTED_GRAPH_PERIOD },

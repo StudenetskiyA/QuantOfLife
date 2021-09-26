@@ -59,6 +59,10 @@ class CreateGoalDialogFragment(
             dismiss()
         }
 
+        binding.buttonBack.setOnClickListener {
+            dismiss()
+        }
+
         binding.buttonOk.setOnClickListener {
             val category = when (binding.spinnerCategory.selectedItemPosition) {
                 0 -> QuantCategory.Physical

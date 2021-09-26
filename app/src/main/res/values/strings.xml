@@ -26,11 +26,22 @@
     <string name="menu_item_create_quant">Создать событие</string>
     <string name="menu_item_create_goal">Создать цель</string>
 
+    <string name="delete_quant_title">Удаление типа события</string>
+    <string name="delete_quant_message">Вы действительно хотите удалить этот тип события?</string>
+
+    <string name="clear_database_title">Очистка всех данных </string>
+    <string name="clear_database_message">Вы действительно хотите удалить все ваши события, типы событий, настройки? Это действие невозможно отменить.</string>
+
+    <string name="clear_events_title">Очистка всех событий</string>
+    <string name="clear_events_message">Вы действительно хотите удалить все ваши события? Это действие невозможно отменить.</string>
+
     <string name="hint_for_fact">За факт</string>
     <string name="hint_for_name">Название</string>
     <string name="quant_type">Тип события - </string>
     <string name="main_category">Основная категория - </string>
     <string name="create_quant_title">Создание нового типа события</string>
+    <string name="create_event_title">Создание нового события</string>
+    <string name="create_goal_title">Создание новой цели</string>
     <string name="select_goal_category">Выберите категорию цели</string>
     <string name="select_goal_period">Выберите срок</string>
     <string name="select_goal_value">Цель в баллах</string>
