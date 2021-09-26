@@ -320,11 +320,18 @@ fun SelectedTimeInterval(
     intervalEnd: Calendar,
     modifier: Modifier = Modifier
 ) {
+    val dayInMillis = 24 * 60 * 60 * 1000
+
     val onStartDateSelected =
         DatePickerDialog.OnDateSetListener { _: DatePicker, year: Int, month: Int, day: Int ->
             intervalStart.set(Calendar.YEAR, year)
             intervalStart.set(Calendar.MONTH, month)
             intervalStart.set(Calendar.DAY_OF_MONTH, day)
+
+            if (intervalEnd.timeInMillis < intervalStart.timeInMillis) {
+                intervalEnd.timeInMillis = intervalStart.timeInMillis + dayInMillis
+            }
+
             setTimeInterval(
                 TimeInterval.Selected(
                     intervalStart.timeInMillis,
@@ -338,6 +345,11 @@ fun SelectedTimeInterval(
             intervalEnd.set(Calendar.YEAR, year)
             intervalEnd.set(Calendar.MONTH, month)
             intervalEnd.set(Calendar.DAY_OF_MONTH, day)
+
+            if (intervalEnd.timeInMillis < intervalStart.timeInMillis) {
+                intervalStart.timeInMillis = intervalEnd.timeInMillis - dayInMillis
+            }
+
             setTimeInterval(
                 TimeInterval.Selected(
                     intervalStart.timeInMillis,
