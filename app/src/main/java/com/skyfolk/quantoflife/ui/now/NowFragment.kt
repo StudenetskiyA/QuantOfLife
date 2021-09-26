@@ -96,10 +96,10 @@ class NowFragment : Fragment() {
             }
         })
 
-        binding.categoryPhysical.text = settingsInteractor.getCategoryName(QuantCategory.Physical)
-        binding.categoryEmotion.text = settingsInteractor.getCategoryName(QuantCategory.Emotion)
-        binding.categoryEvolution.text = settingsInteractor.getCategoryName(QuantCategory.Evolution)
-        binding.categoryOther.text = settingsInteractor.getCategoryName(QuantCategory.Other)
+        binding.categoryPhysical.text = settingsInteractor.categoryNames[QuantCategory.Physical]
+        binding.categoryEmotion.text = settingsInteractor.categoryNames[QuantCategory.Emotion]
+        binding.categoryEvolution.text = settingsInteractor.categoryNames[QuantCategory.Evolution]
+        binding.categoryOther.text = settingsInteractor.categoryNames[QuantCategory.Other]
 
         val listOfQuants: RecyclerView = binding.listOfPhysicalQuants
         val listOfEmotionQuants: RecyclerView = binding.listOfEmotionQuants

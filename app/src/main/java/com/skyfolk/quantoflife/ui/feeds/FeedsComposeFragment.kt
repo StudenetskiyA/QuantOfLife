@@ -54,29 +54,6 @@ class FeedsComposeFragment : Fragment() {
                     val state by viewModel.state.collectAsState()
                     val startIntervalCalendar = remember { viewModel.getDefaultCalendar() }
                     val endIntervalCalendar = remember { viewModel.getDefaultCalendar() }
-                   // var count = remember { mutableStateOf(0) }
-
-//                    ComposeFlowTestTheme {
-//                        Column(
-//                            modifier = Modifier
-//                                .fillMaxWidth()
-//                                .fillMaxHeight()
-//                                .padding(vertical = 5.dp)
-//                        ) {
-//                            Box(
-//                                modifier = Modifier.background(Colors.Green).weight(2f)) {
-//
-//                            }
-//                            Text(
-//                                text = "2:00 am",
-//                                modifier = Modifier.background(Colors.Red)
-//                            )
-//                            Text(
-//                                text = "12:00 am",
-//                                modifier = Modifier.background(Colors.Orange)
-//                            )
-//                        }
-//                    }
 
                     ComposeFlowTestTheme {
                         Column(

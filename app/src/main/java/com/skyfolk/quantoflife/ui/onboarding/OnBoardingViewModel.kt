@@ -20,10 +20,10 @@ class OnBoardingViewModel(private val settingsInteractor: SettingsInteractor) : 
         thirdCategoryName: String,
         fourthCategoryName: String
     ) {
-        settingsInteractor.setCategoryName(QuantCategory.Physical, firstCategoryName)
-        settingsInteractor.setCategoryName(QuantCategory.Emotion, secondCategoryName)
-        settingsInteractor.setCategoryName(QuantCategory.Evolution, thirdCategoryName)
-        settingsInteractor.setCategoryName(QuantCategory.Other, fourthCategoryName)
+        settingsInteractor.categoryNames[QuantCategory.Physical] = firstCategoryName
+        settingsInteractor.categoryNames[QuantCategory.Emotion] = secondCategoryName
+        settingsInteractor.categoryNames[QuantCategory.Evolution] = thirdCategoryName
+        settingsInteractor.categoryNames[QuantCategory.Other] = fourthCategoryName
 
         settingsInteractor.setOnBoardingComplete(true)
         _navigationState.value = OnBoardingWayEvent.OnBoardingCompleted

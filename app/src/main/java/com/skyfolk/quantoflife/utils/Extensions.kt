@@ -67,6 +67,9 @@ fun Calendar.getStartDateCalendar(timeInterval: TimeInterval, startDayTime: Long
         is TimeInterval.Selected -> {
             calendar.timeInMillis = timeInterval.start
         }
+        TimeInterval.Year -> {
+            calendar[Calendar.DAY_OF_YEAR] = 0
+        }
     }
     calendar[Calendar.HOUR_OF_DAY] =
         startDayTime.toCalendarOnlyHourAndMinute()[Calendar.HOUR_OF_DAY]
@@ -98,7 +101,8 @@ fun Calendar.getEndDateCalendar(timeInterval: TimeInterval, startDayTime: Long):
                 (calendar[Calendar.DAY_OF_WEEK] == 2 && calendar.moreHourAndMinute(startDayTime.toCalendarOnlyHourAndMinute())) ||
                 calendar[Calendar.DAY_OF_WEEK] == 1
             ) {
-                calendar[Calendar.WEEK_OF_YEAR]++
+                //calendar[Calendar.WEEK_OF_YEAR]++
+                calendar.timeInMillis += 7 * 24 * 60 * 60 * 1000
             }
             calendar[Calendar.DAY_OF_WEEK] = 2
         }
@@ -110,6 +114,10 @@ fun Calendar.getEndDateCalendar(timeInterval: TimeInterval, startDayTime: Long):
         is TimeInterval.Selected -> {
             calendar.timeInMillis = timeInterval.end
             calendar[Calendar.DAY_OF_MONTH]++
+        }
+        TimeInterval.Year -> {
+            calendar[Calendar.YEAR]++
+            calendar[Calendar.DAY_OF_YEAR] = 0
         }
     }
     calendar[Calendar.HOUR_OF_DAY] =

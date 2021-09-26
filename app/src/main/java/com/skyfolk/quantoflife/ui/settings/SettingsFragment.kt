@@ -20,6 +20,7 @@ import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.databinding.SettingsFragmentBinding
 import com.skyfolk.quantoflife.ui.onboarding.OnBoardingActivity
+import com.skyfolk.quantoflife.utils.showConfirmDialog
 import com.skyfolk.quantoflife.utils.toDateWithoutHourAndMinutes
 import com.skyfolk.quantoflife.utils.toShortDate
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -110,11 +111,25 @@ class SettingsFragment : Fragment() {
         })
 
         binding.clearDbButton.setOnClickListener {
-            viewModel.clearDatabase()
+            requireContext().showConfirmDialog(
+                title = resources.getString(R.string.clear_database_title),
+                message = resources.getString(R.string.clear_database_message),
+                positiveButtonTitle = resources.getString(R.string.delete),
+                negativeButtonTitle = resources.getString(R.string.cancel)
+            ) {
+                viewModel.clearDatabase()
+            }
         }
 
         binding.clearEventsButton.setOnClickListener {
-            viewModel.clearEvents()
+            requireContext().showConfirmDialog(
+                title = resources.getString(R.string.clear_events_title),
+                message = resources.getString(R.string.clear_events_message),
+                positiveButtonTitle = resources.getString(R.string.delete),
+                negativeButtonTitle = resources.getString(R.string.cancel)
+            ) {
+                viewModel.clearEvents()
+            }
         }
 
         binding.exportDbButton.setOnClickListener {

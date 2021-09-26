@@ -6,20 +6,70 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/dialog_event_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:background="@android:color/holo_blue_bright">
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/create_quant_title"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/create_quant_top_bar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/create_quant_title"
-            android:textStyle="bold"
-            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toTopOf="@id/quant_name"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageButton
+                android:id="@+id/button_back"
+                android:focusable="true"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_back"
+                android:scaleType="fitCenter"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/button_delete"
+                android:focusable="true"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_delete"
+                android:scaleType="fitCenter"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/button_back"
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
+            <TextView
+                android:id="@+id/create_quant_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/create_quant_title"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/button_delete"
+                app:layout_constraintRight_toLeftOf="@id/button_ok"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <ImageButton
+                android:id="@+id/button_ok"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:focusable="true"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_ok"
+                android:scaleType="fitCenter"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <EditText
             android:id="@+id/quant_name"
@@ -27,10 +77,11 @@
             android:layout_height="wrap_content"
             android:hint="@string/hint_for_name"
             android:inputType="textCapSentences"
+            android:nextFocusDown="@id/bonus_for_physical_base"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             app:layout_constraintBottom_toTopOf="@id/spinner_quant_type_layout"
-            app:layout_constraintTop_toBottomOf="@+id/create_quant_title"
+            app:layout_constraintTop_toBottomOf="@+id/create_quant_top_bar"
             tools:text="Название" />
 
         <LinearLayout
@@ -134,6 +185,7 @@
                 android:gravity="end"
                 android:hint="@string/hint_for_quant_value"
                 android:inputType="numberSigned|numberDecimal"
+                android:nextFocusDown="@id/bonus_for_emotion_base"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp" />
         </LinearLayout>
@@ -160,6 +212,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_for_fact"
                 android:inputType="numberSigned|numberDecimal"
+                android:nextFocusDown="@id/bonus_for_emotion_for_each"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp" />
 
@@ -171,6 +224,7 @@
                 android:gravity="end"
                 android:hint="@string/hint_for_quant_value"
                 android:inputType="numberSigned|numberDecimal"
+                android:nextFocusDown="@id/bonus_for_evolution_base"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp" />
         </LinearLayout>
@@ -197,6 +251,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_for_fact"
                 android:inputType="numberSigned|numberDecimal"
+                android:nextFocusDown="@id/bonus_for_evolution_for_each"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp" />
 
@@ -217,34 +272,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/hint_for_quant"
+            android:inputType="textCapSentences"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:maxLines="5"
-            app:layout_constraintBottom_toTopOf="@id/button_ok"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/bonus_for_evolution"
             tools:text="Подсказка для выбора значения" />
 
-        <Button
-            android:id="@+id/button_ok"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:focusable="true"
-            android:text="@string/ok"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@+id/button_delete"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/note_for_quant" />
-
-        <Button
-            android:id="@+id/button_delete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:focusable="true"
-            android:text="@string/delete"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/button_ok"
-            app:layout_constraintTop_toBottomOf="@+id/note_for_quant"
-            android:visibility="gone"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -4,7 +4,9 @@ import android.util.Log
 import com.skyfolk.quantoflife.entity.QuantCategory
 import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import java.sql.Time
+import java.text.SimpleDateFormat
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -38,8 +40,42 @@ fun Long.toShortDate(): String {
     val day =
         if (calendar[Calendar.DAY_OF_MONTH] + 1 <= 10) "0${calendar[Calendar.DAY_OF_MONTH]}" else calendar[Calendar.DAY_OF_MONTH]
     val month =
-        if (calendar[Calendar.MONTH] + 1 <= 10) "0${calendar[Calendar.MONTH] + 1}" else calendar[Calendar.MONTH] + 1
+        if (calendar[Calendar.MONTH] + 1 < 10) "0${calendar[Calendar.MONTH] + 1}" else calendar[Calendar.MONTH] + 1
     return "$day.$month"
+}
+
+fun Long.toMonthAndYear(): String {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = this
+
+    val monthNames = arrayOf(
+        "Январь",
+        "Февраль",
+        "Март",
+        "Апрель",
+        "Май",
+        "Июнь",
+        "Июль",
+        "Август",
+        "Сентябрь",
+        "Октябрь",
+        "Ноябрь",
+        "Декабрь"
+    )
+    val month = monthNames[calendar[Calendar.MONTH]]
+
+    return "$month ${calendar[Calendar.YEAR]}"
+}
+
+fun Long.toMediumDate(): String {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = this
+    val day =
+        if (calendar[Calendar.DAY_OF_MONTH] + 1 <= 10) "0${calendar[Calendar.DAY_OF_MONTH]}" else calendar[Calendar.DAY_OF_MONTH]
+    val month =
+        if (calendar[Calendar.MONTH] + 1 < 10) "0${calendar[Calendar.MONTH] + 1}" else calendar[Calendar.MONTH] + 1
+
+    return "$day.$month.${calendar[Calendar.YEAR]}"
 }
 
 fun Long.toCalendarOnlyHourAndMinute(): Calendar {
@@ -95,6 +131,7 @@ fun TimeInterval.toPosition(): Int {
         is TimeInterval.Month -> 2
         is TimeInterval.All -> 3
         is TimeInterval.Selected -> 4
+        is TimeInterval.Year -> 5
     }
 }
 

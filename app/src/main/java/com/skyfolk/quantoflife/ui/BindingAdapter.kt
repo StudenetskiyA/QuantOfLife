@@ -4,6 +4,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.databinding.BindingAdapter
+import com.github.mikephil.charting.data.BarEntry
 
 @BindingAdapter(
     value = [

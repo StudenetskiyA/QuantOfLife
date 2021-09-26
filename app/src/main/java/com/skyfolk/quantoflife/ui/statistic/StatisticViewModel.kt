@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.data.Entry
+import com.skyfolk.quantoflife.GraphSelectedYear
 import com.skyfolk.quantoflife.IDateTimeRepository
 import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.db.EventsStorageInteractor
@@ -25,6 +25,7 @@ import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.utils.*
 import kotlinx.coroutines.launch
 import java.lang.Integer.max
+import java.util.*
 import kotlin.collections.ArrayList
 
 class StatisticViewModel(
@@ -40,10 +41,11 @@ class StatisticViewModel(
 
     private val _selectedFilter = MutableLiveData<SelectedGraphFilter>().apply {
         value = SelectedGraphFilter(
-            timeInterval = settingsInteractor.getSelectedTimeInterval(),
-            measure = settingsInteractor.getSelectedGraphMeasure(),
-            filter = settingsInteractor.getSelectedGraphQuant(1),
-            filter2 = settingsInteractor.getSelectedGraphQuant(2),
+            selectedYear = settingsInteractor.selectedYearFilter,
+            timeInterval = settingsInteractor.selectedTimeInterval,
+            measure = settingsInteractor.selectedGraphMeasure,
+            filter = settingsInteractor.selectedGraphQuantFirst,
+            filter2 = settingsInteractor.selectedGraphQuantSecond,
             listOfQuants = quantsStorageInteractor.getAllQuantsList(false)
                 .filterIsInstance<QuantBase.QuantRated>()
                 .filter { it.usageCount > 9 }
@@ -52,34 +54,73 @@ class StatisticViewModel(
     val selectedFilter: LiveData<SelectedGraphFilter> = _selectedFilter
 
     fun setEventFilter(position: Int, filter: QuantFilter) {
-        settingsInteractor.writeSelectedGraphQuant(position, filter)
         when (position) {
-            1 -> _selectedFilter.value = _selectedFilter.value?.copy(filter = filter)
-            2 -> _selectedFilter.value = _selectedFilter.value?.copy(filter2 = filter)
+            1 -> {
+                settingsInteractor.selectedGraphQuantFirst = filter
+                _selectedFilter.value = _selectedFilter.value?.copy(filter = filter)
+            }
+            2 -> {
+                settingsInteractor.selectedGraphQuantSecond = filter
+                _selectedFilter.value = _selectedFilter.value?.copy(filter2 = filter)
+            }
         }
     }
 
+    fun setYearFilter(filter: GraphSelectedYear) {
+        settingsInteractor.selectedYearFilter = filter
+        _selectedFilter.value = _selectedFilter.value?.copy(selectedYear = filter)
+    }
+
     fun setMeasureFilter(measure: Measure) {
-        settingsInteractor.writeSelectedGraphMeasure(measure)
-         _selectedFilter.value = _selectedFilter.value?.copy(measure = measure)
+        settingsInteractor.selectedGraphMeasure = measure
+        _selectedFilter.value = _selectedFilter.value?.copy(measure = measure)
     }
 
     fun setTimeIntervalFilter(timeInterval: TimeInterval) {
-        settingsInteractor.writeSelectedTimeInterval(timeInterval)
+        QLog.d("skyfolk-filter","set TimeInterval = $timeInterval")
+        settingsInteractor.selectedTimeInterval = timeInterval
         _selectedFilter.value = _selectedFilter.value?.copy(timeInterval = timeInterval)
     }
 
     private fun getEntries(
+        selectedYear: GraphSelectedYear,
         allEvents: ArrayList<EventBase>,
         allQuants: ArrayList<QuantBase>,
         quantFilter: QuantFilter?,
-        lastDate: Long,
         startDayTime: Long,
         timeInterval: TimeInterval = TimeInterval.Week,
         measure: Measure
     ): StatisticFragmentState.EntriesAndFirstDate {
-        val result = ArrayList<Entry>()
+        QLog.d(
+            "skyfolk-graph",
+            "run search with ${selectedYear}, ${timeInterval}, ${measure}"
+        )
+        val result = ArrayList<BarEntry>()
         var resultCount = 0
+
+        var lastDate = when (selectedYear) {
+            GraphSelectedYear.All -> dateTimeRepository.getTimeInMillis()
+            is GraphSelectedYear.OnlyYear -> {
+                val calendar = dateTimeRepository.getCalendar()
+                calendar[Calendar.YEAR] = selectedYear.year
+                calendar
+                    .getEndDateCalendar(TimeInterval.Year, settingsInteractor.startDayTime)
+                    .timeInMillis
+            }
+        }
+        lastDate = Math.min(lastDate, dateTimeRepository.getTimeInMillis())
+
+        val firstDate = when (selectedYear) {
+            GraphSelectedYear.All ->  if (allEvents.isNotEmpty()) allEvents.first().date else lastDate
+            is GraphSelectedYear.OnlyYear -> {
+                val calendar = dateTimeRepository.getCalendar()
+                calendar[Calendar.YEAR] = selectedYear.year
+                calendar
+                    .getStartDateCalendar(TimeInterval.Year, settingsInteractor.startDayTime)
+                    .timeInMillis
+            }
+        }
+
         val allFilteredEvents = allEvents.filter {
             when (quantFilter) {
                 QuantFilter.All -> true
@@ -87,9 +128,27 @@ class StatisticViewModel(
                 is QuantFilter.OnlySelected -> it.quantId == getQuantIdByName(quantFilter.selectQuant)
                 else -> true
             }
-        }
+        }.filter {
+            when (selectedYear) {
+                GraphSelectedYear.All -> true
+                is GraphSelectedYear.OnlyYear -> {
+                    val calendar = Calendar.getInstance()
+                    calendar[Calendar.YEAR] = selectedYear.year
 
-        val firstDate = if (allEvents.isNotEmpty()) allEvents.first().date else lastDate
+                    val startYear = calendar
+                        .getStartDateCalendar(
+                            TimeInterval.Year,
+                            settingsInteractor.startDayTime
+                        )
+                        .timeInMillis
+
+                    val endYear = calendar
+                        .getEndDateCalendar(TimeInterval.Year, settingsInteractor.startDayTime)
+                        .timeInMillis
+                    it.date in (startYear + 1) until endYear
+                }
+            }
+        }
 
         var currentPeriodStart = firstDate
         var currentPeriodEnd = firstDate
@@ -106,12 +165,17 @@ class StatisticViewModel(
         var totalMaximumWithoutStartTime: Long = 0
 
         while (currentPeriodEnd <= lastDate) {
+
             currentPeriodEnd = currentPeriodStart.toCalendar().getEndDateCalendar(
                 timeInterval,
                 startDayTime
             ).timeInMillis
+
             val filteredEvents =
                 allFilteredEvents.filter { it.date in currentPeriodStart until currentPeriodEnd }
+
+            val allEventsInPeriod =
+                allEvents.filter { it.date in currentPeriodStart until currentPeriodEnd }
 
             when (filteredEvents.isEmpty()) {
                 true -> {
@@ -186,7 +250,12 @@ class StatisticViewModel(
                     getTotalCount(filteredEvents)
             }
 
-            result.add(BarEntry((resultCount).toFloat(), totalByPeriod.toFloat()))
+            when (allEventsInPeriod.isNotEmpty()) {
+                true -> {
+                    result.add(BarEntry((resultCount).toFloat(), totalByPeriod.toFloat()))
+                }
+            }
+
             resultCount++
             currentPeriodStart = currentPeriodEnd + 1
         }
@@ -198,12 +267,21 @@ class StatisticViewModel(
             else -> "Все события"
         }
 
+
+
+
         return StatisticFragmentState.EntriesAndFirstDate(
             name = name,
             entries = result,
             firstDate = firstDate,
-            maximumWith = StatisticFragmentState.MaximumContinuously(totalMaximumWith, totalMaximumWithStartTime),
-            maximumWithout = StatisticFragmentState.MaximumContinuously(totalMaximumWithout, totalMaximumWithoutStartTime)
+            maximumWith = StatisticFragmentState.MaximumContinuously(
+                totalMaximumWith,
+                totalMaximumWithStartTime
+            ),
+            maximumWithout = StatisticFragmentState.MaximumContinuously(
+                totalMaximumWithout,
+                totalMaximumWithoutStartTime
+            )
         )
     }
 
@@ -214,18 +292,18 @@ class StatisticViewModel(
         val onlyQuant2 = _selectedFilter.value?.filter2
         val timeInterval = _selectedFilter.value?.timeInterval
         val measure = _selectedFilter.value?.measure
+        val selectedYear = _selectedFilter.value?.selectedYear
 
-        QLog.d("skyfolk-graph", "run search with ${onlyQuant}, ${onlyQuant2}, ${timeInterval}, ${measure}")
         viewModelScope.launch {
             val result: ArrayList<StatisticFragmentState.EntriesAndFirstDate> = arrayListOf()
             if (onlyQuant != QuantFilter.Nothing) {
                 result.add(
                     getEntries(
+                        selectedYear = selectedYear ?: GraphSelectedYear.All,
                         allEvents = eventsStorageInteractor.getAllEvents(),
                         allQuants = quantsStorageInteractor.getAllQuantsList(false),
                         quantFilter = onlyQuant,
-                        lastDate = dateTimeRepository.getTimeInMillis(),
-                        startDayTime = settingsInteractor.getStartDayTime(),
+                        startDayTime = settingsInteractor.startDayTime,
                         timeInterval = timeInterval ?: TimeInterval.Week,
                         measure = measure ?: Measure.TotalCount
                     )
@@ -234,11 +312,11 @@ class StatisticViewModel(
             if (onlyQuant2 != QuantFilter.Nothing) {
                 result.add(
                     getEntries(
+                        selectedYear = selectedYear ?: GraphSelectedYear.All,
                         allEvents = eventsStorageInteractor.getAllEvents(),
                         allQuants = quantsStorageInteractor.getAllQuantsList(false),
                         quantFilter = onlyQuant2,
-                        lastDate = dateTimeRepository.getTimeInMillis(),
-                        startDayTime = settingsInteractor.getStartDayTime(),
+                        startDayTime = settingsInteractor.startDayTime,
                         timeInterval = timeInterval ?: TimeInterval.Week,
                         measure = measure ?: Measure.TotalCount
                     )
@@ -264,7 +342,7 @@ sealed class StatisticFragmentState {
     class Entries(val entries: ArrayList<EntriesAndFirstDate>) : StatisticFragmentState()
     data class EntriesAndFirstDate(
         val name: String,
-        val entries: ArrayList<Entry>,
+        val entries: ArrayList<BarEntry>,
         var firstDate: Long,
         val maximumWith: MaximumContinuously,
         val maximumWithout: MaximumContinuously
@@ -276,6 +354,7 @@ sealed class StatisticFragmentState {
 }
 
 data class SelectedGraphFilter(
+    var selectedYear: GraphSelectedYear,
     var timeInterval: TimeInterval,
     var measure: Measure,
     var filter: QuantFilter,

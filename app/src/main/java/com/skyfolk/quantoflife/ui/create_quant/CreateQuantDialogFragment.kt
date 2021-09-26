@@ -16,6 +16,7 @@ import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.databinding.CreateQuantDialogBinding
 import com.skyfolk.quantoflife.entity.*
 import com.skyfolk.quantoflife.settings.SettingsInteractor
+import com.skyfolk.quantoflife.utils.showConfirmDialog
 import java.lang.reflect.Field
 
 class CreateQuantDialogFragment(
@@ -41,11 +42,11 @@ class CreateQuantDialogFragment(
             false
         )
 
-        val categoryArray = mutableListOf(
-            settingsInteractor.getCategoryName(QuantCategory.Physical),
-            settingsInteractor.getCategoryName(QuantCategory.Emotion),
-            settingsInteractor.getCategoryName(QuantCategory.Evolution),
-            settingsInteractor.getCategoryName(QuantCategory.Other)
+        val categoryArray = listOf(
+            settingsInteractor.categoryNames[QuantCategory.Physical],
+            settingsInteractor.categoryNames[QuantCategory.Emotion],
+            settingsInteractor.categoryNames[QuantCategory.Evolution],
+            settingsInteractor.categoryNames[QuantCategory.Other]
         )
         val spinnerArrayAdapter =
             ArrayAdapter(requireContext(), R.layout.right_to_left_spinner, categoryArray)
@@ -123,7 +124,18 @@ class CreateQuantDialogFragment(
             }
 
         binding.buttonDelete.setOnClickListener {
-            dialogListener?.onDelete(quant!!)
+            requireContext().showConfirmDialog(
+                title = resources.getString(R.string.delete_quant_title),
+                message = resources.getString(R.string.delete_quant_message),
+                positiveButtonTitle = resources.getString(R.string.delete),
+                negativeButtonTitle = resources.getString(R.string.cancel)
+            ) {
+                dialogListener?.onDelete(quant!!)
+                dismiss()
+            }
+        }
+
+        binding.buttonBack.setOnClickListener {
             dismiss()
         }
 

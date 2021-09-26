@@ -71,6 +71,15 @@ class EndDayTests {
         Assert.assertEquals(2021, calendar.getEndDateCalendar(TimeInterval.Week, startDayTimeInMillis)[Calendar.YEAR])
 
 
+        //01-01 05:05
+        calendar[Calendar.DAY_OF_MONTH] = 28
+        calendar[Calendar.MONTH] = 11
+        calendar[Calendar.MINUTE] = 5
+        calendar[Calendar.YEAR] = 2020
+        Assert.assertEquals(3, calendar.getEndDateCalendar(TimeInterval.Week, startDayTimeInMillis)[Calendar.DAY_OF_MONTH])
+        Assert.assertEquals(0, calendar.getEndDateCalendar(TimeInterval.Week, startDayTimeInMillis)[Calendar.MONTH])
+        Assert.assertEquals(5, calendar.getEndDateCalendar(TimeInterval.Week, startDayTimeInMillis)[Calendar.MINUTE])
+        Assert.assertEquals(2021, calendar.getEndDateCalendar(TimeInterval.Week, startDayTimeInMillis)[Calendar.YEAR])
     }
 
     @Test

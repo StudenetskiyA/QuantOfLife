@@ -36,11 +36,11 @@ class FeedsViewModel(
     private val _state = MutableStateFlow<FeedsFragmentState>(FeedsFragmentState.EventsListLoading(
             listOfQuants = quantsStorageInteractor.getAllQuantsList(false),
             selectedTimeInterval = TimeInterval.toTimeInterval(
-                settingsInteractor.getStatisticTimeIntervalSelectedElement(),
-                settingsInteractor.getStatisticTimeStart(),
-                settingsInteractor.getStatisticTimeEnd()
+                settingsInteractor.statisticTimeIntervalSelectedElement,
+                settingsInteractor.statisticTimeStart,
+                settingsInteractor.statisticTimeEnd
             ),
-            selectedEventFilter = getQuantNameById(settingsInteractor.getSelectedEventFiler()),
+            selectedEventFilter = getQuantNameById(settingsInteractor.selectedEventFiler),
             quantCategoryNames = settingsInteractor.getCategoryNames()
         ))
     val state: StateFlow<FeedsFragmentState> = _state.asStateFlow()
@@ -63,12 +63,12 @@ class FeedsViewModel(
                 val startDate =
                     dateTimeRepository.getCalendar().getStartDateCalendar(
                         interval,
-                        settingsInteractor.getStartDayTime()
+                        settingsInteractor.startDayTime
                     ).timeInMillis
                 val endDate =
                     dateTimeRepository.getCalendar().getEndDateCalendar(
                         interval,
-                        settingsInteractor.getStartDayTime()
+                        settingsInteractor.startDayTime
                     ).timeInMillis
 
                 var listOfEvents = ArrayList(
@@ -131,10 +131,10 @@ class FeedsViewModel(
     }
 
     fun setTimeIntervalState(timeInterval: TimeInterval) {
-        settingsInteractor.writeStatisticTimeIntervalSelectedElement(timeInterval.javaClass.name)
+        settingsInteractor.statisticTimeIntervalSelectedElement = timeInterval.javaClass.name
         if (timeInterval is TimeInterval.Selected) {
-            settingsInteractor.setStatisticTimeStart(timeInterval.start)
-            settingsInteractor.setStatisticTimeEnd(timeInterval.end)
+            settingsInteractor.statisticTimeStart = timeInterval.start
+            settingsInteractor.statisticTimeEnd = timeInterval.end
         }
 
         runSearch(timeIntervalWasChanged = TimeIntervalWasChanged(timeInterval))
@@ -142,9 +142,9 @@ class FeedsViewModel(
 
     fun setSelectedEventFilter(itemName: String?, valueNotChange: Boolean = false) {
         if (valueNotChange) {
-            runSearch(eventFilterWasChanged = EventFilterWasChanged(settingsInteractor.getSelectedEventFiler()))
+            runSearch(eventFilterWasChanged = EventFilterWasChanged(settingsInteractor.selectedEventFiler))
         } else {
-            settingsInteractor.setSelectedEventFiler(getQuantIdByName(itemName))
+            settingsInteractor.selectedEventFiler = getQuantIdByName(itemName)
             runSearch(eventFilterWasChanged = EventFilterWasChanged(getQuantIdByName(itemName)))
         }
     }

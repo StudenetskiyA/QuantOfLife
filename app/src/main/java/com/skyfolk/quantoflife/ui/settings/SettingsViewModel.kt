@@ -27,7 +27,7 @@ class SettingsViewModel(
     val toastState: LiveData<SettingsFragment.SettingsFragmentToast> get() = _toastState
 
     private val _dayStartTime = SingleLiveEvent<Calendar>().apply {
-        value = settingsInteractor.getStartDayTime().toCalendarOnlyHourAndMinute()
+        value = settingsInteractor.startDayTime.toCalendarOnlyHourAndMinute()
     }
     val dayStartTime: LiveData<Calendar> get() = _dayStartTime
 
@@ -75,7 +75,7 @@ class SettingsViewModel(
     }
 
     fun setStartDayTime(timeInMillis: Long) {
-        settingsInteractor.setStartDayTime(timeInMillis)
+        settingsInteractor.startDayTime = timeInMillis
         _dayStartTime.value = timeInMillis.toCalendarOnlyHourAndMinute()
     }
 }
