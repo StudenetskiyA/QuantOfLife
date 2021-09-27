@@ -11,12 +11,13 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.skyfolk.quantoflife.R
@@ -25,6 +26,7 @@ import com.skyfolk.quantoflife.entity.QuantCategory
 import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.ui.theme.Colors.Orange
 import com.skyfolk.quantoflife.ui.theme.Typography
+import com.skyfolk.quantoflife.utils.format
 import com.skyfolk.quantoflife.utils.toDate
 import com.skyfolk.quantoflife.utils.toDateWithoutHourAndMinutes
 import java.util.*
@@ -273,28 +275,65 @@ fun EventItem(event: EventDisplayable, onItemClick: (EventDisplayable) -> Unit) 
                     Text(event.name)
                     Text(event.date.toDate(), fontSize = 12.sp)
                 }
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    when {
-                        ((event.bonuses != null) && (event.value != null)) -> {
+
+                when {
+                    ((event.bonuses != null) && (event.value != null)) -> {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
                             RatingBar(
                                 rating = event.value.toFloat(),
                                 color = Color.Cyan,
                                 modifier = Modifier.height(20.dp)
                             )
+
+                            var physicalBonus = 0.0
+                            var emotionBonus = 0.0
+                            var evolutionBonus = 0.0
+
+                            for (bonus in event.bonuses) {
+                                when (bonus.category) {
+                                    QuantCategory.Physical -> {
+                                        physicalBonus += bonus.baseBonus + bonus.bonusForEachRating * event.value
+                                    }
+                                    QuantCategory.Emotion -> {
+                                        emotionBonus += bonus.baseBonus + bonus.bonusForEachRating * event.value
+                                    }
+                                    QuantCategory.Evolution -> {
+                                        evolutionBonus += bonus.baseBonus + bonus.bonusForEachRating * event.value
+                                    }
+                                }
+                            }
+
+                            Text("${physicalBonus.format(1)}|${emotionBonus.format(1)}|${evolutionBonus.format(1)}", fontSize = 14.sp, fontStyle = FontStyle.Italic, maxLines = 1)
                         }
-                        ((event.bonuses == null) && (event.value != null)) -> {
-                            Text(event.value.toString())
-                        }
+                    }
+                    ((event.bonuses == null) && (event.value != null)) -> {
+                        Text(event.value.toString())
                     }
                 }
 
-                Text(event.note, fontSize = 14.sp, maxLines = 2)
+                Text(event.note, fontSize = 12.sp, maxLines = 3)
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun EventItemPreview() {
+    val event = EventDisplayable(
+        id = "id000",
+        name = "Event name",
+        quantId = "quantId",
+        icon = "quant_cardio",
+        date = Calendar.getInstance().timeInMillis,
+        note = "Заметка. Много строк - очень-очень длинный текст заметки-примечания для события, где описывается что-то прям важное и нужное.",
+        value = 4.0,
+        bonuses = arrayListOf()
+    )
+    EventItem(event = event, onItemClick = {})
 }
 
 @Composable
@@ -366,7 +405,8 @@ fun SelectedTimeInterval(
         TimeSelectLayout(
             time = intervalStart.timeInMillis,
             horizontalArrangement = Arrangement.Start,
-            modifier = Modifier.fillMaxWidth(0.5f)) {
+            modifier = Modifier.fillMaxWidth(0.5f)
+        ) {
             DatePickerDialog(
                 context,
                 onStartDateSelected,
