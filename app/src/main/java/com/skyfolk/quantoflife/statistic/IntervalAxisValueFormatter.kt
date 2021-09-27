@@ -24,7 +24,7 @@ class IntervalAxisValueFormatter(
         }
 
         val startFirstPeriodTimeInMillis =
-            firstDate.toCalendar().getStartDateCalendar(timeInterval, settingsInteractor.startDayTime).timeInMillis
+            (firstDate+period).toCalendar().getStartDateCalendar(timeInterval, settingsInteractor.startDayTime).timeInMillis
 
         val time: Long = startFirstPeriodTimeInMillis + period * value.toInt()
 

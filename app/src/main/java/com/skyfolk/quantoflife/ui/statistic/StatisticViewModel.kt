@@ -48,7 +48,8 @@ class StatisticViewModel(
             filter2 = settingsInteractor.selectedGraphQuantSecond,
             listOfQuants = quantsStorageInteractor.getAllQuantsList(false)
                 .filterIsInstance<QuantBase.QuantRated>()
-                .filter { it.usageCount > 9 }
+                .filter { it.usageCount > 9 },
+            listOfYears = eventsStorageInteractor.getAllEventsYears()
         )
     }
     val selectedFilter: LiveData<SelectedGraphFilter> = _selectedFilter
@@ -77,7 +78,6 @@ class StatisticViewModel(
     }
 
     fun setTimeIntervalFilter(timeInterval: TimeInterval) {
-        QLog.d("skyfolk-filter","set TimeInterval = $timeInterval")
         settingsInteractor.selectedTimeInterval = timeInterval
         _selectedFilter.value = _selectedFilter.value?.copy(timeInterval = timeInterval)
     }
@@ -145,7 +145,8 @@ class StatisticViewModel(
                     val endYear = calendar
                         .getEndDateCalendar(TimeInterval.Year, settingsInteractor.startDayTime)
                         .timeInMillis
-                    it.date in (startYear + 1) until endYear
+
+                    it.date in startYear until endYear
                 }
             }
         }
@@ -173,6 +174,10 @@ class StatisticViewModel(
 
             val filteredEvents =
                 allFilteredEvents.filter { it.date in currentPeriodStart until currentPeriodEnd }
+
+            QLog.d("skyfolk-graph",
+                "from ${currentPeriodStart.toMediumDate()} to ${currentPeriodEnd.toMediumDate()}, " +
+                        "lastDate = ${lastDate.toDate()}")
 
             val allEventsInPeriod =
                 allEvents.filter { it.date in currentPeriodStart until currentPeriodEnd }
@@ -359,6 +364,7 @@ data class SelectedGraphFilter(
     var measure: Measure,
     var filter: QuantFilter,
     var filter2: QuantFilter,
-    var listOfQuants: List<QuantBase>
+    var listOfQuants: List<QuantBase>,
+    var listOfYears: List<String>
 )
 

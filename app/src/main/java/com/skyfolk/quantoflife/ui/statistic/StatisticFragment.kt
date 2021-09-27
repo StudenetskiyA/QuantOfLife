@@ -48,6 +48,8 @@ class StatisticFragment : Fragment() {
                     binding.progress.visibility = View.VISIBLE
                     binding.chart.visibility = View.INVISIBLE
                     binding.chartNotEnought.visibility = View.INVISIBLE
+                    binding.maximimumWithText.visibility = View.INVISIBLE
+                    binding.maximimumWithoutText.visibility = View.INVISIBLE
                 }
                 is StatisticFragmentState.Entries -> {
                     if (data.entries.size > 0 && data.entries.first().entries.size > 1) {
@@ -115,11 +117,15 @@ class StatisticFragment : Fragment() {
                         binding.progress.visibility = View.INVISIBLE
                         binding.chart.visibility = View.VISIBLE
                         binding.chartNotEnought.visibility = View.INVISIBLE
+                        binding.maximimumWithText.visibility = View.VISIBLE
+                        binding.maximimumWithoutText.visibility = View.VISIBLE
                     } else {
                         // Not enough data
                         binding.progress.visibility = View.INVISIBLE
-                        binding.chart.visibility = View.GONE
+                        binding.chart.visibility = View.INVISIBLE
                         binding.chartNotEnought.visibility = View.VISIBLE
+                        binding.maximimumWithText.visibility = View.INVISIBLE
+                        binding.maximimumWithoutText.visibility = View.INVISIBLE
                     }
                 }
             }
@@ -148,14 +154,7 @@ class StatisticFragment : Fragment() {
                 )
 
                 //TODO
-                val listOfYears = mutableListOf<String>(
-                    "2021",
-                    "2020",
-                    "2019",
-                    "2018",
-                    "2017",
-                    "2016"
-                )//it.listOfQuants.map { it.name }.toMutableList()
+                val listOfYears = it.listOfYears.toMutableList()
                 listOfYears.add(0, "Все годы")
                 val yearsSpinnerAdapter = ArrayAdapter(
                     requireContext(),

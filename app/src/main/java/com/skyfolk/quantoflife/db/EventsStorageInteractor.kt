@@ -5,6 +5,8 @@ import com.skyfolk.quantoflife.entity.*
 import io.realm.Realm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.*
+import kotlin.collections.ArrayList
 
 class EventsStorageInteractor(private val dbInteractor: DBInteractor) {
     fun clearDataBase() {
@@ -61,6 +63,24 @@ class EventsStorageInteractor(private val dbInteractor: DBInteractor) {
         }, {
            onComplete()
         }, null)
+    }
+
+    fun getAllEventsYears() : List<String> {
+        //  TODO Это очень, очень неоптимальный поиск
+
+        val result = mutableListOf<String>()
+
+        for (event in dbInteractor.getDB().freeze().where(EventDbEntity::class.java).findAll() //TODO Async
+            .sortedBy { it.date }) {
+            val calendar = Calendar.getInstance()
+            calendar.timeInMillis = event.date
+            val year = calendar[Calendar.YEAR]
+            if (!result.contains(year.toString())) {
+                result.add(year.toString())
+            }
+        }
+
+        return result
     }
 
     suspend fun getAllEvents(): ArrayList<EventBase> = withContext(Dispatchers.IO){
