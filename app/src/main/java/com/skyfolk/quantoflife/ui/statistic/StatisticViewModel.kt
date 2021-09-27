@@ -165,7 +165,7 @@ class StatisticViewModel(
         var maximumWithoutStartTime: Long = 0
         var totalMaximumWithoutStartTime: Long = 0
 
-        while (currentPeriodEnd <= lastDate) {
+        while (currentPeriodEnd < lastDate) {
 
             currentPeriodEnd = currentPeriodStart.toCalendar().getEndDateCalendar(
                 timeInterval,
@@ -176,8 +176,8 @@ class StatisticViewModel(
                 allFilteredEvents.filter { it.date in currentPeriodStart until currentPeriodEnd }
 
             QLog.d("skyfolk-graph",
-                "from ${currentPeriodStart.toMediumDate()} to ${currentPeriodEnd.toMediumDate()}, " +
-                        "lastDate = ${lastDate.toDate()}")
+                "from ${currentPeriodStart} to ${currentPeriodEnd}, " +
+                        "lastDate = ${lastDate}")
 
             val allEventsInPeriod =
                 allEvents.filter { it.date in currentPeriodStart until currentPeriodEnd }

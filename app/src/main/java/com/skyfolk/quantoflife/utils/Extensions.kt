@@ -124,5 +124,6 @@ fun Calendar.getEndDateCalendar(timeInterval: TimeInterval, startDayTime: Long):
         startDayTime.toCalendarOnlyHourAndMinute()[Calendar.HOUR_OF_DAY]
     calendar[Calendar.MINUTE] = startDayTime.toCalendarOnlyHourAndMinute()[Calendar.MINUTE]
     calendar[Calendar.SECOND] = 0
+    calendar[Calendar.MILLISECOND] = 0
     return calendar
 }
