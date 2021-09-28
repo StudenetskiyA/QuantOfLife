@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
+import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.databinding.FeedsFragmentComposeBinding
 import com.skyfolk.quantoflife.entity.EventBase
@@ -86,6 +87,7 @@ class FeedsComposeFragment : Fragment() {
                                         viewModel.editEvent(id)
                                     }
 
+
                                     SeparatorLine()
                                 }
                             }
@@ -129,7 +131,9 @@ class FeedsComposeFragment : Fragment() {
                                 (state.selectedTimeInterval as? TimeInterval.Selected)?.let { interval ->
                                     SelectedTimeInterval(
                                         LocalContext.current,
-                                        { viewModel.setTimeIntervalState(it) },
+                                        {
+                                            QLog.d("skyfolk-graph","set ${it.start} to ${it.end}")
+                                            viewModel.setTimeIntervalState(it) },
                                         Calendar.getInstance().timeInMillis(interval.start),
                                         Calendar.getInstance().timeInMillis(interval.end)
                                     )

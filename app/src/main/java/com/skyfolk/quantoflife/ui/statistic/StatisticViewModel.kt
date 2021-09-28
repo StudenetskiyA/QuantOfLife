@@ -49,7 +49,7 @@ class StatisticViewModel(
             listOfQuants = quantsStorageInteractor.getAllQuantsList(false)
                 .filterIsInstance<QuantBase.QuantRated>()
                 .filter { it.usageCount > 9 },
-            listOfYears = eventsStorageInteractor.getAllEventsYears()
+            listOfYears = eventsStorageInteractor.getAllEventsYears(settingsInteractor.startDayTime)
         )
     }
     val selectedFilter: LiveData<SelectedGraphFilter> = _selectedFilter
@@ -175,9 +175,9 @@ class StatisticViewModel(
             val filteredEvents =
                 allFilteredEvents.filter { it.date in currentPeriodStart until currentPeriodEnd }
 
-            QLog.d("skyfolk-graph",
-                "from ${currentPeriodStart} to ${currentPeriodEnd}, " +
-                        "lastDate = ${lastDate}")
+//            QLog.d("skyfolk-graph",
+//                "from ${currentPeriodStart} to ${currentPeriodEnd}, " +
+//                        "lastDate = ${lastDate}")
 
             val allEventsInPeriod =
                 allEvents.filter { it.date in currentPeriodStart until currentPeriodEnd }
@@ -271,9 +271,6 @@ class StatisticViewModel(
             is QuantFilter.OnlySelected -> quantFilter.selectQuant
             else -> "Все события"
         }
-
-
-
 
         return StatisticFragmentState.EntriesAndFirstDate(
             name = name,

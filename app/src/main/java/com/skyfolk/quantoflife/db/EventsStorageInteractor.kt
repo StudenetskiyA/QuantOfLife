@@ -65,16 +65,30 @@ class EventsStorageInteractor(private val dbInteractor: DBInteractor) {
         }, null)
     }
 
-    fun getAllEventsYears() : List<String> {
+    fun getAllEventsYears(startDayTime: Long) : List<String> {
         //  TODO Это очень, очень неоптимальный поиск
 
         val result = mutableListOf<String>()
+        val minute = 60 * 1000
+        val hour = 60 * minute
 
-        for (event in dbInteractor.getDB().freeze().where(EventDbEntity::class.java).findAll() //TODO Async
+        for (event in dbInteractor.getDB().freeze().where(EventDbEntity::class.java).findAll()
             .sortedBy { it.date }) {
             val calendar = Calendar.getInstance()
             calendar.timeInMillis = event.date
+            val dayTime: Long = (calendar[Calendar.HOUR_OF_DAY] * hour + calendar[Calendar.MINUTE] * minute +
+                    calendar[Calendar.SECOND] * 1000).toLong()
+            if (dayTime < startDayTime) {
+                calendar[Calendar.DAY_OF_YEAR]--
+            }
+
             val year = calendar[Calendar.YEAR]
+
+            if (event.date in 1609400000000..1609460000000) {
+                QLog.d("skyfolk-graph",
+                        "found event ${event.note}, date = ${event.date}, year = ${year}")
+            }
+
             if (!result.contains(year.toString())) {
                 result.add(year.toString())
             }
