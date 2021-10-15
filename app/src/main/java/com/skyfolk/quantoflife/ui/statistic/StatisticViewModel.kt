@@ -40,6 +40,10 @@ class StatisticViewModel(
     val barEntryData: LiveData<StatisticFragmentState> = _barEntryData
 
     private val _selectedFilter = MutableLiveData<SelectedGraphFilter>().apply {
+        QLog.d(
+            "skyfolk-settings",
+            "get interval mutable = ${settingsInteractor.selectedTimeInterval}"
+        )
         value = SelectedGraphFilter(
             selectedYear = settingsInteractor.selectedYearFilter,
             timeInterval = settingsInteractor.selectedTimeInterval,
@@ -78,6 +82,10 @@ class StatisticViewModel(
     }
 
     fun setTimeIntervalFilter(timeInterval: TimeInterval) {
+        QLog.d(
+            "skyfolk-settings",
+            "setTimeIntervalFilter = ${timeInterval}"
+        )
         settingsInteractor.selectedTimeInterval = timeInterval
         _selectedFilter.value = _selectedFilter.value?.copy(timeInterval = timeInterval)
     }

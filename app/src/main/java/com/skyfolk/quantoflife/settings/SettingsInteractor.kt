@@ -36,43 +36,44 @@ class SettingsInteractor(private val context: Context) {
     private val preferences = context.getSharedPreferences("qol_preferences", Context.MODE_PRIVATE)
 
     var lastSelectedCalendar: Calendar
-    get() {
-        if (Calendar.getInstance().timeInMillis - lastSelectedCalendarWhenSelected.timeInMillis
-            > PERIOD_WHILE_SELECTED_CALENDAR_MATTERS) {
-            return Calendar.getInstance()
-        } else {
-            return lastSelectedCalendarWhatSelected
+        get() {
+            if (Calendar.getInstance().timeInMillis - lastSelectedCalendarWhenSelected.timeInMillis
+                > PERIOD_WHILE_SELECTED_CALENDAR_MATTERS
+            ) {
+                return Calendar.getInstance()
+            } else {
+                return lastSelectedCalendarWhatSelected
+            }
         }
-    }
-    set(value) {
-        lastSelectedCalendarWhatSelected = value
-        lastSelectedCalendarWhenSelected = Calendar.getInstance()
-    }
+        set(value) {
+            lastSelectedCalendarWhatSelected = value
+            lastSelectedCalendarWhenSelected = Calendar.getInstance()
+        }
 
     private var lastSelectedCalendarWhenSelected by preferences.calendar()
     private var lastSelectedCalendarWhatSelected by preferences.calendar()
 
-    var selectedTimeInterval by preferences.timeInterval (
+    var selectedTimeInterval by preferences.timeInterval(
         key = { SELECTED_GRAPH_PERIOD },
         defaultValue = TimeInterval.Week
     )
 
-    var selectedGraphQuantFirst by preferences.quantFilter (
+    var selectedGraphQuantFirst by preferences.quantFilter(
         key = { SELECTED_GRAPH_FIRST_QUANT },
         defaultValue = QuantFilter.All
     )
 
-    var selectedGraphQuantSecond by preferences.quantFilter (
+    var selectedGraphQuantSecond by preferences.quantFilter(
         key = { SELECTED_GRAPH_SECOND_QUANT },
         defaultValue = QuantFilter.Nothing
     )
 
-    var selectedGraphMeasure by preferences.measure (
+    var selectedGraphMeasure by preferences.measure(
         key = { SELECTED_GRAPH_MEASURE },
         defaultValue = Measure.TotalCount
     )
 
-    var selectedYearFilter by preferences.graphSelectedYear ()
+    var selectedYearFilter by preferences.graphSelectedYear()
 
     var statisticTimeIntervalSelectedElement by preferences.string(
         key = { SELECTED_RADIO_IN_STATISTIC },
@@ -87,7 +88,7 @@ class SettingsInteractor(private val context: Context) {
         key = { SELECTED_TIME_END }
     )
 
-    var selectedEventFiler by preferences.stringOrNull (
+    var selectedEventFiler by preferences.stringOrNull(
         key = { SELECTED_EVENT_FILTER },
         defaultValue = null
     )
@@ -100,12 +101,12 @@ class SettingsInteractor(private val context: Context) {
         QuantCategory.Other to getCategoryName(QuantCategory.Other),
         QuantCategory.None to getCategoryName(QuantCategory.None)
     )
-    set(value) {
-        field = value
-        for (v in field) {
-            setCategoryName(v.key, v.value)
+        set(value) {
+            field = value
+            for (v in field) {
+                setCategoryName(v.key, v.value)
+            }
         }
-    }
 
     private fun getCategoryName(category: QuantCategory): String {
         val default = context.resources.getStringArray(R.array.category_name)[category.ordinal]
@@ -219,7 +220,7 @@ class SettingsInteractor(private val context: Context) {
             ) = edit().putLong(key(property), value.timeInMillis).apply()
         }
 
-    fun SharedPreferences.measure(
+    private fun SharedPreferences.measure(
         defaultValue: Measure = Measure.TotalCount,
         key: (KProperty<*>) -> String = KProperty<*>::name
     ): ReadWriteProperty<Any, Measure> =
@@ -228,8 +229,8 @@ class SettingsInteractor(private val context: Context) {
                 thisRef: Any,
                 property: KProperty<*>
             ): Measure {
-                QLog.d("skyfolk-settings","read measure = ${getString(key(property), defaultValue.toString())
-                    ?: defaultValue.toString()}, for example = ${Measure.TotalPhysical.name}")
+//                QLog.d("skyfolk-settings","read measure = ${getString(key(property), defaultValue.toString())
+//                    ?: defaultValue.toString()}, for example = ${Measure.TotalPhysical.name}")
                 return when (getString(key(property), defaultValue.toString())
                     ?: defaultValue.toString()) {
                     Measure.TotalCount.name -> Measure.TotalCount
@@ -266,7 +267,7 @@ class SettingsInteractor(private val context: Context) {
                     else -> {
                         if (value.toIntOrNull() != null) {
                             GraphSelectedYear.OnlyYear(value.toInt())
-                            } else {
+                        } else {
                             GraphSelectedYear.All
                         }
 
@@ -280,8 +281,14 @@ class SettingsInteractor(private val context: Context) {
                 value: GraphSelectedYear
             ) {
                 when (value) {
-                    GraphSelectedYear.All -> edit().putString(key(property), GraphSelectedYear.All::class.java.canonicalName).apply()
-                    is GraphSelectedYear.OnlyYear -> edit().putString(key(property), value.year.toString()).apply()
+                    GraphSelectedYear.All -> edit().putString(
+                        key(property),
+                        GraphSelectedYear.All::class.java.canonicalName
+                    ).apply()
+                    is GraphSelectedYear.OnlyYear -> edit().putString(
+                        key(property),
+                        value.year.toString()
+                    ).apply()
                 }
             }
         }
@@ -297,9 +304,9 @@ class SettingsInteractor(private val context: Context) {
             ): TimeInterval {
                 return when (getString(key(property), defaultValue.toString())
                     ?: defaultValue.toString()) {
-                    TimeInterval.Today.toString() -> TimeInterval.Today
-                    TimeInterval.Year.toString() -> TimeInterval.Year
-                    TimeInterval.Week.toString() -> TimeInterval.Week
+                    TimeInterval.Today::class.java.canonicalName -> TimeInterval.Today
+                    TimeInterval.Year::class.java.canonicalName -> TimeInterval.Year
+                    TimeInterval.Week::class.java.canonicalName -> TimeInterval.Week
                     else -> TimeInterval.Month
                 }
             }
@@ -308,7 +315,16 @@ class SettingsInteractor(private val context: Context) {
                 thisRef: Any,
                 property: KProperty<*>,
                 value: TimeInterval
-            ) = edit().putString(key(property), value.toString()).apply()
+            ) {
+                edit().putString(
+                    key(property), when (value) {
+                        is TimeInterval.Today -> TimeInterval.Today::class.java.canonicalName
+                        is TimeInterval.Year -> TimeInterval.Year::class.java.canonicalName
+                        is TimeInterval.Week -> TimeInterval.Week::class.java.canonicalName
+                        else -> TimeInterval.Month::class.java.canonicalName
+                    }
+                ).apply()
+            }
         }
 
     fun SharedPreferences.quantFilter(

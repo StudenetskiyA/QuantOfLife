@@ -13,6 +13,7 @@ import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.skyfolk.quantoflife.GraphSelectedYear
+import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.databinding.StatisticFragmentBinding
 import com.skyfolk.quantoflife.meansure.QuantFilter
@@ -146,6 +147,10 @@ class StatisticFragment : Fragment() {
                 binding.eventSpinner2.adapter = quantsSpinnerAdapter
 
                 binding.meansureSpinner.setSelection(it.measure.toPosition(), false)
+                QLog.d(
+                    "skyfolk-settings",
+                    "setSelection interval = ${it.timeInterval} to ${it.timeInterval.toGraphPosition()}"
+                )
                 binding.timePeriodSpinner.setSelection(it.timeInterval.toGraphPosition(), false)
                 binding.eventSpinner.setSelection(it.filter.toGraphPosition(listOfQuantName), false)
                 binding.eventSpinner2.setSelection(
@@ -310,6 +315,10 @@ class StatisticFragment : Fragment() {
                     if (!isSelectionFromTouch) {
                         return
                     }
+                    QLog.d(
+                        "skyfolk-settings",
+                        "onItemSelectedListener"
+                    )
                     val timeInterval = position.fromPositionToTimeInterval()
                     viewModel.setTimeIntervalFilter(timeInterval = timeInterval)
                     isSelectionFromTouch = false
