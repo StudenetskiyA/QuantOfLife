@@ -80,6 +80,10 @@ class SettingsInteractor(private val context: Context) {
         defaultValue = "All"
     )
 
+    var statisticSearchText by preferences.string(
+        defaultValue = ""
+    )
+
     var statisticTimeStart by preferences.long(
         key = { SELECTED_TIME_START }
     )

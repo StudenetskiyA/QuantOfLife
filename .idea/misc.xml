@@ -12,6 +12,7 @@
         <entry key="../../../../layout/compose-model-1631380499225.xml" value="0.8685636856368564" />
         <entry key="../../../../layout/compose-model-1631446252135.xml" value="0.8685636856368564" />
         <entry key="../../../../layout/compose-model-1632761781044.xml" value="0.55" />
+        <entry key="../../../../layout/compose-model-1634295999884.xml" value="0.475" />
         <entry key="../../../../layout/custom_preview.xml" value="0.1" />
         <entry key="../../Library/Android/sdk/platforms/android-30/data/res/layout/simple_spinner_item.xml" value="0.2046875" />
         <entry key="..\:/Code/QuantOfLife/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.22135416666666666" />
@@ -23,6 +24,9 @@
         <entry key="..\:/Users/wowda/AppData/Local/Android/Sdk/platforms/android-30/data/res/drawable/btn_dropdown.xml" value="0.22135416666666666" />
         <entry key="app/src/main/res/drawable/fade_green.xml" value="0.228125" />
         <entry key="app/src/main/res/drawable/fade_red.xml" value="0.228125" />
+        <entry key="app/src/main/res/drawable/ic_balanced.xml" value="0.17395833333333333" />
+        <entry key="app/src/main/res/drawable/ic_home_black_24dp.xml" value="0.17395833333333333" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.17395833333333333" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.2046875" />
         <entry key="app/src/main/res/layout/activity_onboarding.xml" value="0.2046875" />
         <entry key="app/src/main/res/layout/create_event_dialog.xml" value="0.21197916666666666" />

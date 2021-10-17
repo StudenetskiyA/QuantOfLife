@@ -11,17 +11,20 @@ sealed class FeedsFragmentState(
     open val listOfQuants: ArrayList<QuantBase>,
     open val selectedTimeInterval: TimeInterval,
     open val selectedEventFilter: String?,
+    open val selectedTextFilter: String,
     open val quantCategoryNames: ArrayList<Pair<QuantCategory, String>>
 ) {
     data class EventsListLoading(
         override val listOfQuants: ArrayList<QuantBase>,
         override val selectedTimeInterval: TimeInterval,
         override val selectedEventFilter: String?,
+        override val selectedTextFilter: String,
         override val quantCategoryNames: ArrayList<Pair<QuantCategory, String>>
     ) : FeedsFragmentState(
         listOfQuants,
         selectedTimeInterval,
         selectedEventFilter,
+        selectedTextFilter,
         quantCategoryNames
     ) {
         companion object {
@@ -31,6 +34,7 @@ sealed class FeedsFragmentState(
                         it.listOfQuants,
                         it.selectedTimeInterval,
                         it.selectedEventFilter,
+                        it.selectedTextFilter,
                         it.quantCategoryNames
                     )
                 }
@@ -42,6 +46,7 @@ sealed class FeedsFragmentState(
         override val listOfQuants: ArrayList<QuantBase>,
         override val selectedTimeInterval: TimeInterval,
         override val selectedEventFilter: String?,
+        override val selectedTextFilter: String,
         override val quantCategoryNames: ArrayList<Pair<QuantCategory, String>>,
         val listOfEvents: ArrayList<EventDisplayable>,
         val totalPhysicalFound: Double,
@@ -53,6 +58,7 @@ sealed class FeedsFragmentState(
         listOfQuants,
         selectedTimeInterval,
         selectedEventFilter,
+        selectedTextFilter,
         quantCategoryNames
     ) {
         companion object {
@@ -60,6 +66,7 @@ sealed class FeedsFragmentState(
                 state: MutableStateFlow<FeedsFragmentState>,
                 _timeInterval: TimeInterval,
                 _selectedEventFilter: String?,
+                _selectedTextFilter: String,
                 _quantCategoryName: ArrayList<Pair<QuantCategory, String>>,
                 _listOfEvents: ArrayList<EventDisplayable>,
                 _totalPhysicalFound: Double,
@@ -73,6 +80,7 @@ sealed class FeedsFragmentState(
                         it.listOfQuants,
                         _timeInterval,
                         _selectedEventFilter,
+                        _selectedTextFilter,
                         _quantCategoryName,
                         _listOfEvents,
                         _totalPhysicalFound,

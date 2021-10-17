@@ -33,7 +33,8 @@ class FeedsViewModel(
     private val quantsStorageInteractor: IQuantsStorageInteractor,
     private val dateTimeRepository: IDateTimeRepository
 ) : ViewModel() {
-    private val _state = MutableStateFlow<FeedsFragmentState>(FeedsFragmentState.EventsListLoading(
+    private val _state = MutableStateFlow<FeedsFragmentState>(
+        FeedsFragmentState.EventsListLoading(
             listOfQuants = quantsStorageInteractor.getAllQuantsList(false),
             selectedTimeInterval = TimeInterval.toTimeInterval(
                 settingsInteractor.statisticTimeIntervalSelectedElement,
@@ -41,8 +42,10 @@ class FeedsViewModel(
                 settingsInteractor.statisticTimeEnd
             ),
             selectedEventFilter = getQuantNameById(settingsInteractor.selectedEventFiler),
+            selectedTextFilter = settingsInteractor.statisticSearchText,
             quantCategoryNames = settingsInteractor.getCategoryNames()
-        ))
+        )
+    )
     val state: StateFlow<FeedsFragmentState> = _state.asStateFlow()
 
     private val _singleLifeEvent = SingleLiveEvent<FeedsFragmentSingleLifeEvent>()
@@ -52,13 +55,15 @@ class FeedsViewModel(
         timeIntervalWasChanged: TimeIntervalWasChanged? = null,
         eventFilterWasChanged: EventFilterWasChanged? = null
     ) {
-        Log.d("skyfolk-timer", "runSearchStart: ${System.currentTimeMillis()}" )
+        Log.d("skyfolk-timer", "runSearchStart: ${System.currentTimeMillis()}")
 
         viewModelScope.launch {
             val selectedTimeInterval =
                 timeIntervalWasChanged?.timeInterval ?: _state.value.selectedTimeInterval
             selectedTimeInterval.let { interval ->
                 updateStateToLoading(_state)
+
+                val searchText = settingsInteractor.statisticSearchText
 
                 val startDate =
                     dateTimeRepository.getCalendar().getStartDateCalendar(
@@ -73,7 +78,15 @@ class FeedsViewModel(
 
                 var listOfEvents = ArrayList(
                     eventsStorageInteractor.getAllEvents()
-                        .filter { it.date in startDate until endDate })
+                        .filter { it.date in startDate until endDate }
+                        .filter {
+//                            quantsStorageInteractor.getQuantById(it.quantId)?.name?.contains(
+//                                searchText,
+//                                ignoreCase = true
+//                            ) == true ||
+                                    it.note.contains(searchText, ignoreCase = true)
+                        })
+
                 val selectedEventFilter =
                     if (eventFilterWasChanged != null) eventFilterWasChanged.eventFilter else
                         getQuantIdByName(_state.value.selectedEventFilter)
@@ -81,7 +94,7 @@ class FeedsViewModel(
                     listOfEvents = ArrayList(listOfEvents.filter { it.quantId == filter })
                 }
 
-                Log.d("skyfolk-timer", "runSearchEnd: ${System.currentTimeMillis()}" )
+                Log.d("skyfolk-timer", "runSearchEnd: ${System.currentTimeMillis()}")
 
                 val allQuantsFound = quantsStorageInteractor.getAllQuantsList(false)
 
@@ -106,12 +119,13 @@ class FeedsViewModel(
                 val totalFound = getTotal(allQuantsFound, listOfEvents)
                 val starFound = getStarTotal(allQuantsFound, listOfEvents)
 
-                Log.d("skyfolk-timer", "runSearchValuesEnd: ${System.currentTimeMillis()}" )
+                Log.d("skyfolk-timer", "runSearchValuesEnd: ${System.currentTimeMillis()}")
 
                 updateStateToCompleted(
                     _state,
                     _timeInterval = interval,
                     _selectedEventFilter = getQuantNameById(selectedEventFilter),
+                    _selectedTextFilter = searchText,
                     _quantCategoryName = settingsInteractor.getCategoryNames(),
                     _listOfEvents = listOfEvents.toDisplayableEvents(allQuantsFound),
                     _totalPhysicalFound = totalPhysicalFound,
@@ -121,7 +135,7 @@ class FeedsViewModel(
                     _totalStarFound = starFound
                 )
 
-                Log.d("skyfolk-timer", "runSearchUpdateStateEnd: ${System.currentTimeMillis()}" )
+                Log.d("skyfolk-timer", "runSearchUpdateStateEnd: ${System.currentTimeMillis()}")
             }
         }
     }
@@ -138,6 +152,12 @@ class FeedsViewModel(
         }
 
         runSearch(timeIntervalWasChanged = TimeIntervalWasChanged(timeInterval))
+    }
+
+    fun setSearchText(searchText: String) {
+        settingsInteractor.statisticSearchText = searchText
+
+        runSearch()
     }
 
     fun setSelectedEventFilter(itemName: String?, valueNotChange: Boolean = false) {
@@ -172,7 +192,7 @@ class FeedsViewModel(
         id?.let {
             return quantsStorageInteractor.getQuantById(it)?.name
         }
-            return null
+        return null
     }
 
     private fun getQuantIdByName(name: String?): String? {
@@ -206,7 +226,7 @@ fun ArrayList<EventBase>.toDisplayableEvents(quants: List<QuantBase>): ArrayList
                     icon = it.icon,
                     date = event.date,
                     note = event.note,
-                    value =  value,
+                    value = value,
                     bonuses = bonuses
                 )
             )

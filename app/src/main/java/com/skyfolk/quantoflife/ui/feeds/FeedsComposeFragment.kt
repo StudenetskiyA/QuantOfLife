@@ -12,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -41,6 +42,7 @@ class FeedsComposeFragment : Fragment() {
         viewModel.setSelectedEventFilter(null, true)
     }
 
+    @ExperimentalComposeUiApi
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -117,6 +119,7 @@ class FeedsComposeFragment : Fragment() {
                                     listOfTimeInterval = resources.getStringArray(R.array.time_interval)
                                         .toList(),
                                     selectedTimeIntervalPosition = state.selectedTimeInterval.toPosition(),
+                                    selectedTextFilter = state.selectedTextFilter,
                                     onTimeIntervalFilterClick = { position ->
                                         val start = startIntervalCalendar.timeInMillis
                                         val end = endIntervalCalendar.timeInMillis
@@ -124,6 +127,9 @@ class FeedsComposeFragment : Fragment() {
                                         viewModel.setTimeIntervalState(
                                             fromPositionToTimeInterval(position, start, end)
                                         )
+                                    },
+                                    onTextSearchEnter = {
+                                        viewModel.setSearchText(it)
                                     },
                                     modifier = Modifier
                                 )
