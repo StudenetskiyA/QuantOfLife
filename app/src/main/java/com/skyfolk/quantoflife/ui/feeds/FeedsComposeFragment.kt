@@ -23,6 +23,7 @@ import com.skyfolk.quantoflife.databinding.FeedsFragmentComposeBinding
 import com.skyfolk.quantoflife.entity.EventBase
 import com.skyfolk.quantoflife.timeInterval.TimeInterval
 import com.skyfolk.quantoflife.ui.now.CreateEventDialogFragment
+import com.skyfolk.quantoflife.ui.statistic.NavigateToFeedEvent
 import com.skyfolk.quantoflife.ui.theme.Colors
 import com.skyfolk.quantoflife.ui.theme.ComposeFlowTestTheme
 import com.skyfolk.quantoflife.utils.fromPositionToTimeInterval
@@ -38,7 +39,21 @@ class FeedsComposeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        Log.d("skyfolk-timer", "onResume: ${System.currentTimeMillis()}" )
+
+        arguments?.let{
+            val start = it.getLong(NavigateToFeedEvent.START_DATE_KEY)
+            val end = it.getLong(NavigateToFeedEvent.END_DATE_KEY)
+
+            if (start != 0L && end != 0L ) {
+                viewModel.setTimeIntervalState(
+                    TimeInterval.Selected(
+                        it.getLong(NavigateToFeedEvent.START_DATE_KEY),
+                        it.getLong(NavigateToFeedEvent.END_DATE_KEY)
+                    )
+                )
+            }
+        }
+
         viewModel.setSelectedEventFilter(null, true)
     }
 

@@ -38,4 +38,17 @@ sealed class TimeInterval {
             is Year -> array[5]
         }
     }
+
+    fun toDuration(): Long {
+        val day: Long = (24 * 60 * 60 * 1000).toLong()
+        return when (this) {
+            is Today -> day
+            is Week -> day * 7
+            // TODO
+            is Month -> day * 31
+            is All -> 0
+            is Selected -> 0
+            is Year -> day * 365
+        }
+    }
 }

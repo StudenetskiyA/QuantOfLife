@@ -8,25 +8,45 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.skyfolk.quantoflife.GraphSelectedYear
 import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.databinding.StatisticFragmentBinding
 import com.skyfolk.quantoflife.meansure.QuantFilter
 import com.skyfolk.quantoflife.meansure.fromPositionToMeasure
+import com.skyfolk.quantoflife.ui.feeds.FeedsComposeFragment
 import com.skyfolk.quantoflife.ui.theme.Colors
 import com.skyfolk.quantoflife.ui.theme.toInt
 import com.skyfolk.quantoflife.utils.fromPositionToTimeInterval
+import com.skyfolk.quantoflife.utils.toDate
 import com.skyfolk.quantoflife.utils.toDateWithoutHourAndMinutes
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class StatisticFragment : Fragment() {
+class StatisticFragment : Fragment(), OnChartValueSelectedListener {
     private val viewModel: StatisticViewModel by viewModel()
     private lateinit var binding: StatisticFragmentBinding
+
+    private fun openFeedsFragment(event: NavigateToFeedEvent) {
+        val bundle = bundleOf(
+            NavigateToFeedEvent.START_DATE_KEY to event.startDate,
+            NavigateToFeedEvent.END_DATE_KEY to event.endDate
+        )
+        this.findNavController().navigate(R.id.action_global_to_feeds, bundle)
+    }
+
+    fun Fragment.findNavController(): NavController =
+        NavHostFragment.findNavController(this)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,6 +62,12 @@ class StatisticFragment : Fragment() {
         //TODO If one data source
         binding.chart.legend.isEnabled = true
         binding.chart.legend.textColor = Color.rgb(255, 255, 255)
+
+        viewModel.navigationEvent.observe(viewLifecycleOwner) { event ->
+            QLog.d("skyfolk-graph", "navigationEvent $event")
+
+            openFeedsFragment(event)
+        }
 
         viewModel.barEntryData.observe(viewLifecycleOwner) { data ->
             when (data) {
@@ -62,24 +88,25 @@ class StatisticFragment : Fragment() {
                             data.entries[0].maximumWith.startDate.toDateWithoutHourAndMinutes()
                         )
 
-                        binding.maximimumWithoutText.text = when (data.entries[0].maximumWithout.lenght > 0) {
-                            true -> {
-                                getString(
-                                    R.string.statistic_maximum_without,
-                                    binding.timePeriodSpinner.selectedItem.toString(),
-                                    data.entries[0].name,
-                                    data.entries[0].maximumWithout.lenght,
-                                    data.entries[0].maximumWithout.startDate.toDateWithoutHourAndMinutes()
-                                )
+                        binding.maximimumWithoutText.text =
+                            when (data.entries[0].maximumWithout.lenght > 0) {
+                                true -> {
+                                    getString(
+                                        R.string.statistic_maximum_without,
+                                        binding.timePeriodSpinner.selectedItem.toString(),
+                                        data.entries[0].name,
+                                        data.entries[0].maximumWithout.lenght,
+                                        data.entries[0].maximumWithout.startDate.toDateWithoutHourAndMinutes()
+                                    )
+                                }
+                                false -> {
+                                    getString(
+                                        R.string.statistic_maximum_without_no_one,
+                                        binding.timePeriodSpinner.selectedItem.toString(),
+                                        data.entries[0].name
+                                    )
+                                }
                             }
-                            false -> {
-                                getString(
-                                    R.string.statistic_maximum_without_no_one,
-                                    binding.timePeriodSpinner.selectedItem.toString(),
-                                    data.entries[0].name
-                                )
-                            }
-                        }
 
                         val dataSets = arrayListOf<BarDataSet>()
                         val set1 = BarDataSet(data.entries[0].entries, data.entries[0].name)
@@ -103,6 +130,8 @@ class StatisticFragment : Fragment() {
                             (data.entries[0].entries[1].x - data.entries[0].entries[0].x)
                         }
                         binding.chart.xAxis.labelCount = data.entries[0].entries.size
+
+                        binding.chart.setOnChartValueSelectedListener(this)
 
                         binding.timePeriodSpinner.selectedItemPosition.fromPositionToTimeInterval()
                             .let {
@@ -158,7 +187,6 @@ class StatisticFragment : Fragment() {
                     false
                 )
 
-                //TODO
                 val listOfYears = it.listOfYears.toMutableList()
                 listOfYears.add(0, "Все годы")
                 val yearsSpinnerAdapter = ArrayAdapter(
@@ -372,5 +400,14 @@ class StatisticFragment : Fragment() {
             textColor = Colors.Green.toInt(),
             fillDrawable = R.drawable.fade_green
         )
+    }
+
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
+        h?.let {
+            viewModel.selectGraphBar(it.x)
+        }
+    }
+
+    override fun onNothingSelected() {
     }
 }

@@ -15,13 +15,25 @@
         android:id="@+id/navigation_feeds"
         android:name="com.skyfolk.quantoflife.ui.feeds.FeedsComposeFragment"
         android:label="@string/title_feeds"
-        tools:layout="@layout/feeds_fragment" />
+        tools:layout="@layout/feeds_fragment">
+
+        <argument
+            android:name="selectedInterval"
+            app:argType="string" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_statistic"
         android:name="com.skyfolk.quantoflife.ui.statistic.StatisticFragment"
         android:label="@string/title_statistic"
-        tools:layout="@layout/feeds_fragment" />
+        tools:layout="@layout/feeds_fragment">
+
+        <action
+            android:id="@+id/action_global_to_feeds"
+            app:destination="@id/navigation_feeds" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_settings"
