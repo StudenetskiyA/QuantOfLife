@@ -124,7 +124,8 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
                         setAxisProperties()
 
                         //TODO Даже в три раза меньше делений это может быть много, сделай нормально
-                        binding.chart.xAxis.granularity = if (data.entries[0].entries.size > 20) {
+                        binding.chart.xAxis.granularity =
+                            if (data.entries[0].entries.size > 20) {
                             (data.entries[0].entries[1].x - data.entries[0].entries[0].x) * 4
                         } else {
                             (data.entries[0].entries[1].x - data.entries[0].entries[0].x)
@@ -404,7 +405,7 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
 
     override fun onValueSelected(e: Entry?, h: Highlight?) {
         h?.let {
-            viewModel.selectGraphBar(it.x)
+            viewModel.selectGraphBar(it.x.toInt())
         }
     }
 

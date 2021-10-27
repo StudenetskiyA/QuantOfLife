@@ -26,10 +26,7 @@ import com.skyfolk.quantoflife.ui.now.CreateEventDialogFragment
 import com.skyfolk.quantoflife.ui.statistic.NavigateToFeedEvent
 import com.skyfolk.quantoflife.ui.theme.Colors
 import com.skyfolk.quantoflife.ui.theme.ComposeFlowTestTheme
-import com.skyfolk.quantoflife.utils.fromPositionToTimeInterval
-import com.skyfolk.quantoflife.utils.setOnHideByTimeout
-import com.skyfolk.quantoflife.utils.timeInMillis
-import com.skyfolk.quantoflife.utils.toPosition
+import com.skyfolk.quantoflife.utils.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.util.*
 
@@ -40,21 +37,21 @@ class FeedsComposeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        arguments?.let{
+        arguments?.let {
             val start = it.getLong(NavigateToFeedEvent.START_DATE_KEY)
             val end = it.getLong(NavigateToFeedEvent.END_DATE_KEY)
 
+
             if (start != 0L && end != 0L ) {
+                QLog.d("skyfolk-graph","event from graph ${start.toDate()} to ${end.toDate()}")
+
                 viewModel.setTimeIntervalState(
-                    TimeInterval.Selected(
-                        it.getLong(NavigateToFeedEvent.START_DATE_KEY),
-                        it.getLong(NavigateToFeedEvent.END_DATE_KEY)
-                    )
+                    TimeInterval.Selected(start, end)
                 )
+            } else {
+                viewModel.setSelectedEventFilter(null, true)
             }
         }
-
-        viewModel.setSelectedEventFilter(null, true)
     }
 
     @ExperimentalComposeUiApi
@@ -63,11 +60,9 @@ class FeedsComposeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.d("skyfolk-timer", "onCreateView: ${System.currentTimeMillis()}" )
         binding = FeedsFragmentComposeBinding.inflate(inflater, container, false)
             .apply {
                 composeView.setContent {
-                    Log.d("skyfolk-timer", "topUpdateState: ${System.currentTimeMillis()}" )
 
                     val state by viewModel.state.collectAsState()
                     val startIntervalCalendar = remember { viewModel.getDefaultCalendar() }

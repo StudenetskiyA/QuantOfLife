@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import java.lang.Integer.max
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.min
 
 class StatisticViewModel(
     private val eventsStorageInteractor: EventsStorageInteractor,
@@ -58,32 +59,24 @@ class StatisticViewModel(
     }
     val selectedFilter: LiveData<SelectedGraphFilter> = _selectedFilter
 
-    fun selectGraphBar(index: Float) {
+    fun selectGraphBar(index: Int) {
             if (barEntryData.value is StatisticFragmentState.Entries) {
                 val value = barEntryData.value as StatisticFragmentState.Entries
 
                 viewModelScope.launch {
-                    val firstDate = value.entries[0].firstDate
                     val timeInterval = _selectedFilter.value?.timeInterval ?: TimeInterval.Week
-                    val period = timeInterval.toDuration()
-
-                    val startFirstPeriodTimeInMillis =
-                        (firstDate + period).toCalendar().getStartDateCalendar(timeInterval, settingsInteractor.startDayTime).timeInMillis
-
-                    QLog.d("skyfolk-graph","first date ${startFirstPeriodTimeInMillis.toDate()}")
-
-                    val lambda: Long = (index * timeInterval.toDuration()).toLong() + startFirstPeriodTimeInMillis
-                    val end = lambda + timeInterval.toDuration()
-
-                    QLog.d("skyfolk-graph","period date ${lambda.toDate()} to ${end.toDate()}")
+                    val period = timeInterval.getPeriod(
+                        firstDate = value.entries[0].firstDate,
+                        index = index,
+                        startDayTime = settingsInteractor.startDayTime
+                    )
 
                     _navigationEvent.value = NavigateToFeedEvent(
-                        startDate = lambda,
-                        endDate = end)
+                        startDate = period.start,
+                        endDate = period.end)
                 }
 
             }
-
     }
 
     fun setEventFilter(position: Int, filter: QuantFilter) {
@@ -110,10 +103,6 @@ class StatisticViewModel(
     }
 
     fun setTimeIntervalFilter(timeInterval: TimeInterval) {
-        QLog.d(
-            "skyfolk-settings",
-            "setTimeIntervalFilter = ${timeInterval}"
-        )
         settingsInteractor.selectedTimeInterval = timeInterval
         _selectedFilter.value = _selectedFilter.value?.copy(timeInterval = timeInterval)
     }
@@ -127,10 +116,7 @@ class StatisticViewModel(
         timeInterval: TimeInterval = TimeInterval.Week,
         measure: Measure
     ): StatisticFragmentState.EntriesAndFirstDate {
-        QLog.d(
-            "skyfolk-graph",
-            "run search with ${selectedYear}, ${timeInterval}, ${measure}"
-        )
+
         val result = ArrayList<BarEntry>()
         var resultCount = 0
 
@@ -144,10 +130,10 @@ class StatisticViewModel(
                     .timeInMillis
             }
         }
-        lastDate = Math.min(lastDate, dateTimeRepository.getTimeInMillis())
+        lastDate = min(lastDate, dateTimeRepository.getTimeInMillis())
 
         val firstDate = when (selectedYear) {
-            GraphSelectedYear.All ->  if (allEvents.isNotEmpty()) allEvents.first().date else lastDate
+            GraphSelectedYear.All -> if (allEvents.isNotEmpty()) allEvents.first().date else lastDate
             is GraphSelectedYear.OnlyYear -> {
                 val calendar = dateTimeRepository.getCalendar()
                 calendar[Calendar.YEAR] = selectedYear.year
@@ -164,31 +150,13 @@ class StatisticViewModel(
                 is QuantFilter.OnlySelected -> it.quantId == getQuantIdByName(quantFilter.selectQuant)
                 else -> true
             }
-        }.filter {
-            when (selectedYear) {
-                GraphSelectedYear.All -> true
-                is GraphSelectedYear.OnlyYear -> {
-                    val calendar = Calendar.getInstance()
-                    calendar[Calendar.YEAR] = selectedYear.year
-
-                    val startYear = calendar
-                        .getStartDateCalendar(
-                            TimeInterval.Year,
-                            settingsInteractor.startDayTime
-                        )
-                        .timeInMillis
-
-                    val endYear = calendar
-                        .getEndDateCalendar(TimeInterval.Year, settingsInteractor.startDayTime)
-                        .timeInMillis
-
-                    it.date in startYear until endYear
-                }
-            }
         }
 
-        var currentPeriodStart = firstDate
-        var currentPeriodEnd = firstDate
+        var currentPeriodStart = firstDate.toCalendar().getStartDateCalendar(
+            timeInterval,
+            startDayTime
+        ).timeInMillis
+        var currentPeriodEnd = 0L
 
         var maximumWith = 0
         var totalMaximumWith = 0
@@ -207,6 +175,8 @@ class StatisticViewModel(
                 timeInterval,
                 startDayTime
             ).timeInMillis
+
+           // QLog.d("skyfolk-graph","period = ${currentPeriodStart.toDate()} to ${currentPeriodEnd.toDate()}")
 
             val filteredEvents =
                 allFilteredEvents.filter { it.date in currentPeriodStart until currentPeriodEnd }
@@ -404,6 +374,10 @@ data class NavigateToFeedEvent(
     companion object {
         const val START_DATE_KEY = "start_date_key"
         const val END_DATE_KEY = "end_date_key"
+    }
+
+    override fun toString(): String {
+        return "NavigateToFeedEvent(${startDate.toDate()} to ${endDate.toDate()})"
     }
 }
 

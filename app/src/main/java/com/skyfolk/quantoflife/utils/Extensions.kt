@@ -23,7 +23,7 @@ fun ArrayList<QuantBase>.filterToArrayList(predicate: (QuantBase) -> Boolean): A
 
 fun Calendar.lessHourAndMinute(calendar: Calendar): Boolean {
     if ((this[Calendar.HOUR_OF_DAY] < calendar[Calendar.HOUR_OF_DAY]) ||
-        (this[Calendar.HOUR_OF_DAY] == calendar[Calendar.HOUR_OF_DAY] && this[Calendar.MINUTE] <= calendar[Calendar.MINUTE])
+        (this[Calendar.HOUR_OF_DAY] == calendar[Calendar.HOUR_OF_DAY] && this.timeInMillis < calendar.timeInMillis)
     ) {
         return true
     }
@@ -32,7 +32,7 @@ fun Calendar.lessHourAndMinute(calendar: Calendar): Boolean {
 
 fun Calendar.moreHourAndMinute(calendar: Calendar): Boolean {
     if ((this[Calendar.HOUR_OF_DAY] > calendar[Calendar.HOUR_OF_DAY]) ||
-        (this[Calendar.HOUR_OF_DAY] == calendar[Calendar.HOUR_OF_DAY] && this[Calendar.MINUTE] >= calendar[Calendar.MINUTE])
+        (this[Calendar.HOUR_OF_DAY] == calendar[Calendar.HOUR_OF_DAY] && this.timeInMillis > calendar.timeInMillis)
     ) {
         return true
     }
@@ -78,7 +78,7 @@ fun Calendar.getStartDateCalendar(timeInterval: TimeInterval, startDayTime: Long
     return calendar
 }
 
-//Возвращает оконачние временного интервала timeInterval,
+//Возвращает окончание временного интервала timeInterval,
 //учитывая, что сутки начинаются в startDayTime миллисекунд, а не в полночь
 fun Calendar.getEndDateCalendar(timeInterval: TimeInterval, startDayTime: Long): Calendar {
     val calendar: Calendar = this.clone() as Calendar
@@ -101,7 +101,6 @@ fun Calendar.getEndDateCalendar(timeInterval: TimeInterval, startDayTime: Long):
                 (calendar[Calendar.DAY_OF_WEEK] == 2 && calendar.moreHourAndMinute(startDayTime.toCalendarOnlyHourAndMinute())) ||
                 calendar[Calendar.DAY_OF_WEEK] == 1
             ) {
-                //calendar[Calendar.WEEK_OF_YEAR]++
                 calendar.timeInMillis += 7 * 24 * 60 * 60 * 1000
             }
             calendar[Calendar.DAY_OF_WEEK] = 2

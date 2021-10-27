@@ -84,11 +84,6 @@ class EventsStorageInteractor(private val dbInteractor: DBInteractor) {
 
             val year = calendar[Calendar.YEAR]
 
-            if (event.date in 1609400000000..1609460000000) {
-                QLog.d("skyfolk-graph",
-                        "found event ${event.note}, date = ${event.date}, year = ${year}")
-            }
-
             if (!result.contains(year.toString())) {
                 result.add(year.toString())
             }

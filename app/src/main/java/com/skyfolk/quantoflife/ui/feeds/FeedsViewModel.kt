@@ -80,10 +80,6 @@ class FeedsViewModel(
                     eventsStorageInteractor.getAllEvents()
                         .filter { it.date in startDate until endDate }
                         .filter {
-//                            quantsStorageInteractor.getQuantById(it.quantId)?.name?.contains(
-//                                searchText,
-//                                ignoreCase = true
-//                            ) == true ||
                                     it.note.contains(searchText, ignoreCase = true)
                         })
 

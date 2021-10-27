@@ -12,22 +12,8 @@ class IntervalAxisValueFormatter(
     private val settingsInteractor: SettingsInteractor
 ) : ValueFormatter() {
     override fun getFormattedValue(value: Float): String {
-//        val day: Long = 24 * 60 * 60 * 1000
-//        val week: Long = day * 7
-//        //TODO
-//        val month: Long = day * 31
-        val period = timeInterval.toDuration()
-//        when (timeInterval) {
-//            is TimeInterval.Week -> week
-//            is TimeInterval.Month -> month
-//            is TimeInterval.Today -> day
-//            else -> week
-//        }
 
-        val startFirstPeriodTimeInMillis =
-            (firstDate+period).toCalendar().getStartDateCalendar(timeInterval, settingsInteractor.startDayTime).timeInMillis
-
-        val time: Long = startFirstPeriodTimeInMillis + period * value.toInt()
+        val time: Long = timeInterval.getPeriod(firstDate, value.toInt(), settingsInteractor.startDayTime).start
 
         return when (timeInterval) {
             TimeInterval.Month -> time.toMonthAndYear()
