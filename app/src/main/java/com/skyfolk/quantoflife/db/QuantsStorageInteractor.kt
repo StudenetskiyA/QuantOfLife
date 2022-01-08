@@ -2,12 +2,11 @@ package com.skyfolk.quantoflife.db
 
 import com.skyfolk.quantoflife.entity.*
 import io.realm.Realm
-import kotlin.collections.ArrayList
 
 class QuantsStorageInteractor(private val dbInteractor: DBInteractor) : IQuantsStorageInteractor {
     override fun addQuantToDB(quant: QuantBase, onComplete: () -> Unit) {
         dbInteractor.getDB().executeTransactionAsync( {
-            val existQuant = existEventOrNull(it, quant)
+            val existQuant = existQuantOrNull(it, quant)
             var usageCount = 0
             if (existQuant != null) {
                 usageCount = existQuant.usageCount
@@ -83,7 +82,7 @@ class QuantsStorageInteractor(private val dbInteractor: DBInteractor) : IQuantsS
         }
     }
 
-    private fun existEventOrNull(realm: Realm, quant: QuantBase): QuantDbEntity? {
+    private fun existQuantOrNull(realm: Realm, quant: QuantBase): QuantDbEntity? {
         return realm.where(QuantDbEntity::class.java)
             .equalTo("id", quant.id)
             .findFirst()

@@ -174,48 +174,54 @@ class StatisticViewModel(
                 startDayTime
             ).timeInMillis
 
-           // QLog.d("skyfolk-graph","period = ${currentPeriodStart.toDate()} to ${currentPeriodEnd.toDate()}")
-
             val filteredEvents =
                 allFilteredEvents.filter { it.date in currentPeriodStart until currentPeriodEnd }
 
             val allEventsInPeriod =
                 allEvents.filter { it.date in currentPeriodStart until currentPeriodEnd }
 
-            when (filteredEvents.isEmpty()) {
+            when (allEventsInPeriod.isEmpty()) {
                 true -> {
-                    when (lastPeriodWithout) {
-                        true -> {
-                            maximumWithout++
-                        }
-                        false -> {
-                            maximumWithout = 1
-                            maximumWithoutStartTime = currentPeriodStart
-                        }
-                    }
-                    if (maximumWithout > totalMaximumWithout) {
-                        totalMaximumWithoutStartTime = maximumWithoutStartTime
-                    }
-                    totalMaximumWithout = max(maximumWithout, totalMaximumWithout)
                     lastPeriodWith = false
-                    lastPeriodWithout = true
+                    lastPeriodWithout = false
                 }
                 false -> {
-                    when (lastPeriodWith) {
+                    when (filteredEvents.isEmpty()) {
                         true -> {
-                            maximumWith++
+                            when (lastPeriodWithout) {
+                                true -> {
+                                    maximumWithout++
+                                }
+                                false -> {
+                                    maximumWithout = 1
+                                    maximumWithoutStartTime = currentPeriodStart
+                                }
+                            }
+                            if (maximumWithout > totalMaximumWithout) {
+                                totalMaximumWithoutStartTime = maximumWithoutStartTime
+                            }
+                            totalMaximumWithout = max(maximumWithout, totalMaximumWithout)
+                            lastPeriodWith = false
+                            lastPeriodWithout = true
                         }
                         false -> {
-                            maximumWith = 1
-                            maximumWithStartTime = currentPeriodStart
+                            when (lastPeriodWith) {
+                                true -> {
+                                    maximumWith++
+                                }
+                                false -> {
+                                    maximumWith = 1
+                                    maximumWithStartTime = currentPeriodStart
+                                }
+                            }
+                            if (maximumWith > totalMaximumWith) {
+                                totalMaximumWithStartTime = maximumWithStartTime
+                            }
+                            totalMaximumWith = max(maximumWith, totalMaximumWith)
+                            lastPeriodWithout = false
+                            lastPeriodWith = true
                         }
                     }
-                    if (maximumWith > totalMaximumWith) {
-                        totalMaximumWithStartTime = maximumWithStartTime
-                    }
-                    totalMaximumWith = max(maximumWith, totalMaximumWith)
-                    lastPeriodWithout = false
-                    lastPeriodWith = true
                 }
             }
 
