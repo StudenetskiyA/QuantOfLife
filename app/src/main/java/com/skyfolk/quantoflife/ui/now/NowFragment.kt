@@ -20,7 +20,6 @@ import com.skyfolk.quantoflife.entity.*
 import com.skyfolk.quantoflife.settings.SettingsInteractor
 import com.skyfolk.quantoflife.ui.goals.GoalsListDataAdapter
 import com.skyfolk.quantoflife.ui.now.CreateEventDialogFragment.DialogListener
-import com.skyfolk.quantoflife.utils.filterToArrayList
 import com.skyfolk.quantoflife.utils.setOnHideByTimeout
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -150,22 +149,22 @@ class NowFragment : Fragment() {
         lifecycleScope.launch {
             viewModel.listOfQuants.observe(viewLifecycleOwner) { quantsList ->
                 val adapterPhysical =
-                    QuantListDataAdapter(quantsList.filterToArrayList { it.primalCategory == QuantCategory.Physical },
+                    QuantListDataAdapter(quantsList.filter { it.primalCategory == QuantCategory.Physical },
                         { quant -> quantListClickListener(quant) },
                         { quant -> quantListLongClickListener(quant) })
 
                 val adapterEmotion =
-                    QuantListDataAdapter(quantsList.filterToArrayList { it.primalCategory == QuantCategory.Emotion },
+                    QuantListDataAdapter(quantsList.filter { it.primalCategory == QuantCategory.Emotion },
                         { quant -> quantListClickListener(quant) },
                         { quant -> quantListLongClickListener(quant) })
 
                 val adapterEvolution =
-                    QuantListDataAdapter(quantsList.filterToArrayList { it.primalCategory == QuantCategory.Evolution },
+                    QuantListDataAdapter(quantsList.filter { it.primalCategory == QuantCategory.Evolution },
                         { quant -> quantListClickListener(quant) },
                         { quant -> quantListLongClickListener(quant) })
 
                 val adapterOther =
-                    QuantListDataAdapter(quantsList.filterToArrayList { it.primalCategory == QuantCategory.Other },
+                    QuantListDataAdapter(quantsList.filter { it.primalCategory == QuantCategory.Other },
                         { quant -> quantListClickListener(quant) },
                         { quant -> quantListLongClickListener(quant) })
 

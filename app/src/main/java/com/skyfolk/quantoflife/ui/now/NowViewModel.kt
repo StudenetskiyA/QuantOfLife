@@ -41,10 +41,10 @@ class NowViewModel(
     private val _dialogState = SingleLiveEvent<DialogFragment>()
     val dialogState: LiveData<DialogFragment> get() = _dialogState
 
-    private val _listOfQuants = MutableLiveData<ArrayList<QuantBase>>().apply {
+    private val _listOfQuants = MutableLiveData<List<QuantBase>>().apply {
         value = quantsStorageInteractor.getAllQuantsList(false)
     }
-    val listOfQuants: LiveData<ArrayList<QuantBase>> = _listOfQuants
+    val listOfQuants: LiveData<List<QuantBase>> = _listOfQuants
 
     private val _todayTotal = MutableStateFlow(0.0)
     val todayTotal: StateFlow<Double> = _todayTotal.asStateFlow()

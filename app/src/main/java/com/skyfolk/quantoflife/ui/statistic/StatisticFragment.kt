@@ -64,8 +64,6 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
         binding.chart.legend.textColor = Color.rgb(255, 255, 255)
 
         viewModel.navigationEvent.observe(viewLifecycleOwner) { event ->
-            QLog.d("skyfolk-graph", "navigationEvent $event")
-
             openFeedsFragment(event)
         }
 
@@ -177,10 +175,6 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
                 binding.eventSpinner2.adapter = quantsSpinnerAdapter
 
                 binding.meansureSpinner.setSelection(it.measure.toPosition(), false)
-                QLog.d(
-                    "skyfolk-settings",
-                    "setSelection interval = ${it.timeInterval} to ${it.timeInterval.toGraphPosition()}"
-                )
                 binding.timePeriodSpinner.setSelection(it.timeInterval.toGraphPosition(), false)
                 binding.eventSpinner.setSelection(it.filter.toGraphPosition(listOfQuantName), false)
                 binding.eventSpinner2.setSelection(

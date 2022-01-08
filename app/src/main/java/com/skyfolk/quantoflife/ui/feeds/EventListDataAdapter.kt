@@ -15,8 +15,8 @@ import com.skyfolk.quantoflife.utils.toDate
 import kotlin.collections.ArrayList
 
 class EventListDataAdapter(
-    private val eventsList: ArrayList<EventDisplayable>,
-    private val quantCategoryNames: ArrayList<Pair<QuantCategory, String>>,
+    private val eventsList: List<EventDisplayable>,
+    private val quantCategoryNames: List<Pair<QuantCategory, String>>,
     private val clickListener: (String) -> Unit
 ) : RecyclerView.Adapter<EventListDataAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -35,7 +35,7 @@ class EventListDataAdapter(
 
     class ViewHolder(
         itemView: View,
-        private val quantCategoryName: ArrayList<Pair<QuantCategory, String>>
+        private val quantCategoryName: List<Pair<QuantCategory, String>>
     ) : RecyclerView.ViewHolder(itemView) {
 
         fun bindItems(event: EventDisplayable,

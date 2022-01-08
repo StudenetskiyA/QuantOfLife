@@ -112,9 +112,12 @@ fun fromPositionToTimeInterval(
             TimeInterval.Month
         }
         3 -> {
-            TimeInterval.All
+            TimeInterval.Year
         }
         4 -> {
+            TimeInterval.All
+        }
+        5 -> {
             TimeInterval.Selected(
                 startIntervalCalendar,
                 endIntervalCalendar

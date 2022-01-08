@@ -193,7 +193,7 @@ class FeedsViewModel(
 
     private fun getQuantIdByName(name: String?): String? {
         name?.let {
-            return quantsStorageInteractor.getQuantByName(it)?.id
+            return quantsStorageInteractor.getQuantIdByName(it)
         }
         return null
     }

@@ -31,32 +31,48 @@ class QuantsStorageInteractor(private val dbInteractor: DBInteractor) : IQuantsS
         }, null)
     }
 
-    override fun getAllQuantsList(includeDeleted: Boolean): ArrayList<QuantBase> {
-        val result = ArrayList<QuantBase>()
-        for (r in dbInteractor
+    override fun getAllQuantsList(includeDeleted: Boolean): List<QuantBase> {
+
+        return dbInteractor
             .getDB()
             .where(QuantDbEntity::class.java)
             .findAll()
-            .sortedWith(quantComparator)) {
-            if (!r.isDeleted || includeDeleted) result.add(r.toQuantBase())
-        }
-        return result
+            .sortedWith(quantComparator)
+            .filter {
+                !it.isDeleted || includeDeleted
+            }
+            .map {
+                it.toQuantBase()
+            }
     }
 
-    //TODO This is bad implementation
     override fun alreadyHaveQuant(quant: QuantBase): Boolean {
-        for (storedQuant in getAllQuantsList(true)) {
-            if (quant.isEqual(storedQuant)) return true
-        }
-        return false
+
+        return dbInteractor
+            .getDB()
+            .where(QuantDbEntity::class.java)
+            .equalTo("id", quant.id)
+            .findFirst() != null
     }
 
     override fun getQuantById(id: String): QuantBase? {
-        return getAllQuantsList(true).find { it.id == id }
+
+        return dbInteractor
+            .getDB()
+            .where(QuantDbEntity::class.java)
+            .equalTo("id", id)
+            .findFirst()
+            ?.toQuantBase()
     }
 
-    override fun getQuantByName(name: String): QuantBase? {
-        return getAllQuantsList(true).find { it.name == name }
+    override fun getQuantIdByName(name: String): String? {
+
+        return dbInteractor
+            .getDB()
+            .where(QuantDbEntity::class.java)
+            .equalTo("name", name)
+            .findFirst()
+            ?.id
     }
 
     override fun incrementQuantUsage(id: String) {

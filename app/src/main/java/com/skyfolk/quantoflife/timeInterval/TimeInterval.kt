@@ -1,8 +1,6 @@
 package com.skyfolk.quantoflife.timeInterval
 
-import android.util.Log
 import com.skyfolk.quantoflife.utils.getStartDateCalendar
-import com.skyfolk.quantoflife.utils.toDate
 import java.util.*
 
 sealed class TimeInterval {

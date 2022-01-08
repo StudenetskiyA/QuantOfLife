@@ -1,6 +1,5 @@
 package com.skyfolk.quantoflife.ui.statistic
 
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.github.mikephil.charting.data.BarEntry
 import com.skyfolk.quantoflife.GraphSelectedYear
 import com.skyfolk.quantoflife.IDateTimeRepository
-import com.skyfolk.quantoflife.QLog
 import com.skyfolk.quantoflife.db.EventsStorageInteractor
 import com.skyfolk.quantoflife.db.IQuantsStorageInteractor
 import com.skyfolk.quantoflife.entity.EventBase
@@ -109,8 +107,8 @@ class StatisticViewModel(
 
     private fun getEntries(
         selectedYear: GraphSelectedYear,
-        allEvents: ArrayList<EventBase>,
-        allQuants: ArrayList<QuantBase>,
+        allEvents: List<EventBase>,
+        allQuants: List<QuantBase>,
         quantFilter: QuantFilter?,
         startDayTime: Long,
         timeInterval: TimeInterval = TimeInterval.Week,
@@ -334,7 +332,7 @@ class StatisticViewModel(
     }
 
     private fun getQuantIdByName(name: String): String? {
-        return quantsStorageInteractor.getQuantByName(name)?.id
+        return quantsStorageInteractor.getQuantIdByName(name)
     }
 
     fun getFormatter(firstDate: Long, timeInterval: TimeInterval): IntervalAxisValueFormatter {

@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.skyfolk.quantoflife.R
 import com.skyfolk.quantoflife.entity.QuantBase
 
-class QuantListDataAdapter(private val quantsList: ArrayList<QuantBase>,
+class QuantListDataAdapter(private val quantsList: List<QuantBase>,
                            private val clickListener: (QuantBase) -> Unit,
                            private val longClickListener: (QuantBase) -> Boolean) : RecyclerView.Adapter<QuantListDataAdapter.ViewHolder>() {
 

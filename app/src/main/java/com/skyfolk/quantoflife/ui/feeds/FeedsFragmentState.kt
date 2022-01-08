@@ -8,18 +8,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
 sealed class FeedsFragmentState(
-    open val listOfQuants: ArrayList<QuantBase>,
+    open val listOfQuants: List<QuantBase>,
     open val selectedTimeInterval: TimeInterval,
     open val selectedEventFilter: String?,
     open val selectedTextFilter: String,
-    open val quantCategoryNames: ArrayList<Pair<QuantCategory, String>>
+    open val quantCategoryNames: List<Pair<QuantCategory, String>>
 ) {
     data class EventsListLoading(
-        override val listOfQuants: ArrayList<QuantBase>,
+        override val listOfQuants: List<QuantBase>,
         override val selectedTimeInterval: TimeInterval,
         override val selectedEventFilter: String?,
         override val selectedTextFilter: String,
-        override val quantCategoryNames: ArrayList<Pair<QuantCategory, String>>
+        override val quantCategoryNames: List<Pair<QuantCategory, String>>
     ) : FeedsFragmentState(
         listOfQuants,
         selectedTimeInterval,
@@ -43,12 +43,12 @@ sealed class FeedsFragmentState(
     }
 
     data class LoadingEventsListCompleted(
-        override val listOfQuants: ArrayList<QuantBase>,
+        override val listOfQuants: List<QuantBase>,
         override val selectedTimeInterval: TimeInterval,
         override val selectedEventFilter: String?,
         override val selectedTextFilter: String,
-        override val quantCategoryNames: ArrayList<Pair<QuantCategory, String>>,
-        val listOfEvents: ArrayList<EventDisplayable>,
+        override val quantCategoryNames: List<Pair<QuantCategory, String>>,
+        val listOfEvents: List<EventDisplayable>,
         val totalPhysicalFound: Double,
         val totalEmotionalFound: Double,
         val totalEvolutionFound: Double,

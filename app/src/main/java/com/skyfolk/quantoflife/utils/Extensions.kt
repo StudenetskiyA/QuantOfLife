@@ -17,7 +17,7 @@ fun Snackbar.setOnHideByTimeout(onTimeout: () -> Unit) {
     })
 }
 
-fun ArrayList<QuantBase>.filterToArrayList(predicate: (QuantBase) -> Boolean): ArrayList<QuantBase> {
+fun List<QuantBase>.filterToArrayList(predicate: (QuantBase) -> Boolean): ArrayList<QuantBase> {
     return ArrayList(this.filter(predicate))
 }
 
