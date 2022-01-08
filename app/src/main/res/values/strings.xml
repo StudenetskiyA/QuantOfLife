@@ -111,6 +111,7 @@
         <item>Сегодня</item>
         <item>Неделя</item>
         <item>Месяц</item>
+        <item>Год</item>
         <item>Все время</item>
         <item>Выбранный интервал</item>
     </string-array>

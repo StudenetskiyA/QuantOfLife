@@ -6,7 +6,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/dialog_event_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/bottom_menu_background">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/create_quant_top_bar"
