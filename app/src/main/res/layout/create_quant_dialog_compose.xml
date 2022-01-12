@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/dialog_event_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bottom_menu_background">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/create_quant_top_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@id/quant_name"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageButton
+                android:id="@+id/button_back"
+                android:focusable="true"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_back"
+                android:scaleType="fitCenter"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/button_delete"
+                android:focusable="true"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_delete"
+                android:scaleType="fitCenter"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/button_back"
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
+            <TextView
+                android:id="@+id/create_quant_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/create_quant_title"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/button_delete"
+                app:layout_constraintRight_toLeftOf="@id/button_ok"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <ImageButton
+                android:id="@+id/button_ok"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:focusable="true"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_ok"
+                android:scaleType="fitCenter"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <EditText
+            android:id="@+id/quant_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_for_name"
+            android:inputType="textCapSentences"
+            android:nextFocusDown="@id/bonus_for_physical_base"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            app:layout_constraintBottom_toTopOf="@id/spinner_quant_type_layout"
+            app:layout_constraintTop_toBottomOf="@+id/create_quant_top_bar"
+            tools:text="Название" />
+
+        <LinearLayout
+            android:id="@+id/spinner_quant_type_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@id/spinner_category_layout"
+            app:layout_constraintTop_toBottomOf="@+id/quant_name">
+
+            <Button
+                android:id="@+id/about_type_button"
+                android:background="@drawable/quant_default"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginStart="10dp"
+                android:visibility="gone"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/quant_type"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+
+            <Spinner
+                android:id="@+id/spinner_quant_type"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:theme="@style/AppTheme.Spinner"
+                android:entries="@array/quant_type_name"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/spinner_category_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@id/list_of_quants_icons"
+            app:layout_constraintTop_toBottomOf="@+id/spinner_quant_type_layout">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/main_category"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+
+            <Spinner
+                android:id="@+id/spinner_category"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:theme="@style/AppTheme.Spinner"
+                tools:entries="@array/category_name"/>
+
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list_of_quants_icons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/bonus_for_physical"
+            app:layout_constraintTop_toBottomOf="@+id/spinner_category_layout" />
+
+        <LinearLayout
+            android:id="@+id/bonus_for_physical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@id/bonus_for_emotion"
+            app:layout_constraintTop_toBottomOf="@+id/list_of_quants_icons">
+
+            <TextView
+                android:id="@+id/bonus_for_physical_name"
+                android:layout_width="@dimen/create_quant_bonus_note_width"
+                android:layout_height="wrap_content"
+                tools:text="Физические бонусы"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+
+            <EditText
+                android:id="@+id/bonus_for_physical_base"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_for_fact"
+                android:inputType="numberSigned|numberDecimal"
+                android:nextFocusDown="@id/bonus_for_physical_for_each"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+
+            <EditText
+                android:id="@+id/bonus_for_physical_for_each"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:hint="@string/hint_for_quant_value"
+                android:inputType="numberSigned|numberDecimal"
+                android:nextFocusDown="@id/bonus_for_emotion_base"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/bonus_for_emotion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@id/bonus_for_evolution"
+            app:layout_constraintTop_toBottomOf="@+id/bonus_for_physical">
+
+            <TextView
+                android:id="@+id/bonus_for_emotion_name"
+                android:layout_width="@dimen/create_quant_bonus_note_width"
+                android:layout_height="wrap_content"
+                tools:text="Эволюционные бонусы"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+
+            <EditText
+                android:id="@+id/bonus_for_emotion_base"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_for_fact"
+                android:inputType="numberSigned|numberDecimal"
+                android:nextFocusDown="@id/bonus_for_emotion_for_each"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+
+            <EditText
+                android:id="@+id/bonus_for_emotion_for_each"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:hint="@string/hint_for_quant_value"
+                android:inputType="numberSigned|numberDecimal"
+                android:nextFocusDown="@id/bonus_for_evolution_base"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/bonus_for_evolution"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@id/note_for_quant"
+            app:layout_constraintTop_toBottomOf="@+id/bonus_for_emotion">
+
+            <TextView
+                android:id="@+id/bonus_for_evolution_name"
+                android:layout_width="@dimen/create_quant_bonus_note_width"
+                android:layout_height="wrap_content"
+                tools:text="Эволюционные бонусы"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+
+            <EditText
+                android:id="@+id/bonus_for_evolution_base"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_for_fact"
+                android:inputType="numberSigned|numberDecimal"
+                android:nextFocusDown="@id/bonus_for_evolution_for_each"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+
+            <EditText
+                android:id="@+id/bonus_for_evolution_for_each"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:hint="@string/hint_for_quant_value"
+                android:inputType="numberSigned|numberDecimal"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/note_for_quant"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_for_quant"
+            android:inputType="textMultiLine|textCapSentences"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:maxLines="5"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bonus_for_evolution"
+            tools:text="Подсказка для выбора значения" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
