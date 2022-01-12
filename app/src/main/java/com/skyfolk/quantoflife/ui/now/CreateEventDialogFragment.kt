@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -107,6 +108,7 @@ class CreateEventDialogFragment(val quant: QuantBase, private val existEvent: Ev
                     return@setOnClickListener
                 }
             }
+            Log.d("skyfolk-head", "onCreateView: ${quant.id}")
             dialogListener?.onConfirm(
                 quant.toEvent(
                     existEvent?.id,

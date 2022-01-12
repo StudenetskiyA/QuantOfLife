@@ -70,7 +70,9 @@ class QuantsStorageInteractor(private val dbInteractor: DBInteractor) : IQuantsS
             .getDB()
             .where(QuantDbEntity::class.java)
             .equalTo("name", name)
-            .findFirst()
+            .findAll().firstOrNull {
+                !it.isDeleted
+            }
             ?.id
     }
 
